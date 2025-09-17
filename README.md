@@ -55,6 +55,7 @@ elmo-hikes/
 ---
 
 ## Contributors
+- **Tyson** - BCIT CST Student, very cool and can solve a rubix cube in around 1 minute.
 
 - **Maria** - BCIT CST Student. BCIT CST Student with a passion for animals and code. Fun fact: Loves sleeping 8 hours.
 
