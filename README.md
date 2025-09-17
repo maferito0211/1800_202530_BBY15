@@ -60,6 +60,8 @@ elmo-hikes/
 
 - **Thor Baker** - BCIT CST Student with a passion for outdoor adventures and user-friendly applications. Fun fact: Loves solving Rubik's Cubes in under a minute.
 
+- **Tyson** - BCIT CST Student.
+
 - **BBY 15** - BCIT CST Student, we are enthusiast with a knack for creative design. Fun fact: I have never use git before.
 
 ## Acknowledgments
