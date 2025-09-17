@@ -57,9 +57,10 @@ elmo-hikes/
 ## Contributors
 
 - **Maria Maldonado** - BCIT CST Student with a passion for animals and code. Fun fact: Loves sleeping 8 hours.
-- **BBY 15** - BCIT CST Student, we are enthusiast with a knack for creative design. Fun fact: I have never use git before.
 
----
+- **Thor Baker** - BCIT CST Student with a passion for outdoor adventures and user-friendly applications. Fun fact: Loves solving Rubik's Cubes in under a minute.
+
+- **BBY 15** - BCIT CST Student, we are enthusiast with a knack for creative design. Fun fact: I have never use git before.
 
 ## Acknowledgments
 
