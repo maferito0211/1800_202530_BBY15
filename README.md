@@ -62,6 +62,8 @@ elmo-hikes/
 - **Tyson** - BCIT CST Student.
 - **Maria** - BCIT CST Student.
 -**Thor** - BCIT CST Student.
+- **Your Name** - BCIT CST Student with a passion for outdoor adventures and user-friendly applications. Fun fact: Loves solving Rubik's Cubes in under a minute.
+- Thor Baker - BCIT CST Student, Frontend enthusiast with a knack for creative design. Fun fact: Has a collection of over 50 houseplants.
 
 ---
 
