@@ -1,6 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap');
+
+body{
+  font-family: Zalando Sans;
+}
+
 h1 {
   text-align: center;
   margin-top: 50px;
+}
+
+#popupcontainer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+#popup {
+  margin-top: 500px;
+  width: 70%;
+  position: absolute;
+  border: solid;
+  border-color: #b1b1b1;
+  text-align: center;
+  padding: 0 5% 20px;
+  border-radius: 15%;
 }
 
 footer {
