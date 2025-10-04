@@ -1,1 +1,38 @@
+h1 {
+  text-align: center;
+  margin-top: 50px;
+}
 
+footer {
+  display: grid;
+  grid-template-columns: 33% 34% 33%;
+  text-align: center;
+  padding-top: 10px;
+  background-color: #333;
+  color: rgb(179, 179, 179);
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+#map img {
+  height: 60px;
+  border-radius: 50%;
+}
+
+#forum img {
+  height: 60px;
+  border-radius: 50%;
+}
+
+#profile img {
+  height: 60px;
+  border-radius: 50%;
+}
+
+.search-bar {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
