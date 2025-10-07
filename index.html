@@ -9,29 +9,35 @@
     <script src="./src/main.js"></script>
   </head>
 
-
   <body>
-    <div class="search-bar">
-        <label for="search">Search:</label>
-        <input type="text" id="search" name="search" />
+    <div class="search-container">
+      <input type="text" placeholder="Search..." class="search-input" />
+      <button class="search-button">🔍</button>
     </div>
+
     <div id="popupcontainer">
       <div id="popup">
         <h1>Welcome!</h1>
-        <p>Here, you can browse the local map and discuss anonymously in our forums!</p>
+        <p>
+          Here, you can browse the local map and discuss anonymously in our
+          forums!
+        </p>
         <button onclick="disappear()">Continue to Map</button>
       </div>
     </div>
-    
+
     <footer>
       <a id="map" href="#map">
-        <img src="./images/maps.gif" alt="Map Icon"/>
+        <img src="./images/maps.gif" alt="Map Icon" />
       </a>
-      <a id="forum" href="https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311&hyl_auth_required=true&hyl_presentation_style=fullscreen&utm_campaign=checkin&utm_id=6&utm_medium=notice&utm_source=ingame">
-        <img src="./images/forum.gif" alt="Forum Icon"/>
+      <a
+        id="forum"
+        href="https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311&hyl_auth_required=true&hyl_presentation_style=fullscreen&utm_campaign=checkin&utm_id=6&utm_medium=notice&utm_source=ingame"
+      >
+        <img src="./images/forum.gif" alt="Forum Icon" />
       </a>
       <a id="profile" href="#profile">
-        <img src="./images/profile.gif" alt="Profile Icon"/>
+        <img src="./images/profile.gif" alt="Profile Icon" />
       </a>
       <!-- <a href="https://www.flaticon.com/free-animated-icons/phone" title="phone animated icons">Phone animated icons created by Freepik - Flaticon</a> -->
     </footer>
