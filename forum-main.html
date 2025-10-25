@@ -1,12 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <title>Landing Page</title>
     <meta name="comp1800 template" content="My 1800 App" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="./styles/style.css" />
-    <script src="./src/main.js"></script>
+    <link rel="stylesheet" href="./styles/forum-style.css" />
   </head>
 
   <body>
@@ -15,16 +14,8 @@
       <button class="search-button">🔍</button>
     </div>
 
-    <div id="popupcontainer">
-      <div id="popup">
-        <h1>Welcome!</h1>
-        <p>
-          Here, you can browse the local map and discuss anonymously in our
-          forums!
-        </p>
-        <button onclick="disappear()">Continue to Map</button>
-      </div>
-    </div>
+    <ul>
+    </ul>
 
     <footer>
       <a id="map" href="#map">
@@ -32,8 +23,7 @@
       </a>
       <a
         id="forum"
-        href="./forum-main.html"
-      >
+         href="./forum-main.html">
         <img src="./images/forum.gif" alt="Forum Icon" />
       </a>
       <a id="profile" href="#profile">
@@ -41,5 +31,23 @@
       </a>
       <!-- <a href="https://www.flaticon.com/free-animated-icons/phone" title="phone animated icons">Phone animated icons created by Freepik - Flaticon</a> -->
     </footer>
+
+    <script src="./src/data.js"></script>
+    <script>
+      var container = document.querySelector("ul");
+      for (let thread of threads) {
+        var html =
+          `<li>
+            <a href="./forumpost.html?id=${thread.id}">
+              <h4 class="title"> ${thread.title} </h4>
+              <div class="subtitle">
+                <p class="timestamp"> ${new Date(thread.date).toLocaleString()} </p>
+                <p class="commentcount"> ${thread.comments.length} comments </p>
+              </div>
+            </a>
+          </li>`;
+        container.insertAdjacentHTML("beforeend", html);
+      }
+    </script>
   </body>
 </html>
