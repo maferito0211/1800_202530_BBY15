@@ -55,6 +55,13 @@ h4 {
   display: block;
 }
 
+.reply {
+  padding: 0 0 20px 40px;
+  margin: 5px 0 0 15px;
+  border-left: solid;
+  border-color: #b1b1b1;
+}
+
 /* footer style */
 footer {
   display: grid;

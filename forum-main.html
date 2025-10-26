@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="./styles/forum-style.css" />
   </head>
 
-  <body>
+  <body onload="displayThreads()">
     <div class="search-container">
       <input type="text" placeholder="Search..." class="search-input" />
       <button class="search-button">🔍</button>
@@ -33,21 +33,5 @@
     </footer>
 
     <script src="./src/data.js"></script>
-    <script>
-      var container = document.querySelector("ul");
-      for (let thread of threads) {
-        var html =
-          `<li>
-            <a href="./forumpost.html?id=${thread.id}">
-              <h4 class="title"> ${thread.title} </h4>
-              <div class="subtitle">
-                <p class="timestamp"> ${new Date(thread.date).toLocaleString()} </p>
-                <p class="commentcount"> ${thread.comments.length} comments </p>
-              </div>
-            </a>
-          </li>`;
-        container.insertAdjacentHTML("beforeend", html);
-      }
-    </script>
   </body>
 </html>
