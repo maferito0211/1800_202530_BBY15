@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Login Page</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./styles/login-style.css" />
+  </head>
+  <body>
+    <!-- Alerts -->
+    <div id="authAlert" class="alert alert-danger d-none" role="alert"></div>
+
+    <!-- Login Form -->
+    <div id="loginView">
+      <h1>Login</h1>
+      <form id="loginForm" action="/submit-login" method="post">
+        <input
+          type="email"
+          id="loginEmail"
+          name="loginEmail"
+          required
+          placeholder="Email"
+        /><br />
+        <input
+          type="password"
+          id="loginPassword"
+          name="loginPassword"
+          required
+          placeholder="Password"
+        /><br />
+        <button type="submit">Login</button>
+        <br />
+        <a class="link" href="#" id="toSignup"
+          >Don't have an account? Register here.</a
+        >
+      </form>
+    </div>
+
+    <!-- Signup (hidden initially) -->
+    <div id="signupView" class="d-none">
+      <h1>Signup</h1>
+      <form id="signupForm" action="/submit-signup" method="post">
+        <input
+          type="text"
+          id="signupName"
+          name="signupName"
+          required
+          placeholder="Display Name"
+        /><br />
+        <input
+          type="email"
+          id="signupEmail"
+          name="signupEmail"
+          required
+          placeholder="Email"
+        /><br />
+        <input
+          type="password"
+          id="signupPassword"
+          name="signupPassword"
+          required
+          placeholder="Password"
+        /><br />
+        <button type="submit">Create Account</button>
+        <br />
+        <a class="link" href="#" id="toLogin">Have an account? Login here.</a>
+      </form>
+    </div>
+
+    <!-- Footer / Navigation Bar-->
+    <footer>
+      <a id="map" href="#map">
+        <img src="./images/maps.gif" alt="Map Icon" />
+      </a>
+      <a id="forum" href="./forum-main.html">
+        <img src="./images/forum.gif" alt="Forum Icon" />
+      </a>
+      <a id="profile" href="./loginPage.html">
+        <img src="./images/profile.gif" alt="Profile Icon" />
+      </a>
+    </footer>
+
+    <!-- Firebase and authentication related scripts -->
+    <!-- The order of loading matters -->
+    <script type="module" src="/src/firebaseConfig.js"></script>
+    <script type="module" src="/src/authentication.js"></script>
+    <script type="module" src="/src/loginSignup.js"></script>
+    <script type="module" src="/src/navBar.js"></script>
+  </body>
+</html>
