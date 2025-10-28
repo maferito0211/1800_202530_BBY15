@@ -55,13 +55,12 @@ elmo-hikes/
 ---
 
 ## Contributors
+
 - **Tyson** - BCIT CST Student, very cool and can solve a rubix cube in around 1 minute.
 
 - **Maria** - BCIT CST Student. BCIT CST Student with a passion for animals and code. Fun fact: Loves sleeping 8 hours.
 
 - **Thor** - BCIT CST Student. BCIT CST Student hoping to learn how to programming for future endeavors. Love the synthesizer.
-
-- **Tyson** - BCIT CST Student. BCIT CST Student wants to learn new things.
 
 - **BBY 15** - Gruop that loves learning new things and want good grades on this Lab.
 

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <title>Landing Page</title>
@@ -13,40 +13,34 @@
       <input type="text" placeholder="Search..." class="search-input" />
       <button class="search-button">🔍</button>
     </div>
-    <div class="header">
-    </div>
+    <div class="header"></div>
     <div class="commentinput">
       <textarea placeholder="Leave a comment"></textarea>
       <button onclick="postComment()">Post</button>
     </div>
-    <div class="comments">
-    </div>
-    
-
+    <div class="comments"></div>
 
     <footer>
       <a id="map" href="#map">
         <img src="./images/maps.gif" alt="Map Icon" />
       </a>
-      <a
-        id="forum"
-        href="./forum-main.html">
+      <a id="forum" href="./forum-main.html">
         <img src="./images/forum.gif" alt="Forum Icon" />
       </a>
-      <a id="profile" href="#profile">
+      <a id="profile" href="./loginPage.html">
         <img src="./images/profile.gif" alt="Profile Icon" />
       </a>
       <!-- <a href="https://www.flaticon.com/free-animated-icons/phone" title="phone animated icons">Phone animated icons created by Freepik - Flaticon</a> -->
     </footer>
     <script src="src/data.js"></script>
+    <script type="module" src="/src/navBar.js"></script>
     <script>
-          var id = window.location.search.slice(4);
-      var thread = threads.find(t => t.id == id);
+      var id = window.location.search.slice(4);
+      var thread = threads.find((t) => t.id == id);
 
-var comments = document.querySelector(".comments");
-for (let comment of thread.comments) {
-}
-
+      var comments = document.querySelector(".comments");
+      for (let comment of thread.comments) {
+      }
     </script>
   </body>
 </html>
