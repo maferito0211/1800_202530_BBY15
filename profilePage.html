@@ -1,19 +1,34 @@
 <!DOCTYPE html>
-<head lang ="en"></head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
-  <title>Profile</title>
-  <link rel="stylesheet" href="./styles/style.css">
-</head>
-<body>
-    <main>
-        <h1>Place Holder Profile Page</h1>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
+    <title>Profile</title>
+    <link rel="stylesheet" href="./styles/style.css" />
+    <link rel="stylesheet" href="./styles/profile-page.css" />
+  </head>
+
+  <body>
+    <div id="name-container">
+      <div id="banner-img">
+        <img
+          id="profile-picture"
+          src="./images/defaultProfilePicture.png"
+          alt="Profile Picture"
+        />
+      </div>
+      <div id="name-bar">
         <h2 id="displayName">Loading...</h2>
-        <p>Tyson was here</p>
-        <button id="logoutBtn">Logout</button>
+      </div>
+    </div>
+    <main>
+      <p>Tyson was here</p>
+      <button id="logoutBtn">Logout</button>
     </main>
-        <footer>
+
+    <!-- Footer -->
+    <footer>
       <a id="map" href="#map">
         <img src="./images/maps.gif" alt="Map Icon" />
       </a>
@@ -23,9 +38,9 @@
       <a id="profile" href="./loginPage.html">
         <img src="./images/profile.gif" alt="Profile Icon" />
       </a>
-      <!-- <a href="https://www.flaticon.com/free-animated-icons/phone" title="phone animated icons">Phone animated icons created by Freepik - Flaticon</a> -->
-        </footer>
-        <script type="module" src="/src/navBar.js"></script>
-        <script type="module" src="/src/profile.js"></script>
-    </body>
+    </footer>
+    <!-- JavaScript Files -->
+    <script type="module" src="/src/navBar.js"></script>
+    <script type="module" src="/src/profile.js"></script>
+  </body>
 </html>

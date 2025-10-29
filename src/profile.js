@@ -7,14 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // optimistic render from cache (instant)
   const cached = localStorage.getItem("displayName");
-  if (nameEl && cached) nameEl.textContent = `Hello, ${cached}`;
+  if (nameEl && cached) nameEl.textContent = cached;
 
   // try immediate value if SDK already restored it
   const immediate = auth.currentUser;
   if (immediate && nameEl) {
     const raw = immediate.displayName || immediate.email || "Profile";
     const short = raw.includes("@") ? raw.split("@")[0] : raw;
-    nameEl.textContent = `Hello, ${short}`;
+    nameEl.textContent = short;
   }
 
   // update once Firebase finishes initialization
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (nameEl) {
       const raw = user.displayName || user.email || "Profile";
       const shortName = raw.includes("@") ? raw.split("@")[0] : raw;
-      nameEl.textContent = `Hello, ${shortName}`;
+      nameEl.textContent = shortName;
       // update cache for next page load
       localStorage.setItem("displayName", shortName);
     }
