@@ -84,20 +84,41 @@ function addThread() {
 }
 
 //Takes User details and adds them to comment, then calls addComment(comment)
-function postComment() {
+async function postComment() {
   var txt = document.querySelector("textarea");
 
   // determine author from Firebase auth if available
   var author = "anonymous";
+
   try {
     if (window.firebaseAuth && window.firebaseAuth.currentUser) {
       const user = window.firebaseAuth.currentUser;
-      author =
-        user.displayName ||
-        (user.email ? user.email.split("@")[0] : "anonymous");
+
+      // If Firestore helper functions are available, try to load the user doc
+      if (
+        typeof window.firebaseDb === "object" &&
+        typeof window.firebaseDb.getDoc === "function" &&
+        typeof doc === "function" &&
+        typeof db !== "undefined"
+      ) {
+        const userDoc = await window.firebaseDb.getDoc(
+          doc(db, "users", user.uid)
+        );
+        if (userDoc && userDoc.exists()) {
+          const data = userDoc.data();
+          author = data.name || "anonymous";
+        } else {
+          author = "anonymous";
+        }
+      } else {
+        // Fallback to auth profile info if present
+        author =
+          user.displayName ||
+          (user.email && user.email.split("@")[0]) ||
+          "anonymous";
+      }
     }
   } catch (e) {
-    // fallback to anonymous on any errors
     author = "anonymous";
   }
 

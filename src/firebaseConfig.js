@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -23,6 +24,8 @@ const app = initializeApp(firebaseConfig);
 // import("firebase/analytics").then(m => m.getAnalytics(app));
 
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 
-// Make auth available globally for non-module scripts (e.g. src/data.js)
+window.firebaseApp = app;
 window.firebaseAuth = auth;
+window.firebaseDb = db;
