@@ -8,6 +8,8 @@
 
 // Import the initialized Firebase Authentication object
 import { auth } from "/src/firebaseConfig.js";
+import { db } from "/src/firebaseConfig.js";
+import { doc, setDoc, updateDoc, increment } from "firebase/firestore";
 
 // Import specific functions from the Firebase Auth SDK
 import {
@@ -51,9 +53,26 @@ export async function loginUser(email, password) {
 //   const user = await signupUser("Alice", "alice@email.com", "secret");
 // -------------------------------------------------------------
 export async function signupUser(name, email, password) {
-  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  await updateProfile(userCredential.user, { displayName: name });
-  return userCredential.user;
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+  const user = userCredential.user; // Get the user object
+  await updateProfile(user, { displayName: name });
+
+  try {
+    // create user doc with an integer field (score) initialized to 0
+    await setDoc(doc(db, "users", user.uid), {
+      name: name,
+      comment_count: 0, // integer stored in Firestore
+    });
+    console.log("Firestore user document created");
+  } catch (error) {
+    console.error("Error creating Firestore user document:", error);
+  }
+
+  return user;
 }
 
 // -------------------------------------------------------------
@@ -131,3 +150,17 @@ export function authErrorMessage(error) {
   return map[code] || "Something went wrong. Please try again.";
 }
 
+// Set (or overwrite) an integer field for a user (uses merge to avoid clobbering)
+export async function setUserInt(uid, key, value) {
+  // value should be a Number (integer)
+  await setDoc(
+    doc(db, "users", uid),
+    { [key]: Number(value) },
+    { merge: true }
+  );
+}
+
+// Increment an integer field atomically (creates field if missing)
+export async function incrementUserInt(uid, key, delta = 1) {
+  await updateDoc(doc(db, "users", uid), { [key]: increment(delta) });
+}

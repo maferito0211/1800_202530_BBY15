@@ -1,34 +1,26 @@
-import { auth } from "./firebaseConfig.js";
-import { onAuthStateChanged } from "firebase/auth";
-import { signOut } from "firebase/auth";
+import { auth, db } from "./firebaseConfig.js";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const nameEl = document.getElementById("displayName");
-
-  // optimistic render from cache (instant)
-  const cached = localStorage.getItem("displayName");
-  if (nameEl && cached) nameEl.textContent = cached;
-
-  // try immediate value if SDK already restored it
-  const immediate = auth.currentUser;
-  if (immediate && nameEl) {
-    const raw = immediate.displayName || immediate.email || "Profile";
-    const short = raw.includes("@") ? raw.split("@")[0] : raw;
-    nameEl.textContent = short;
-  }
+  const nameElement = document.getElementById("displayName");
 
   // update once Firebase finishes initialization
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, async (user) => {
     if (!user) {
+      // If no user is signed in → redirect back to login page.
       location.href = "./loginPage.html";
       return;
     }
-    if (nameEl) {
-      const raw = user.displayName || user.email || "Profile";
-      const shortName = raw.includes("@") ? raw.split("@")[0] : raw;
-      nameEl.textContent = shortName;
-      // update cache for next page load
-      localStorage.setItem("displayName", shortName);
+
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    const name = userDoc.exists()
+      ? userDoc.data().name
+      : user.displayName || user.email;
+
+    // Update the welcome message with their name/email.
+    if (nameElement) {
+      nameElement.textContent = `Hello, ${name}!`;
     }
   });
 
