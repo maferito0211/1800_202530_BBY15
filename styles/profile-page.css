@@ -1,0 +1,52 @@
+/* reset default page spacing that causes a white gap */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#name-container {
+  display: grid;
+  grid-template-rows: auto auto;
+}
+
+#banner-img {
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  width: 100vw;
+  max-width: 100%;
+  height: 30vh;
+  margin: 0;
+  padding: 0;
+  border: none;
+  object-fit: cover;
+  background-color: #4f92ff;
+}
+
+#profile-picture {
+  height: 25vh;
+  width: auto;
+  border-radius: 50%;
+  margin-right: 5vw;
+}
+
+#name-bar {
+  width: 100vw;
+  height: 60px;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  background-color: #b4b4b4;
+  align-items: center;
+  justify-content: left;
+}
+
+#displayName {
+  display: block;
+  text-align: center;
+  margin: 0;
+  color: white;
+  margin-left: 2vw;
+}
