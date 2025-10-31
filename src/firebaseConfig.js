@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -29,3 +30,17 @@ export const db = getFirestore(app);
 window.firebaseApp = app;
 window.firebaseAuth = auth;
 window.firebaseDb = db;
+
+// run the callback once after the initial auth state is known
+export function onAuthReady(authInstance, callback) {
+  const unsubscribe = onAuthStateChanged(authInstance, (user) => {
+    try {
+      callback(user);
+    } finally {
+      unsubscribe(); // only run once
+    }
+  });
+}
+
+// also expose globally for backwards compatibility
+window.onAuthReady = onAuthReady;
