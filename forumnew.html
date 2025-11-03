@@ -5,8 +5,7 @@
     <meta name="comp1800 template" content="My 1800 App" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="./styles/style.css" />
-    <script src="./src/main.js"></script>
+    <link rel="stylesheet" href="./styles/forum-style.css" />
   </head>
 
   <body>
@@ -14,32 +13,32 @@
       <input type="text" placeholder="Search..." class="search-input" />
       <button class="search-button">🔍</button>
     </div>
-
-    <div id="popupcontainer">
-      <div id="popup">
-        <h1>Welcome!</h1>
-        <p>
-          Here, you can browse the local map and discuss anonymously in our
-          forums!
-        </p>
-        <button onclick="disappear()">Continue to Map</button>
-      </div>
-    </div>
+      
+    <h1>New Post</h1>
+    <form>
+        <h3>Forum Title</h3>
+      <textarea id="threadtitle" placeholder="Title" ></textarea>
+        <h3>Forum Content</h3>
+        <textarea id="content" placeholder="Why is parking at BCIT so expensive?"></textarea>
+        <br/>
+        <input type="button" id="post" value="POST">
+    </form>
 
     <footer>
       <a id="map" href="#map">
         <img src="./images/maps.gif" alt="Map Icon" />
       </a>
-      <a id="forum" href="./forum-main.html">
+      <a
+        id="forum"
+        href="./forum-main.html"
+      >
         <img src="./images/forum.gif" alt="Forum Icon" />
       </a>
-      <a id="profile" href="./loginPage.html">
+      <a id="profile" href="#profile">
         <img src="./images/profile.gif" alt="Profile Icon" />
       </a>
       <!-- <a href="https://www.flaticon.com/free-animated-icons/phone" title="phone animated icons">Phone animated icons created by Freepik - Flaticon</a> -->
     </footer>
-    <!-- Script Imports-->
-    <script type="module" src="./src/navBar.js"></script>
-    <script type="module" src="./src/data.js"></script>
+      <script type="module" src="./src/forumnew.js"></script>
   </body>
 </html>

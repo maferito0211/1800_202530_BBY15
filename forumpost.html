@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="./styles/forum-style.css" />
   </head>
 
-  <body onload="addThread()">
+  <body>
     <div class="search-container">
       <input type="text" placeholder="Search..." class="search-input" />
       <button class="search-button">🔍</button>
@@ -32,15 +32,12 @@
       </a>
       <!-- <a href="https://www.flaticon.com/free-animated-icons/phone" title="phone animated icons">Phone animated icons created by Freepik - Flaticon</a> -->
     </footer>
-    <script src="src/data.js"></script>
+    <script type="module" src="src/forumpost.js"></script>
     <script type="module" src="/src/navBar.js"></script>
     <script>
-      var id = window.location.search.slice(4);
-      var thread = threads.find((t) => t.id == id);
 
       var comments = document.querySelector(".comments");
-      for (let comment of thread.comments) {
-      }
+
     </script>
   </body>
 </html>

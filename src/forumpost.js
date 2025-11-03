@@ -1,87 +1,31 @@
-//Data structure for threads, comments and replys
-var threads = [
-  {
-    id: 1,
-    title: "Thread 1",
-    author: "User1",
-    date: Date.now(),
-    content: "Thread content",
-    comments: [
-      {
-        author: "User2",
-        date: Date.now(),
-        content: "Comment text",
-        replys: [
-          {
-            author: "User3",
-            date: Date.now(),
-            content: "reply content",
-          },
-        ],
-      },
-      {
-        author: "User2",
-        date: Date.now(),
-        content: "More comments",
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Thread 2",
-    author: "User1",
-    date: Date.now(),
-    content: "Thread content",
-    comments: [
-      {
-        author: "User2",
-        date: Date.now(),
-        content: "Comment text",
-      },
-      {
-        author: "User2",
-        date: Date.now(),
-        content: "More comments",
-      },
-    ],
-  },
-];
+import { onAuthReady } from "./authentication.js";
+import { db, auth } from "./firebaseConfig.js";
+import { doc, onSnapshot } from "firebase/firestore";
+import { collection, getDoc, getDocs, addDoc, serverTimestamp, getCountFromServer, query, where } from "firebase/firestore";
 
-//Displays posted threads for forum-main.html
-function displayThreads() {
-  var thread;
-  var container = document.querySelector("ul");
-  for (let thread of threads) {
-    var html = `<li>
-            <a href="./forumpost.html?id=${thread.id}">
-              <h4 class="title"> ${thread.title} </h4>
-              <div class="subtitle">
-                <p class="timestamp"> ${new Date(
-                  thread.date
-                ).toLocaleString()} </p>
-                <p class="commentcount"> ${thread.comments.length} comments </p>
-              </div>
-            </a>
-          </li>`;
-    container.insertAdjacentHTML("beforeend", html);
-  }
-}
-
-//forumpost functions
 
 //Inserts the main post details on page load
-function addThread() {
-  var header = document.querySelector(".header");
+const querySnapshot = await getDocs(collection(db, "threads"));
+const getCount = await getCountFromServer(collection(db, "threads"));
+
+var id = window.location.search.slice(4);
+  const currentThread = query(collection(db, "threads"), where("id", "==", Number(id)));
+  const threadSnap = await getDocs(currentThread);
+  threadSnap.forEach((doc) => {
+      var header = document.querySelector(".header");
   var headerHtml = `
-      <h2 class="title"> ${thread.title}</h2>
-      <p> ${thread.content} </p>
+      <h2 class="title"> ${doc.data().title}</h2>
+      <p> ${doc.data().content} </p>
       <div class="subtitle">
-        <p class="timestamp"> ${new Date(thread.date).toLocaleString()}</p>
-        <p class="commentcount"> ${thread.comments.length} comments</p>
+        <p class="timestamp"> ${new Date(doc.data().date).toLocaleString()}</p>
+        <p class="commentcount"> ${doc.data().comment_count} comments</p>
       </div>
       `;
   header.insertAdjacentHTML("beforeend", headerHtml);
-}
+  });   
+
+
+
 
 //Takes User details and adds them to comment, then calls addComment(comment)
 async function postComment() {
@@ -181,3 +125,5 @@ function addReply(reply) {
   for (let reply of comment.replys) {
   }
 }
+
+

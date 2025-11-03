@@ -34,6 +34,18 @@ h4 {
   color: #6e6e6e;
 }
 
+/*forum-main styles*/
+#newpost {
+  padding: 15px;
+  border-radius: 13px;
+  border: solid;
+  position: fixed;
+  bottom: 115px;
+  right: 5%;
+  background-color: white;
+  
+}
+
 /* forumpost styles */
 .comment-top {
   display: flex;
@@ -47,7 +59,7 @@ h4 {
   margin-left: 1%;
 }
 
-.commentinput textarea {
+textarea {
   width: 75%;
 }
 
@@ -60,6 +72,11 @@ h4 {
   margin: 5px 0 0 15px;
   border-left: solid;
   border-color: #b1b1b1;
+}
+
+/*forumnew styles */
+#content {
+  height: 9em;
 }
 
 /* footer style */
