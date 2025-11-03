@@ -11,6 +11,11 @@
     "vite": "^7.1.12"
   },
   "dependencies": {
+<<<<<<< HEAD
     "firebase": "^12.5.0"
+=======
+    "firebase": "^12.5.0",
+    "mapbox-gl": "^3.16.0"
+>>>>>>> 52fd3378187e26df00408b2a17db16d837d394ef
   }
 }
