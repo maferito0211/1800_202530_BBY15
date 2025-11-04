@@ -40,17 +40,17 @@ footer {
   width: 100%;
 }
 
-#map img {
+#mapIcon img {
   height: 60px;
   border-radius: 50%;
 }
 
-#forum img {
+#forumIcon img {
   height: 60px;
   border-radius: 50%;
 }
 
-#profile img {
+#profileIcon img {
   height: 60px;
   border-radius: 50%;
 }
