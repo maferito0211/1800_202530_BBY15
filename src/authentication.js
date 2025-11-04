@@ -62,10 +62,9 @@ export async function signupUser(name, email, password) {
   await updateProfile(user, { displayName: name });
 
   try {
-    // create user doc with an integer field (score) initialized to 0
     await setDoc(doc(db, "users", user.uid), {
       name: name,
-      comment_count: 0, // integer stored in Firestore
+      comment_count: 0,
     });
     console.log("Firestore user document created");
   } catch (error) {

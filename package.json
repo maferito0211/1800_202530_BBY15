@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "firebase": "^12.5.0",
+    "mapbox": "^1.0.0-beta10",
     "mapbox-gl": "^3.16.0"
   }
 }
