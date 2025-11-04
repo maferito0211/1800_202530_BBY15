@@ -4,6 +4,8 @@ import { doc, getDoc } from "firebase/firestore";
 
 document.addEventListener("DOMContentLoaded", () => {
   const nameElement = document.getElementById("displayName");
+  nameElement.textContent =
+    "Hello, " + (localStorage.getItem("displayName") || "Loading...") + "!";
 
   // update once Firebase finishes initialization
   onAuthReady(auth, async (user) => {
