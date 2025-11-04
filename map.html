@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Map Page</title>
+    <title>Vancouver Student Map</title>
 
     <!-- Bootstrap CSS -->
     <link
@@ -16,53 +16,174 @@
       href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css"
       rel="stylesheet"
     />
+
+    <style>
+      body {
+        background-color: #f5f5f5;
+        font-family: "Inter", sans-serif;
+        color: #333;
+      }
+
+      h2 {
+        text-align: center;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1.5rem;
+      }
+
+      header {
+        background-color: #fff;
+      }
+
+      header h1 {
+        color: #343a40 !important;
+      }
+
+      #filters {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 1.5rem;
+      }
+
+      #filters button {
+        border-radius: 20px;
+        padding: 8px 18px;
+        color: #444;
+        border-color: #555;
+        transition: all 0.2s ease;
+      }
+
+      #filters button:hover,
+      #filters button.active {
+        background-color: #444;
+        color: #fff;
+        border-color: #444;
+      }
+
+      #map {
+        width: 100%;
+        height: 450px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      #searchBox {
+        border-radius: 25px;
+        padding: 10px 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #ccc;
+      }
+
+      #locateBtn {
+        position: absolute;
+        top: 10px; /* distance from top of map */
+        left: 10px; /* distance from right edge */
+        z-index: 10; /* make sure it stays above the map */
+        border-radius: 25px;
+        padding: 8px 18px;
+        font-weight: 500;
+        background-color: #444;
+        color: white;
+        border: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      #locateBtn:hover {
+        background-color: #222;
+      }
+      footer {
+        display: grid;
+        grid-template-columns: 33% 34% 33%;
+        text-align: center;
+        padding-top: 10px;
+        background-color: #222;
+        color: rgb(180, 180, 180);
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+      }
+
+      footer a img {
+        height: 55px;
+        border-radius: 50%;
+        transition: transform 0.2s ease;
+      }
+
+      footer a img:hover {
+        transform: scale(1.1);
+      }
+    </style>
   </head>
 
   <body>
-    <!-- Main Body -->
-    <main class="container mt-4 mb-4">
-      <!-- MAPBOX -->
-      <h2>Map View Holder</h2>
+    <!-- Header -->
+    <header class="py-3 mb-4 border-bottom shadow-sm">
+      <div class="container text-center">
+        <h1 class="fw-bold">🌎 BCIT Community Map</h1>
+        <p class="text-muted">
+          Find key places and student resources around Burnaby
+        </p>
+      </div>
+    </header>
 
-      <div id="filters" class="mb-3">
-        <button class="btn btn-outline-primary" data-category="All">All</button>
-        <button class="btn btn-outline-primary" data-category="Education">
+    <!-- Main Content -->
+    <main class="container mb-4">
+      <!-- Search Bar -->
+      <div id="searchContainer" class="mb-3 text-center">
+        <input
+          type="text"
+          id="searchBox"
+          class="form-control w-50 mx-auto"
+          placeholder="Search for a place..."
+        />
+      </div>
+
+      <!-- Filters -->
+      <div id="filters">
+        <button class="btn btn-outline-dark" data-category="All">All</button>
+        <button class="btn btn-outline-dark" data-category="Education">
           Education
         </button>
-        <button class="btn btn-outline-primary" data-category="Groceries">
+        <button class="btn btn-outline-dark" data-category="Groceries">
           Groceries
         </button>
-        <button class="btn btn-outline-primary" data-category="Banks">
+        <button class="btn btn-outline-dark" data-category="Banks">
           Banks
         </button>
-        <button class="btn btn-outline-primary" data-category="Government">
+        <button class="btn btn-outline-dark" data-category="Government">
           Government
         </button>
-        <button class="btn btn-outline-primary" data-category="Pharmacies">
+        <button class="btn btn-outline-dark" data-category="Pharmacies">
           Pharmacies
         </button>
       </div>
 
-      <div id="map" style="width: 100%; height: 400px"></div>
-      <!-- MAPBOX -->
+      <div class="card border-0 shadow-sm position-relative">
+  <div class="card-body p-2">
+    <div id="map"></div>
+    <button id="locateBtn" class="btn">📍 Locate Me</button>
+  </div>
+</div>
 
-      <div>
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Need Suggestion?</h5>
-            <p class="card-text">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione
-              eos, molestias dolore deleniti repellendus quam eligendi
-              consequatur asperiores in nostrum ex error. Voluptatibus odio
-              reiciendis aliquam accusantium distinctio perferendis dolorum
-              voluptatum odit delectus iste quisquam impedit inventore eos unde
-              perspiciatis nam earum ad rem, nesciunt quam? Laudantium
-              voluptates repellat unde.
-            </p>
-          </div>
-        </div>
-      </div>
-    </main>
+    <br />
+    <br />
+    <br />
+
+    <footer>
+      <a id="mapIcon" href="./map.html">
+        <img src="./images/maps.gif" alt="Map Icon" />
+      </a>
+      <a id="forumIcon" href="./forum-main.html">
+        <img src="./images/forum.gif" alt="Forum Icon" />
+      </a>
+      <a id="profileIcon" href="./loginPage.html">
+        <img src="./images/profile.gif" alt="Profile Icon" />
+      </a>
+    </footer>
 
     <!-- Mapbox JS -->
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>

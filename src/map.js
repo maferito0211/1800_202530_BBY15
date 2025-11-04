@@ -1,52 +1,84 @@
+// Import necessary Firebase and Mapbox libraries
 import { db } from "./firebaseConfig.js";
 import { collection, getDocs } from "firebase/firestore";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-// This function loads all location data from Firestore
-// and displays it on the map as red pins with popups.
-async function loadMapData(map) {
-  // Get all documents from the "locations" collection
+async function loadLocations(map) {
   const querySnapshot = await getDocs(collection(db, "locations"));
-
-  // Loop through each document
   querySnapshot.forEach((doc) => {
-    const data = doc.data(); // Extract all the document's fields
-    const { name, lat, lng, category } = data; // Destructure for convenience
+    const data = doc.data();
+    const { name, lat, lng, category } = data;
 
-    // Create a marker for each document
-    //  Store it in a variable so we can use it later for filtering
-    const marker = new mapboxgl.Marker({ color: "red" })
-      .setLngLat([lng, lat]) // Set its position
+    /* ---------------------  MARKERS ------------------------*/
+    // Create a custom HTML element for the marker
+    const el = document.createElement("div");
+    el.className = "custom-marker";
+
+    // Optionally: change marker color or image based on category
+    if (data.category === "Education") {
+      el.style.backgroundImage = "url('/images/icons/education.png')";
+    } else if (data.category === "Groceries") {
+      el.style.backgroundImage = "url('/images/icons/groceries.png')";
+    } else if (data.category === "Banks") {
+      el.style.backgroundImage = "url('/images/icons/bank.png')";
+    } else if (data.category === "Government") {
+      el.style.backgroundImage = "url('/images/icons/government.png')";
+    } else if (data.category === "Pharmacies") {
+      el.style.backgroundImage = "url('/images/icons/pharmacy.png')";
+    } else {
+      el.style.backgroundImage = "url('/images/icons/default.png')";
+    }
+
+    // Marker styling (make sure they are visible and clickable)
+    el.style.width = "32px";
+    el.style.height = "32px";
+    el.style.backgroundSize = "cover";
+    el.style.cursor = "pointer";
+
+    // Create a new marker using your custom element
+    const marker = new mapboxgl.Marker(el)
+      .setLngLat([data.lng, data.lat])
       .setPopup(
-        new mapboxgl.Popup().setHTML(`<h5>${name}</h5><p>${category}</p>`)
-      ) // Add popup info
-      .addTo(map); // Add it to the map
+        new mapboxgl.Popup().setHTML(
+          `<h5>${data.name}</h5><p>${data.category}</p>`
+        )
+      )
+      .addTo(map);
 
-    // Store both the marker and its category in the global array
-    // This lets us show/hide them later based on the selected filter
-    markers.push({ marker, category });
-
-    // When user clicks the marker, smoothly fly to it
-    marker.getElement().addEventListener("click", () => {
-      // This moves the map view to center on the clicked marker
+    // 🔹 Add zoom animation when the marker is clicked
+    el.addEventListener("click", () => {
       map.flyTo({
         center: [lng, lat],
         zoom: 14,
         essential: true,
       });
     });
+
+    // Store for filters
+    markers.push({ marker, name, category });
   });
 }
 
-async function loadLocations(map) {
-  const querySnapshot = await getDocs(collection(db, "locations"));
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-    new mapboxgl.Marker({ color: "red" })
-      .setLngLat([data.lng, data.lat])
-      .setPopup(new mapboxgl.Popup().setText(data.name))
-      .addTo(map);
+// 🔹 This function filters markers based on the search box input
+function setupSearch() {
+  // Select the search input element
+  const searchBox = document.getElementById("searchBox");
+
+  // Listen for every keystroke
+  searchBox.addEventListener("input", () => {
+    // Convert typed text to lowercase for case-insensitive matching
+    const query = searchBox.value.toLowerCase();
+
+    // Go through every marker and check if it matches the search
+    markers.forEach(({ marker, name, category }) => {
+      const matches =
+        name.toLowerCase().includes(query) ||
+        category.toLowerCase().includes(query);
+
+      // Show or hide marker based on match
+      marker.getElement().style.display = matches ? "block" : "none";
+    });
   });
 }
 
@@ -63,21 +95,28 @@ function showMap() {
   // This helps users navigate the map manually.
   map.addControl(new mapboxgl.NavigationControl());
 
-  // Run setupMap() once when the style loads
-  map.once("load", () => setupMap(map)); // run once for the initial style
-
-  //One-time setup function to add layers, sources, etc.
-  //You can call additional functions from here to keep things organized.
-  function setupMap(map) {
+  // Wait for map to finish loading before running setup
+  map.once("load", async () => {
     addUserPin(map);
-    loadMapData(map).then(() => setupFilters(map)); //  this line loads your Firebase markers
-    //then call filters after markers are loaded
+    await loadLocations(map); // Load Firebase markers
+    setupFilters(map);
+    setupSearch(); // Search bar
 
-    //add other layers and stuff here
-    //addCustomLayer1(map);
-    //addCustomLayer2(map);
-    //addCustomLayer3(map);
-  }
+    // 🔹 Locate Me button logic
+    const locateBtn = document.getElementById("locateBtn");
+    if (locateBtn) {
+      locateBtn.addEventListener("click", () => {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          const coords = [pos.coords.longitude, pos.coords.latitude];
+          map.flyTo({
+            center: coords,
+            zoom: 14,
+            essential: true,
+          });
+        });
+      });
+    }
+  });
 }
 
 //-----------------------------------------------------
@@ -147,6 +186,7 @@ function setupFilters(map) {
   });
 }
 
-let markers = []; // Store all marker objects here
+// Global array to store all map markers (so we can show/hide/filter them)
+let markers = [];
 
 showMap();
