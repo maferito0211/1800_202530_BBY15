@@ -4,7 +4,11 @@
     <title>Login Page</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="./styles/style.css" />
     <link rel="stylesheet" href="./styles/login-style.css" />
+    <!-- Web Components -->
+    <script type="module" src="/src/components/site-footer.js"></script>
   </head>
   <body>
     <!-- Alerts -->
@@ -68,17 +72,7 @@
     </div>
 
     <!-- Footer / Navigation Bar-->
-    <footer>
-      <a id="map" href="#map">
-        <img src="./images/maps.gif" alt="Map Icon" />
-      </a>
-      <a id="forum" href="./forum-main.html">
-        <img src="./images/forum.gif" alt="Forum Icon" />
-      </a>
-      <a id="profile" href="./loginPage.html">
-        <img src="./images/profile.gif" alt="Profile Icon" />
-      </a>
-    </footer>
+    <site-footer></site-footer>
 
     <!-- Firebase and authentication related scripts -->
     <!-- The order of loading matters -->

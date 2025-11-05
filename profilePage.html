@@ -7,6 +7,9 @@
     <title>Profile</title>
     <link rel="stylesheet" href="./styles/style.css" />
     <link rel="stylesheet" href="./styles/profile-page.css" />
+
+    <!-- Web Components -->
+    <script type="module" src="/src/components/site-footer.js"></script>
   </head>
 
   <body>
@@ -28,17 +31,7 @@
     </main>
 
     <!-- Footer -->
-    <footer>
-      <a id="mapIcon" href="#map">
-        <img src="./images/maps.gif" alt="Map Icon" />
-      </a>
-      <a id="forumIcon" href="./forum-main.html">
-        <img src="./images/forum.gif" alt="Forum Icon" />
-      </a>
-      <a id="profileIcon" href="./loginPage.html">
-        <img src="./images/profile.gif" alt="Profile Icon" />
-      </a>
-    </footer>
+    <site-footer></site-footer>
     <!-- JavaScript Files -->
     <script type="module" src="/src/navBar.js"></script>
     <script type="module" src="/src/profile.js"></script>

@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="./styles/style.css" />
     <script src="./src/main.js"></script>
+
+    <!-- Web Components -->
+    <script type="module" src="/src/components/site-footer.js"></script>
   </head>
 
   <body>
@@ -26,17 +29,8 @@
       </div>
     </div>
 
-    <footer>
-      <a id="mapIcon" href="./map.html">
-        <img src="./images/maps.gif" alt="Map Icon" />
-      </a>
-      <a id="forumIcon" href="./forum-main.html">
-        <img src="./images/forum.gif" alt="Forum Icon" />
-      </a>
-      <a id="profileIcon" href="./loginPage.html">
-        <img src="./images/profile.gif" alt="Profile Icon" />
-      </a>
-    </footer>
+    <!-- Footer -->
+    <site-footer></site-footer>
     <!-- Script Imports-->
     <script type="module" src="./src/navBar.js"></script>
   </body>
