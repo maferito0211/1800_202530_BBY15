@@ -1,39 +1,23 @@
 import { onAuthReady } from "./authentication.js";
 import { db, auth } from "./firebaseConfig.js";
-import { doc, onSnapshot } from "firebase/firestore";
-import {
-  collection,
-  getDoc,
-  getDocs,
-  addDoc,
-  serverTimestamp,
-  getCountFromServer,
-  query,
-  where,
-} from "firebase/firestore";
-
-//Inserts the main post details on page load
-const querySnapshot = await getDocs(collection(db, "threads"));
-const getCount = await getCountFromServer(collection(db, "threads"));
+import { doc } from "firebase/firestore";
+import { getDoc } from "firebase/firestore";
 
 var id = window.location.search.slice(4);
-const currentThread = query(
-  collection(db, "threads"),
-  where("id", "==", Number(id))
-);
-const threadSnap = await getDocs(currentThread);
-threadSnap.forEach((doc) => {
-  var header = document.querySelector(".header");
-  var headerHtml = `
-      <h2 class="title"> ${doc.data().title}</h2>
-      <p> ${doc.data().content} </p>
+
+const docSnap = await getDoc(doc(db, "threads", id));
+const docData = docSnap.data();
+
+var header = document.querySelector(".header");
+var headerHtml = `
+      <h2 class="title"> ${docData.title}</h2>
+      <p> ${docData.content} </p>
       <div class="subtitle">
-        <p class="timestamp"> ${new Date(doc.data().date).toLocaleString()}</p>
-        <p class="commentcount"> ${doc.data().comment_count} comments</p>
+        <p class="timestamp"> ${new Date(docData.date).toLocaleString()}</p>
+        <p class="commentcount"> ${docData.comment_count} comments</p>
       </div>
       `;
-  header.insertAdjacentHTML("beforeend", headerHtml);
-});
+header.insertAdjacentHTML("beforeend", headerHtml);
 
 document
   .getElementById("postCommentButton")
