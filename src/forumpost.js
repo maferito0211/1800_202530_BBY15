@@ -1,18 +1,29 @@
 import { onAuthReady } from "./authentication.js";
 import { db, auth } from "./firebaseConfig.js";
 import { doc, onSnapshot } from "firebase/firestore";
-import { collection, getDoc, getDocs, addDoc, serverTimestamp, getCountFromServer, query, where } from "firebase/firestore";
-
+import {
+  collection,
+  getDoc,
+  getDocs,
+  addDoc,
+  serverTimestamp,
+  getCountFromServer,
+  query,
+  where,
+} from "firebase/firestore";
 
 //Inserts the main post details on page load
 const querySnapshot = await getDocs(collection(db, "threads"));
 const getCount = await getCountFromServer(collection(db, "threads"));
 
 var id = window.location.search.slice(4);
-  const currentThread = query(collection(db, "threads"), where("id", "==", Number(id)));
-  const threadSnap = await getDocs(currentThread);
-  threadSnap.forEach((doc) => {
-      var header = document.querySelector(".header");
+const currentThread = query(
+  collection(db, "threads"),
+  where("id", "==", Number(id))
+);
+const threadSnap = await getDocs(currentThread);
+threadSnap.forEach((doc) => {
+  var header = document.querySelector(".header");
   var headerHtml = `
       <h2 class="title"> ${doc.data().title}</h2>
       <p> ${doc.data().content} </p>
@@ -22,10 +33,13 @@ var id = window.location.search.slice(4);
       </div>
       `;
   header.insertAdjacentHTML("beforeend", headerHtml);
-  });   
+});
 
-
-
+document
+  .getElementById("postCommentButton")
+  .addEventListener("click", function () {
+    postComment();
+  });
 
 //Takes User details and adds them to comment, then calls addComment(comment)
 async function postComment() {
@@ -91,7 +105,6 @@ function addComments(comment) {
       </div>
         `;
   comments.insertAdjacentHTML("beforeend", commentHtml);
-  console.log(thread.comments.length);
 }
 
 //takes user details and adds them to reply, then calls addReply(reply)
@@ -125,5 +138,3 @@ function addReply(reply) {
   for (let reply of comment.replys) {
   }
 }
-
-
