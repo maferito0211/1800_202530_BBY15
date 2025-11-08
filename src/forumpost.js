@@ -10,6 +10,7 @@ import {
   getCountFromServer,
   query,
   where,
+  setDoc
 } from "firebase/firestore";
 
 //Inserts the main post details on page load
@@ -17,10 +18,7 @@ const querySnapshot = await getDocs(collection(db, "threads"));
 const getCount = await getCountFromServer(collection(db, "threads"));
 
 var id = window.location.search.slice(4);
-const currentThread = query(
-  collection(db, "threads"),
-  where("id", "==", Number(id))
-);
+const currentThread = query(collection(db, "threads"), where("id", "==", Number(id)));
 const threadSnap = await getDocs(currentThread);
 threadSnap.forEach((doc) => {
   var header = document.querySelector(".header");
@@ -35,11 +33,29 @@ threadSnap.forEach((doc) => {
   header.insertAdjacentHTML("beforeend", headerHtml);
 });
 
-document
-  .getElementById("postCommentButton")
-  .addEventListener("click", function () {
-    postComment();
-  });
+// Display comments on page load
+const commentDocRef = await getDocs(collection(db, "threads", id.toString(), "comments"));
+commentDocRef.forEach((doc) => {
+  var commentHtml = `
+        <div class="comment">
+        <div class="comment-top">
+          <h4 class="user"> ${doc.data().user}</h4>
+          <p class="timestamp">${new Date(doc.data().date).toLocaleString()}</p>
+        </div>
+        <div class="comment content">
+          ${doc.data().content}
+        </div>
+        <div class="reply">
+        </div>
+      </div>
+        `;
+  comments.insertAdjacentHTML("beforeend", commentHtml);
+});
+
+
+document.getElementById("postCommentButton").addEventListener("click", function () {
+  postComment();
+});
 
 //Takes User details and adds them to comment, then calls addComment(comment)
 async function postComment() {
@@ -59,9 +75,7 @@ async function postComment() {
         typeof doc === "function" &&
         typeof db !== "undefined"
       ) {
-        const userDoc = await window.firebaseDb.getDoc(
-          doc(db, "users", user.uid)
-        );
+        const userDoc = await window.firebaseDb.getDoc(doc(db, "users", user.uid));
         if (userDoc && userDoc.exists()) {
           const data = userDoc.data();
           author = data.name || "anonymous";
@@ -70,20 +84,31 @@ async function postComment() {
         }
       } else {
         // Fallback to auth profile info if present
-        author =
-          user.displayName ||
-          (user.email && user.email.split("@")[0]) ||
-          "anonymous";
+        author = user.displayName || (user.email && user.email.split("@")[0]) || "anonymous";
       }
     }
   } catch (e) {
     author = "anonymous";
   }
 
+  const querySnapshot = await getDocs(collection(db, "threads", id.toString(), "comments"));
+  const coll = collection(db, "threads", id.toString(), "comments");
+  const getCount = await getCountFromServer(coll);
+
+  var content = document.querySelector("textarea");
+  var newID = getCount.data().count;
+
+  setDoc(doc(db, "threads", id.toString(), "comments", newID.toString()), {
+    id: newID,
+    user: author,
+    date: Date.now(),
+    content: content.value
+  });
+  
   var comment = {
     content: txt.value,
     date: Date.now(),
-    author: author,
+    author: author
   };
   addComments(comment);
   txt.value = "";
@@ -113,7 +138,7 @@ function postReply() {
   var reply = {
     content: txt.value,
     date: Date.now(),
-    author: "User0",
+    author: "User0"
   };
   addReply(reply);
   txt.value = "";
