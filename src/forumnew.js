@@ -5,6 +5,9 @@ import {
   getDocs,
   setDoc,
   doc,
+  updateDoc,
+  increment,
+  getDoc,
   serverTimestamp,
   getCountFromServer,
 } from "firebase/firestore";
@@ -12,17 +15,22 @@ import {
 const querySnapshot = await getDocs(collection(db, "threads"));
 const coll = collection(db, "threads");
 const getCount = await getCountFromServer(coll);
+const counterRef = await doc(db, "idCounter", "IdCounterDoc");
+const getCountForID = await getDoc(doc(db, "idCounter", "IdCounterDoc"));
 
 //You know what they say: all posters post posts
 document.getElementById("post").addEventListener("click", function () {
   var title = document.querySelector("#threadtitle");
   var content = document.querySelector("#content");
-  var newID = getCount.data().count;
+  var newID = getCountForID.data().counter + 1;
   const ThreadRef = collection(db, "threads");
+
+  // Everytime a nwew thread is created, increment the counter by 1
+  updateDoc(counterRef, { counter: increment(1) });
 
   setDoc(doc(db, "threads", newID.toString()), {
     id: newID,
-    user: localStorage.getItem("displayName"),
+    user: localStorage.getItem("displayName") || "anonymous",
     title: title.value,
     date: Date.now(),
     content: content.value,

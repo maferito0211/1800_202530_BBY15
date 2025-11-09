@@ -1,0 +1,11 @@
+.comment-content {
+  cursor: pointer;
+}
+
+.comment-content:hover {
+  background-color: rgba(62, 62, 62, 0.329);
+}
+
+.selected-comment {
+  background-color: rgba(0, 172, 199, 0.329);
+}
