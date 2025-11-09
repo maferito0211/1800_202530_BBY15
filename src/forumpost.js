@@ -201,22 +201,27 @@ async function postReply(selectedComment) {
   }
 
   try {
-    // create a collection reference to the parent's "replies" subcollection
-
-    //Same thing here, splits the path into segments to access the correct subcollection
-    const parentSegments = parentDocPath.split("/");
+    // build collection path segments and reserve a numeric id for the reply
+    const parentSegments = parentDocPath.split("/"); // e.g. ["threads","1","comments","5"]
     const repliesColl = collection(db, ...parentSegments, "replies");
 
-    // addDoc returns the new document reference (with id)
-    const docRef = await addDoc(repliesColl, {
+    // get a numeric id (keeps numbering consistent with comments)
+    const getCount = await getCountFromServer(repliesColl);
+    const newID = getCount.data().count;
+
+    // create a document reference for the numeric id and write using setDoc
+    const replyDocRef = doc(db, ...parentSegments, "replies", newID.toString());
+    await setDoc(replyDocRef, {
+      id: newID,
       author,
       content,
       date: Date.now(),
     });
 
     // render reply locally as a nested .comment and allow further nesting
-    const reply = { author, content, date: Date.now() };
-    addReply(reply, selectedComment, docRef.id, docRef.path);
+    const reply = { id: newID, author, content, date: Date.now() };
+    // pass the numeric id and the full doc path so further replies are stored under this reply
+    addReply(reply, selectedComment, newID.toString(), replyDocRef.path);
     txt.value = "";
   } catch (err) {
     console.error("Failed to post reply:", err);
