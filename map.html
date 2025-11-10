@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vancouver Student Map</title>
+    <title>Together BCIT Student Map</title>
 
     <!-- Bootstrap CSS -->
     <link
@@ -17,6 +17,7 @@
       rel="stylesheet"/>
 
     <link type="text/css" rel="stylesheet" href="./styles/map-styles.css" />
+    <link type="text/css" rel="stylesheet" href="./styles/style.css" />
 
     <!-- Web Components -->
     <script type="module" src="/src/components/site-footer.js"></script>
@@ -35,6 +36,7 @@
 
     <!-- Main Content -->
     <main class="container mb-4">
+      <div class="topContainer">
       <!-- Search Bar -->
       <div id="searchContainer" class="mb-3 text-center">
         <input
@@ -49,21 +51,22 @@
       <div id="filters">
         <button class="btn btn-outline-dark" data-category="All">All</button>
         <button class="btn btn-outline-dark" data-category="Education">
-          Education
+          📚Education
         </button>
         <button class="btn btn-outline-dark" data-category="Groceries">
-          Groceries
+          🛒Groceries
         </button>
         <button class="btn btn-outline-dark" data-category="Banks">
-          Banks
+          🏦Banks
         </button>
         <button class="btn btn-outline-dark" data-category="Government">
-          Government
+          🍁Government
         </button>
         <button class="btn btn-outline-dark" data-category="Pharmacies">
-          Pharmacies
+          💊Pharmacies
         </button>
       </div>
+    </div>
 
       <div class="card border-0 shadow-sm position-relative">
   <div class="card-body p-2">
@@ -87,5 +90,8 @@
 
     <!-- Custom JS -->
     <script type="module" src="./src/map.js"></script>
+
+    <!-- Navigation Bar -->
+    <script type="module" src="./src/navBar.js"></script>
   </body>
 </html>

@@ -1,8 +1,10 @@
 import { auth } from "./firebaseConfig.js";
 import { onAuthStateChanged } from "firebase/auth";
 
+console.log("navBar.js loaded ");
+
 document.addEventListener("DOMContentLoaded", () => {
-  const profileLink = document.getElementById("profile");
+  const profileLink = document.getElementById("profileIcon");
   if (!profileLink) return;
 
   // update href whenever auth state changes
