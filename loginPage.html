@@ -1,85 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Login Page</title>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Together BCIT</title>
 
-    <link rel="stylesheet" href="./styles/style.css" />
-    <link rel="stylesheet" href="./styles/login-style.css" />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <link type="text/css" rel="stylesheet" href="./styles/style.css" />
+    <style>
+      body {
+        background-color: #f2f3f5;
+        font-family: "Inter", sans-serif;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .auth-card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        text-align: center;
+      }
+
+      .auth-card h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1.5rem;
+      }
+
+      .auth-card input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 25px;
+        transition: all 0.2s ease;
+      }
+
+      .auth-card input:focus {
+        border-color: #6c757d;
+        outline: none;
+        box-shadow: 0 0 4px rgba(108, 117, 125, 0.4);
+      }
+
+      .auth-card button {
+        width: 100%;
+        padding: 12px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .auth-card button:hover {
+        background-color: #555;
+      }
+
+      .auth-card .link {
+        display: block;
+        margin-top: 0.75rem;
+        color: #555;
+        font-size: 0.9rem;
+      }
+
+      .auth-card .link:hover {
+        text-decoration: underline;
+      }
+
+      .alert {
+        max-width: 400px;
+        margin: 20px auto;
+      }
+
+      footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+      }
+    </style>
+
     <!-- Web Components -->
     <script type="module" src="/src/components/site-footer.js"></script>
   </head>
+
   <body>
     <!-- Alerts -->
     <div id="authAlert" class="alert alert-danger d-none" role="alert"></div>
 
-    <!-- Login Form -->
-    <div id="loginView">
-      <h1>Login</h1>
-      <form id="loginForm" action="/submit-login" method="post">
-        <input
-          type="email"
-          id="loginEmail"
-          name="loginEmail"
-          required
-          placeholder="Email"
-          autocomplete="email"
-        /><br />
-        <input
-          type="password"
-          id="loginPassword"
-          name="loginPassword"
-          required
-          placeholder="Password"
-          autocomplete="current-password"
-        /><br />
-        <button type="submit">Login</button>
-        <br />
-        <a class="link" href="#" id="toSignup"
-          >Don't have an account? Register here.</a
-        >
-      </form>
-    </div>
+    <main>
+      <!-- Login Form -->
+      <div id="loginView" class="auth-card">
+        <h1>Welcome Back 👋</h1>
+        <form id="loginForm" action="/submit-login" method="post">
+          <input
+            type="email"
+            id="loginEmail"
+            name="loginEmail"
+            required
+            placeholder="Email"
+            autocomplete="email"
+          />
+          <input
+            type="password"
+            id="loginPassword"
+            name="loginPassword"
+            required
+            placeholder="Password"
+            autocomplete="current-password"
+          />
+          <button type="submit">Login</button>
+          <a class="link" href="#" id="toSignup">
+            Don't have an account? Register here.
+          </a>
+        </form>
+      </div>
 
-    <!-- Signup (hidden initially) -->
-    <div id="signupView" class="d-none">
-      <h1>Signup</h1>
-      <form id="signupForm" action="/submit-signup" method="post">
-        <input
-          type="text"
-          id="signupName"
-          name="signupName"
-          required
-          placeholder="Display Name"
-        /><br />
-        <input
-          type="email"
-          id="signupEmail"
-          name="signupEmail"
-          required
-          placeholder="Email"
-          autocomplete="email"
-        /><br />
-        <input
-          type="password"
-          id="signupPassword"
-          name="signupPassword"
-          required
-          placeholder="Password"
-          autocomplete="new-password"
-        /><br />
-        <button type="submit">Create Account</button>
-        <br />
-        <a class="link" href="#" id="toLogin">Have an account? Login here.</a>
-      </form>
-    </div>
+      <!-- Signup (hidden initially) -->
+      <!-- Signup (hidden initially) -->
+<div id="signupView" class="auth-card d-none">
+  <h1>Create Account 🧑‍🎓</h1>
+  <form id="signupForm" action="/submit-signup" method="post">
+    <input
+      type="text"
+      id="signupFirstName"
+      name="signupFirstName"
+      required
+      placeholder="First Name"
+    />
+    <input
+      type="text"
+      id="signupLastName"
+      name="signupLastName"
+      required
+      placeholder="Last Name"
+    />
+    <input
+      type="text"
+      id="signupUsername"
+      name="signupUsername"
+      required
+      placeholder="Username"
+    />
+    <input
+      type="email"
+      id="signupEmail"
+      name="signupEmail"
+      required
+      placeholder="Email"
+      autocomplete="email"
+    />
+    <input
+      type="password"
+      id="signupPassword"
+      name="signupPassword"
+      required
+      placeholder="Password"
+      autocomplete="new-password"
+    />
+    <button type="submit">Create Account</button>
+    <a class="link" href="#" id="toLogin">
+      Already have an account? Login here.
+    </a>
+  </form>
+</div>
 
-    <!-- Footer / Navigation Bar-->
+    <!-- Footer -->
     <site-footer></site-footer>
 
-    <!-- Firebase and authentication related scripts -->
-    <!-- The order of loading matters -->
+    <!-- Firebase & JS -->
     <script type="module" src="/src/firebaseConfig.js"></script>
     <script type="module" src="/src/authentication.js"></script>
     <script type="module" src="/src/loginSignup.js"></script>

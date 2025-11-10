@@ -1,39 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Profile</title>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
-    <link rel="stylesheet" href="./styles/style.css" />
-    <link rel="stylesheet" href="./styles/profile-page.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile | Together BCIT</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <link type="text/css" rel="stylesheet" href="./styles/style.css" />
+    <link type="text/css" rel="stylesheet" href="./styles/profile-page.css" />
 
     <!-- Web Components -->
     <script type="module" src="/src/components/site-footer.js"></script>
   </head>
 
   <body>
-    <div id="name-container">
-      <div id="banner-img">
-        <img
-          id="profile-picture"
-          src="./images/defaultProfilePicture.png"
-          alt="Profile Picture"
-        />
+    <!-- Header -->
+    <header class="py-3 mb-4 border-bottom shadow-sm bg-light">
+      <div class="container text-center">
+        <h1 class="fw-bold">👤 My BCIT Profile</h1>
+        <p class="text-muted">View and manage your personal information</p>
       </div>
-      <div id="name-bar">
-        <h2 id="displayName">Loading...</h2>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mb-5">
+      <div
+        class="card border-0 shadow-sm mx-auto text-center"
+        style="max-width: 500px"
+      >
+        <div class="card-body">
+          <!-- Profile Picture -->
+          <img
+            id="profile-picture"
+            src="./images/defaultProfilePicture.png"
+            alt="Profile Picture"
+            class="rounded-circle mb-3 shadow-sm"
+            style="width: 120px; height: 120px; object-fit: cover"
+          />
+
+          <!-- User Info -->
+          <h3 id="fullName" class="fw-semibold">Loading...</h3>
+          <p id="username" class="text-muted">@username</p>
+          <p id="bio" class="small text-secondary">Tell us about yourself...</p>
+
+          <hr />
+
+          <!-- Buttons -->
+          <div class="d-grid gap-2 col-8 mx-auto mt-3">
+            <a href="./editProfile.html" class="btn btn-dark rounded-pill">
+              ✏️ Edit Profile
+            </a>
+            <button id="logoutBtn" class="btn btn-outline-danger rounded-pill">
+              🚪 Logout
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-    <main>
-      <p>Tyson was here</p>
-      <button id="logoutBtn">Logout</button>
     </main>
+
+    <br />
+    <br />
+    <br />
 
     <!-- Footer -->
     <site-footer></site-footer>
-    <!-- JavaScript Files -->
-    <script type="module" src="/src/navBar.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Firebase + Custom Script -->
+    <script type="module" src="/src/firebaseConfig.js"></script>
     <script type="module" src="/src/profile.js"></script>
   </body>
 </html>
