@@ -52,23 +52,37 @@ export async function loginUser(email, password) {
 // Usage:
 //   const user = await signupUser("Alice", "alice@email.com", "secret");
 // -------------------------------------------------------------
-export async function signupUser(name, email, password) {
+export async function signupUser(
+  firstName,
+  lastName,
+  username,
+  email,
+  password
+) {
   const userCredential = await createUserWithEmailAndPassword(
     auth,
     email,
     password
   );
-  const user = userCredential.user; // Get the user object
-  await updateProfile(user, { displayName: name });
+  const user = userCredential.user;
+
+  // Save full name in Firebase Auth profile
+  await updateProfile(user, { displayName: `${firstName} ${lastName}` });
 
   try {
     await setDoc(doc(db, "users", user.uid), {
-      name: name,
+      firstName,
+      lastName,
+      username,
+      email,
+      bio: "",
+      photoURL: "./images/defaultProfilePicture.png",
+      createdAt: new Date(),
       comment_count: 0,
     });
-    console.log("Firestore user document created");
+    console.log("✅ Firestore user document created successfully");
   } catch (error) {
-    console.error("Error creating Firestore user document:", error);
+    console.error("❌ Error creating Firestore user document:", error);
   }
 
   return user;

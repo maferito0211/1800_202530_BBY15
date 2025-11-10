@@ -103,20 +103,31 @@ function initAuthUI() {
   signupForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     hideError();
-    const name = document.querySelector("#signupName")?.value?.trim() ?? "";
+    const firstName =
+      document.querySelector("#signupFirstName")?.value?.trim() ?? "";
+    const lastName =
+      document.querySelector("#signupLastName")?.value?.trim() ?? "";
+    const username =
+      document.querySelector("#signupUsername")?.value?.trim() ?? "";
     const email = document.querySelector("#signupEmail")?.value?.trim() ?? "";
     const password = document.querySelector("#signupPassword")?.value ?? "";
-    if (!name || !email || !password) {
-      showError("Please fill in name, email, and password.");
+
+    if (!firstName || !lastName || !username || !email || !password) {
+      showError("Please fill in all fields.");
       return;
     }
+
     setSubmitDisabled(signupForm, true);
+
     try {
-      const user = await signupUser(name, email, password);
-      // cache name for instant UI on other pages
-      try {
-        localStorage.setItem("displayName", name);
-      } catch (e) {}
+      const user = await signupUser(
+        firstName,
+        lastName,
+        username,
+        email,
+        password
+      );
+      localStorage.setItem("displayName", `${firstName} ${lastName}`);
       location.href = redirectUrl;
     } catch (err) {
       showError(authErrorMessage(err));
