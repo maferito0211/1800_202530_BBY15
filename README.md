@@ -60,7 +60,7 @@ Example:
 
 - **Thor** - BCIT CST Student. BCIT CST Student hoping to learn how to programming for future endeavors. Love the synthesizer.
 
-- **BBY 15** - Gruop that loves learning new things and want good grades on this Lab.
+- **BBY 15** - Group that loves learning new things and want good grades on this Lab.
 
 ---
 
