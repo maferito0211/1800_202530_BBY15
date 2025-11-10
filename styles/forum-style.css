@@ -1,23 +1,33 @@
-@import url("https://fonts.googleapis.com/css2?family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap");
-
-body {
-  font-family: Zalando Sans;
-  background: #f4f4f4;
-}
-
 ul {
   list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+/*Actual Clickable Forums*/
 li {
+  background: var(--gradient);
+  width: 95%;
+
+  border-radius: 1rem;
+  border: var(--border);
+  border-top: solid 1px var(--highlight);
+
+  padding-top: 10px;
   padding-left: 1%;
-  border: solid;
-  border-color: #b1b1b1;
-  margin: 3px 1.2% 3px 0;
+  margin: 3px 1.2% 20px 0;
+
+  box-shadow: var(--shadow);
+}
+
+li:hover {
+  background: var(--gradient-hover);
+  cursor: pointer;
 }
 
 a {
-  color: black;
+  color: var(--text);
   text-decoration: none;
 }
 
@@ -29,7 +39,8 @@ h4 {
   display: flex;
 }
 
-.timestamp, .commentcount {
+.timestamp,
+.commentcount {
   padding-right: 5px;
   color: #6e6e6e;
 }
@@ -37,13 +48,32 @@ h4 {
 /*forum-main styles*/
 #newpost {
   padding: 15px;
-  border-radius: 13px;
-  border: solid;
+  border-radius: 1em;
   position: fixed;
   bottom: 115px;
   right: 5%;
-  background-color: white;
-  
+  background-color: var(--primary);
+  color: var(--text);
+}
+
+#newpost:hover {
+  transition: background-color 0.3s;
+  background-color: oklch(60% 0.15 251);
+  cursor: pointer;
+}
+
+#newpost a {
+  text-align: center;
+  color: var(--highlight);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#newpost #plus {
+  font-size: 24px;
+  margin-right: 10px;
 }
 
 /* forumpost styles */
@@ -77,69 +107,4 @@ textarea {
 /*forumnew styles */
 #content {
   height: 9em;
-}
-
-/* footer style */
-footer {
-  display: grid;
-  grid-template-columns: 33% 34% 33%;
-  text-align: center;
-  padding-top: 10px;
-  background-color: #333;
-  color: rgb(179, 179, 179);
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-}
-
-#map img {
-  height: 60px;
-  border-radius: 50%;
-}
-
-#forum img {
-  height: 60px;
-  border-radius: 50%;
-}
-
-#profile img {
-  height: 60px;
-  border-radius: 50%;
-}
-
-/* search bar style */
-.search-container {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border: 2px solid #ccc;
-  border-radius: 25px;
-  overflow: hidden;
-
-  /* Stretch across page horizontally */
-  width: 100%; /* occupies ?0% of the screen width */
-  /*max-width: 1000px; /* optional: limit on very large screens */
-}
-
-.search-input {
-  flex: 1;
-  padding: 15px 20px;
-  border: none;
-  outline: none;
-  font-size: 18px;
-}
-
-.search-button {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  padding: 15px 30px;
-  cursor: pointer;
-  font-size: 18px;
-  transition: background 0.3s;
-}
-
-.search-button:hover {
-  background: #0056b3;
 }

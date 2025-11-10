@@ -1,30 +1,74 @@
 @import url("https://fonts.googleapis.com/css2?family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap");
 
+/* CSS Variables for color scheme */
+:root {
+  --bg-dark: oklch(0.92 0 252);
+  --bg: oklch(0.96 0 252);
+  --bg-light: oklch(1 0 252);
+  --text: oklch(0.15 0 252);
+  --text-muted: oklch(0.4 0 252);
+  --highlight: oklch(100% 0.00011 271.152);
+  --border: oklch(0.6 0 252);
+  --border-muted: oklch(0.7 0 252);
+  --primary: oklch(49.275% 0.12272 251.853);
+  --secondary: oklch(0.4 0.1 72);
+  --danger: oklch(0.5 0.05 30);
+  --warning: oklch(0.5 0.05 100);
+  --success: oklch(0.5 0.05 160);
+  --info: oklch(0.5 0.05 260);
+  --gradient: linear-gradient(0deg, var(--bg) 95%, var(--bg-light));
+  --gradient-hover: linear-gradient(0deg, var(--bg), var(--bg-light));
+  --shadow: 0px 2px 2px hsla(0, 0%, 0%, 0.07), 0px 4px 4px hsla(0, 0%, 0%, 0.15);
+}
+
+/* Global / default styles */
+html,
 body {
-  font-family: Zalando Sans;
-  background: #f4f4f4;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  height: 100%;
+  font-family: "Zalando Sans", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+  background: var(--bg-dark);
+  margin: 0;
+  padding: 0 0 80px; /* leave space for fixed footer */
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Generic heading defaults */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0 0 1rem 0;
+  font-weight: 600;
 }
 
 h1 {
   text-align: center;
   margin-top: 50px;
+  font-size: 2rem;
 }
 
-#popupcontainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Image defaults so components can assume responsive images */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
-#popup {
-  margin-top: 500px;
-  width: 70%;
-  position: absolute;
-  border: solid;
-  border-color: #b1b1b1;
-  text-align: center;
-  padding: 0 5% 20px;
-  border-radius: 15%;
+/* Utility helpers (small, safe set of defaults) */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 footer {
@@ -32,52 +76,82 @@ footer {
   grid-template-columns: 33% 34% 33%;
   text-align: center;
   padding-top: 10px;
-  background-color: #333;
+  background-color: var(--bg-light);
   color: rgb(179, 179, 179);
-  position: sticky;
+  position: fixed;
   left: 0;
   bottom: 0;
   width: 100%;
+  box-sizing: border-box;
 }
 
-#mapIcon img {
-  height: 60px;
-  border-radius: 50%;
+footer a img:hover {
+  transform: scale(1.1);
 }
 
-#forumIcon img {
-  height: 60px;
-  border-radius: 50%;
-}
-
+/* Consolidated icon sizing for footer icons */
+#mapIcon img,
+#forumIcon img,
 #profileIcon img {
   height: 60px;
   border-radius: 50%;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+#popupcontainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+#popup {
+  margin-top: 500px;
+  width: 70%;
+  position: absolute;
+  border: 1px solid #b1b1b1;
+  text-align: center;
+  padding: 0 5% 20px;
+  border-radius: 2em;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+#popupcontainer button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  background-color: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
 }
 
 .search-container {
   display: flex;
   align-items: center;
   background: #fff;
+  margin: 20px auto;
   border: 2px solid #ccc;
   border-radius: 25px;
   overflow: hidden;
-
-  /* Stretch across page horizontally */
-  width: 100%; /* occupies ?0% of the screen width */
-  /*max-width: 1000px; /* optional: limit on very large screens */
+  width: 95vw;
 }
 
 .search-input {
+  color: var(--text-muted);
   flex: 1;
   padding: 15px 20px;
   border: none;
   outline: none;
   font-size: 18px;
+  background: transparent;
 }
 
 .search-button {
-  background: #007bff;
+  background: var(--primary);
   color: #fff;
   border: none;
   padding: 15px 30px;
@@ -89,3 +163,5 @@ footer {
 .search-button:hover {
   background: #0056b3;
 }
+
+/* End of global defaults */

@@ -22,6 +22,10 @@ const currentThread = query(
 
 //Load this threads details
 const threadSnap = await getDocs(currentThread);
+
+//Change the title of the document to the thread title
+document.querySelector("title").textContent = threadSnap.docs[0].data().title;
+
 threadSnap.forEach((doc) => {
   var header = document.querySelector(".header");
   var headerHtml = `
