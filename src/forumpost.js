@@ -141,7 +141,7 @@ function renderCommentHTML(comment, commentId, docPath) {
     docPath || ""
   }">
       <div class="comment-top">
-        <h4 class="user"> ${comment.author}</h4>
+        <p class="user"> <b>${comment.author}</b></p>
         <p class="timestamp">${new Date(comment.date).toLocaleString()}</p>
       </div>
       <div class="comment-content">
