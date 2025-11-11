@@ -77,6 +77,18 @@ h4 {
 }
 
 /* forumpost styles */
+.header {
+  margin: 0 2%;
+}
+
+.user {
+  padding-top: 6px;
+}
+
+.comments {
+  margin: 20px 2%;
+}
+
 .comment-top {
   display: flex;
 }
@@ -85,16 +97,39 @@ h4 {
   padding: 6px 0 0 5px;
 }
 
-.comment input {
-  margin-left: 1%;
+.commentinput {
+  margin:0 2% 0 3%;
 }
 
 textarea {
-  width: 75%;
+  width: 50%;
+}
+
+#postCommentButton {
+  margin-top: 15px;
+  background-color: var(--primary);
+  font-family: "Zalando Sans", system-ui, -apple-system, "Segoe UI", Roboto,
+  "Helvetica Neue", Arial;
+  color: beige;
+  border: none;
+  font-size: medium;
+  border-radius: 1em;
+  width: 90px;
+  height: 35px;
+}
+
+#postCommentButton:hover {
+  transition: background-color 0.3s;
+  background-color: oklch(60% 0.15 251);
+  cursor: pointer;
 }
 
 .commentinput button {
   display: block;
+}
+
+.comment {
+  margin-bottom: 30px;
 }
 
 .reply {
