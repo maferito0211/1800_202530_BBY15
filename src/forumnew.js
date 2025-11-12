@@ -30,7 +30,7 @@ document.getElementById("post").addEventListener("click", function () {
 
   setDoc(doc(db, "threads", newID.toString()), {
     id: newID,
-    user: localStorage.getItem("displayName") || "anonymous",
+    user: localStorage.getItem("fullName") || "Anonymous",
     title: title.value,
     date: Date.now(),
     content: content.value,

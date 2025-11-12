@@ -17,3 +17,20 @@ class SiteFooter extends HTMLElement {
 }
 
 customElements.define("site-footer", SiteFooter);
+
+class SiteHeader extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `
+        <nav>
+          <div>
+            <button id="menuButton">☰</button>
+          </div>
+          <a  href="./secret.html" id="logoContainer">
+            <img id="logo" src="./images/logoImg.png" alt="Site Logo" />
+          </a>
+        </nav>
+        `;
+  }
+}
+
+customElements.define("site-navbar", SiteHeader);

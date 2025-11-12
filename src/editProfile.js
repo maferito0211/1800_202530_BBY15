@@ -130,6 +130,9 @@ document.addEventListener("DOMContentLoaded", () => {
         displayName: `${firstName} ${lastName}`,
       });
 
+      localStorage.setItem("fullName", `${firstName} ${lastName}`);
+      localStorage.setItem("displayName", username);
+
       showToast("✅ Profile updated successfully!");
       setTimeout(() => (window.location.href = "./profilePage.html"), 1500);
     } catch (err) {

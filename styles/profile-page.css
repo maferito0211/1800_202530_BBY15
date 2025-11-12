@@ -1,12 +1,41 @@
 /* reset default page spacing that causes a white gap */
 html,
 body {
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
 }
 
 #name-container {
   display: grid;
   grid-template-rows: auto auto;
+}
+
+.profile-container {
+  background-color: var(--bg);
+  width: 60%;
+  padding: 2%;
+  margin: auto;
+
+  border: var(--border);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
+}
+
+.profile-container h3,
+.profile-container p {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 #banner-img {
@@ -24,10 +53,10 @@ body {
 }
 
 #profile-picture {
-  height: 25vh;
+  height: 20vh;
+  margin-bottom: 2vh;
   width: auto;
   border-radius: 50%;
-  margin-right: 5vw;
 }
 
 #name-bar {

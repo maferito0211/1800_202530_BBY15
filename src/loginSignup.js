@@ -6,10 +6,24 @@
 // Manages the login/signup form behaviour and redirects.
 // -------------------------------------------------------------
 
-import "../styles/login-style.css";
+import "../styles/loginPage.css";
 import { loginUser, signupUser, authErrorMessage } from "./authentication.js";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // --- Login and Signup Page ---
+
+//Checks if the user is already logged in, if so redirects to the profile page
+// firebase auth state listener
+
+const auth = getAuth();
+
+document.onLoad = onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in, redirect to profile page
+    window.location.href = "profilePage.html";
+  }
+});
+
 // Handles toggling between Login/Signup views and form submits
 // using plain DOM APIs for simplicity and maintainability.
 
@@ -127,7 +141,8 @@ function initAuthUI() {
         email,
         password
       );
-      localStorage.setItem("displayName", `${firstName} ${lastName}`);
+      localStorage.setItem("fullName", `${firstName} ${lastName}`);
+      localStorage.setItem("displayName", username);
       location.href = redirectUrl;
     } catch (err) {
       showError(authErrorMessage(err));

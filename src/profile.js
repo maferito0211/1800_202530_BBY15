@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fill in user info
     fullNameEl.textContent =
+      localStorage.getItem("fullName") ||
       `${data.firstName || ""} ${data.lastName || ""}`.trim() ||
       user.displayName ||
       "Anonymous User";
