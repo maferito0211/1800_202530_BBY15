@@ -10,6 +10,10 @@ import {
   setDoc,
 } from "firebase/firestore";
 
+const pageTitle = "💬FORUMS";
+
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
+
 // simple increment (recommended for concurrent writers)
 
 var id = window.location.search.slice(4);

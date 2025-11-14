@@ -5,6 +5,10 @@ import { auth, db } from "./firebaseConfig.js";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
+const pageTitle = "👤PROFILE";
+
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
+
 document.addEventListener("DOMContentLoaded", () => {
   const fullNameEl = document.getElementById("fullName");
   const usernameEl = document.getElementById("username");

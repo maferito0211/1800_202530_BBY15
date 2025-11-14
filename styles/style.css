@@ -76,9 +76,16 @@ nav {
   height: 60px;
   background-color: var(--bg);
 
+  display: grid;
+  grid-template-rows: 60px;
+  grid-template-columns: 33% 34% 33%;
+}
+
+#header-left-section {
   display: flex;
   align-items: center;
   flex-direction: row;
+  flex-wrap: nowrap;
 }
 
 #menuButton {
@@ -93,8 +100,18 @@ nav {
 }
 
 #logo {
-  height: 200px;
-  margin-right: 20px;
+  height: 5vh;
+  width: auto;
+  margin-left: 20px;
+}
+
+#pageTitleSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--primary);
+  font-size: larger;
+  font-weight: bold;
 }
 
 footer {

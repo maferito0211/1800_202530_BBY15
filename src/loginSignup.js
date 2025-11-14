@@ -12,6 +12,10 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // --- Login and Signup Page ---
 
+const pageTitle = "👤PROFILE";
+
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
+
 //Checks if the user is already logged in, if so redirects to the profile page
 // firebase auth state listener
 

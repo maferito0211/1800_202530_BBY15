@@ -17,6 +17,10 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const storage = getStorage();
 
+const pageTitle = "👤PROFILE";
+
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
+
 document.addEventListener("DOMContentLoaded", () => {
   const profileImg = document.getElementById("profile-picture");
   const fileInput = document.getElementById("profileImageInput");

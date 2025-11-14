@@ -12,6 +12,10 @@ import {
   getCountFromServer,
 } from "firebase/firestore";
 
+const pageTitle = "💬FORUMS";
+
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
+
 const querySnapshot = await getDocs(collection(db, "threads"));
 const coll = collection(db, "threads");
 const getCount = await getCountFromServer(coll);

@@ -11,3 +11,7 @@ function disappear() {
   //Bring the user to the map Page
   window.location.href = "map.html";
 }
+
+const pageTitle = "MAIN PAGE";
+
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
