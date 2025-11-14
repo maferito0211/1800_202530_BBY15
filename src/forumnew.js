@@ -56,5 +56,7 @@ document.getElementById("post").addEventListener("click", function () {
   //   content: content.value,
   //   comments: [],
   // });
-  window.open(`./forumpost.html?id=${newID}`);
+  setTimeout(() => {
+    window.location.href = `./forumpost.html?id=${newID}`;
+  }, 3000);
 });
