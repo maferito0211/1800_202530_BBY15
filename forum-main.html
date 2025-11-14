@@ -17,6 +17,29 @@
       <input type="text" placeholder="Search..." class="search-input" />
       <button class="search-button">🔍</button>
     </div>
+    <div>
+      <h3>Filter by category:</h3>
+      <form name="filtersForm">
+        <input type="radio" id="banking" value="0" name="filters" />
+        <label for="banking">Banking</label>
+
+        <input type="radio" id="government" value="1" name="filters" />
+        <label for="government">Government</label>
+
+        <input type="radio" id="medical" value="2" name="filters" />
+        <label for="medical">Medical</label>
+
+        <input type="radio" id="restaurants" value="3" name="filters" />
+        <label for="restaurants">Restaurants</label>
+
+        <input type="radio" id="shopping" value="4" name="filters" />
+        <label for="shopping">Shopping</label>
+
+        <input type="radio" id="transit" value="5" name="filters" />
+        <label for="transit">Transit</label>
+        <input type="button" id="filterButton" value="Filter" />
+      </form>
+    </div>
 
     <ul></ul>
 

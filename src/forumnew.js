@@ -24,6 +24,13 @@ document.getElementById("post").addEventListener("click", function () {
   var content = document.querySelector("#content");
   var newID = getCountForID.data().counter + 1;
   const ThreadRef = collection(db, "threads");
+  var tags = -1;
+  var ele = document.getElementsByName("filters");
+  for (var i = 0; i < ele.length; i++) {
+    if (ele[i].checked) {
+      tags = i;
+    }
+  }
 
   // Everytime a nwew thread is created, increment the counter by 1
   updateDoc(counterRef, { counter: increment(1) });
@@ -34,7 +41,7 @@ document.getElementById("post").addEventListener("click", function () {
     title: title.value,
     date: Date.now(),
     content: content.value,
-    comments: [],
+    tags: tags,
   });
 
   // addDoc(ThreadRef, {
