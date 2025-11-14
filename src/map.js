@@ -4,6 +4,10 @@ import { collection, getDocs } from "firebase/firestore";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
+const pageTitle = "🗺️MAP";
+
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
+
 async function loadLocations(map) {
   const querySnapshot = await getDocs(collection(db, "locations"));
   querySnapshot.forEach((doc) => {

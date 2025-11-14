@@ -9,10 +9,14 @@
     <link rel="stylesheet" href="./styles/forum-style.css" />
 
     <!-- Web Components -->
-    <script type="module" src="/src/components/site-footer.js"></script>
+    <script type="module" src="/src/components/default-components.js"></script>
   </head>
 
   <body>
+    <!-- Header -->
+    <site-navbar></site-navbar>
+
+    <!-- Main -->
     <div class="search-container">
       <input type="text" placeholder="Search..." class="search-input" />
       <button class="search-button">🔍</button>
@@ -41,7 +45,7 @@
       </form>
     </div>
 
-    <ul></ul>
+    <ul id="results"></ul>
 
     <div id="newpost">
       <a href="forumnew.html"><span id="plus">+</span>New Post</a>

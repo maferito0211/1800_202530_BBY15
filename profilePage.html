@@ -15,38 +15,28 @@
     <link type="text/css" rel="stylesheet" href="./styles/profile-page.css" />
 
     <!-- Web Components -->
-    <script type="module" src="/src/components/site-footer.js"></script>
+    <script type="module" src="/src/components/default-components.js"></script>
   </head>
 
   <body>
     <!-- Header -->
-    <header class="py-3 mb-4 border-bottom shadow-sm bg-light">
-      <div class="container text-center">
-        <h1 class="fw-bold">👤 My BCIT Profile</h1>
-        <p class="text-muted">View and manage your personal information</p>
-      </div>
-    </header>
+    <site-navbar></site-navbar>
 
     <!-- Main Content -->
-    <main class="container mb-5">
-      <div
-        class="card border-0 shadow-sm mx-auto text-center"
-        style="max-width: 500px"
-      >
+    <main class="container">
+      <div class="profile-container">
         <div class="card-body">
           <!-- Profile Picture -->
           <img
             id="profile-picture"
             src="./images/defaultProfilePicture.png"
             alt="Profile Picture"
-            class="rounded-circle mb-3 shadow-sm"
-            style="width: 120px; height: 120px; object-fit: cover"
           />
 
           <!-- User Info -->
           <h3 id="fullName" class="fw-semibold">Loading...</h3>
-          <p id="username" class="text-muted">@username</p>
-          <p id="bio" class="small text-secondary">Tell us about yourself...</p>
+          <p id="username">@username</p>
+          <p id="bio">Tell us about yourself...</p>
 
           <hr />
 
@@ -63,10 +53,6 @@
       </div>
     </main>
 
-    <br />
-    <br />
-    <br />
-
     <!-- Footer -->
     <site-footer></site-footer>
 
@@ -76,5 +62,6 @@
     <!-- Firebase + Custom Script -->
     <script type="module" src="/src/firebaseConfig.js"></script>
     <script type="module" src="/src/profile.js"></script>
+    <script type="module" src="/src/navBar.js"></script>
   </body>
 </html>

@@ -10,6 +10,10 @@ import {
   setDoc,
 } from "firebase/firestore";
 
+const pageTitle = "💬FORUMS";
+
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
+
 // simple increment (recommended for concurrent writers)
 
 var id = window.location.search.slice(4);
@@ -94,7 +98,7 @@ document
 async function postComment() {
   var txt = document.querySelector("textarea");
 
-  var author = localStorage.getItem("displayName") || "anonymous";
+  var author = localStorage.getItem("fullName") || "Anonymous";
 
   const coll = collection(db, "threads", id.toString(), "comments");
   const getCount = await getCountFromServer(coll);

@@ -12,6 +12,10 @@ import {
   getCountFromServer,
 } from "firebase/firestore";
 
+const pageTitle = "💬FORUMS";
+
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
+
 const querySnapshot = await getDocs(collection(db, "threads"));
 const coll = collection(db, "threads");
 const getCount = await getCountFromServer(coll);
@@ -37,7 +41,7 @@ document.getElementById("post").addEventListener("click", function () {
 
   setDoc(doc(db, "threads", newID.toString()), {
     id: newID,
-    user: localStorage.getItem("displayName") || "anonymous",
+    user: localStorage.getItem("fullName") || "Anonymous",
     title: title.value,
     date: Date.now(),
     content: content.value,
