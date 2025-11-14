@@ -12,17 +12,14 @@ import {
   where,
   orderBy,
 } from "firebase/firestore";
-import { searchThreads } from "./search.js";
-
-const querySnapshot = await getDocs(collection(db, "threads"));
-const getCount = await getCountFromServer(collection(db, "threads"));
 
 const pageTitle = "💬FORUMS";
 
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
-var container = document.querySelector("#results"); // changed to target the results list by id
-var threadID = getCount.data().count;
+const querySnapshot = await getDocs(collection(db, "threads"));
+const getCount = await getCountFromServer(collection(db, "threads"));
+
 var container = document.querySelector("ul");
 const threadID = getCount.data().count;
 
@@ -47,7 +44,9 @@ function addThreads(snapshot) {
       data.user
     }</span> </h4>
               <div class="subtitle">
-                <p class="timestamp"> ${formatDate(data.date)} </p>
+                <p class="timestamp"> ${new Date(
+                  data.date
+                ).toLocaleString()} </p>
                 <p class="commentcount"> ${data.comment_count} comments </p>
               </div>
             </a>
