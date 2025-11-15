@@ -51,6 +51,33 @@ function addThreads(snapshot) {
   });
 }
 
+//Checks all the threads titles for whats in the search bar
+document
+  .getElementById("searchButton")
+  .addEventListener("click", async function () {
+    container.innerHTML = "";
+    const searchText = document.getElementById("searchValue").value;
+    threadsSnap.forEach((doc) => {
+      const data = doc.data();
+      if (data.title.toLowerCase().includes(searchText.toLowerCase())) {
+        var html = `<li>
+            <a href="./forumpost.html?id=${data.id}">
+              <h4 class="title"> ${data.title} <span> - ${
+          data.user
+        }</span> </h4>
+              <div class="subtitle">
+                <p class="timestamp"> ${new Date(
+                  data.date
+                ).toLocaleString()} </p>
+                <p class="commentcount"> ${data.comment_count} comments </p>
+              </div>
+            </a>
+          </li>`;
+        container.insertAdjacentHTML("beforeend", html);
+      }
+    });
+  });
+
 var radValue;
 document.getElementById("filterButton").addEventListener("click", function () {
   var ele = document.getElementsByName("filters");
