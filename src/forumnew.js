@@ -52,6 +52,9 @@ document.getElementById("post").addEventListener("click", async function () {
     auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
   const uid = user ? user.uid : null;
 
+  const userName =
+    user?.displayName || localStorage.getItem("fullName") || "Anonymous";
+
   var newID = getCountForID.data().counter + 1;
   const ThreadRef = collection(db, "threads");
   var tags = -1;
@@ -62,20 +65,24 @@ document.getElementById("post").addEventListener("click", async function () {
     }
   }
 
-  // Everytime a new thread is created, increment the counter by 1
-  updateDoc(counterRef, { counter: increment(1) });
+  if (userName != "Anonymous") {
+    // Everytime a new thread is created, increment the counter by 1
+    updateDoc(counterRef, { counter: increment(1) });
 
-  await setDoc(doc(db, "threads", newID.toString()), {
-    id: newID,
-    user: user?.displayName || localStorage.getItem("fullName") || "Anonymous",
-    userID: uid, // <- stores UID reliably
-    title: title.value,
-    date: Date.now(),
-    content: content.value,
-    tags: tags,
-  });
+    await setDoc(doc(db, "threads", newID.toString()), {
+      id: newID,
+      user: userName,
+      userID: uid, // <- stores UID reliably
+      title: title.value,
+      date: Date.now(),
+      content: content.value,
+      tags: tags,
+    });
 
-  setTimeout(() => {
-    window.location.href = `./forumpost.html?id=${newID}`;
-  }, 3000);
+    setTimeout(() => {
+      window.location.href = `./forumpost.html?id=${newID}`;
+    }, 3000);
+  } else {
+    alert("Please sign in before posting!");
+  }
 });

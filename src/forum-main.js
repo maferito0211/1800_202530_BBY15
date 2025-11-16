@@ -44,9 +44,9 @@ function addThreads(snapshot) {
       data.user
     }</span> </h4>
               <div class="subtitle">
-                <p class="timestamp"> ${new Date(
-                  data.date
-                ).toLocaleString()} </p>
+                <p class="timestamp"> ${new Date(data.date)
+                  .toLocaleString()
+                  .replace(/(.*)\D\d+/, "$1")} </p>
                 <p class="commentcount"> ${data.comment_count} comments </p>
               </div>
             </a>
@@ -70,9 +70,9 @@ document
           data.user
         }</span> </h4>
               <div class="subtitle">
-                <p class="timestamp"> ${new Date(
-                  data.date
-                ).toLocaleString()} </p>
+                <p class="timestamp"> ${new Date(data.date)
+                  .toLocaleString()
+                  .replace(/(.*)\D\d+/, "$1")} </p>
                 <p class="commentcount"> ${data.comment_count} comments </p>
               </div>
             </a>
