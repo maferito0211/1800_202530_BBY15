@@ -46,6 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await signOut(auth);
       window.location.href = "./loginPage.html";
+
+      localStorage.removeItem("displayName");
+      localStorage.removeItem("fullName");
     } catch (err) {
       console.error("Logout failed:", err);
       alert("Logout failed. Please try again.");
