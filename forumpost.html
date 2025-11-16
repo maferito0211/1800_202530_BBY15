@@ -8,7 +8,6 @@
 
     <link rel="stylesheet" href="./styles/style.css" />
     <link rel="stylesheet" href="./styles/forum-style.css" />
-    <link rel="stylesheet" href="./styles/forum-clickable.css" />
 
     <!-- Web Components -->
     <script type="module" src="/src/components/default-components.js"></script>
@@ -16,23 +15,17 @@
 
   <body>
     <site-navbar></site-navbar>
-    <div class="search-container">
-      <input type="text" placeholder="Search..." class="search-input" />
-      <button class="search-button">🔍</button>
-    </div>
-    <div class="header"></div>
-    <div class="commentinput">
-      <textarea placeholder="Leave a comment"></textarea>
-      <button id="postCommentButton">Post</button>
-    </div>
+
+    <div class="header glow"></div>
     <div class="comments"></div>
 
-    <!-- Footer -->
-    <site-footer></site-footer>
+    <div id="commentInputContainer">
+      <textarea id="comment-input" placeholder="Leave a comment"></textarea>
+      <button type="button" id="postCommentButton">Post</button>
+    </div>
 
     <!-- Script Imports-->
     <script type="module" src="src/forumpost.js"></script>
-    <script type="module" src="/src/navBar.js"></script>
     <script>
       var comments = document.querySelector(".comments");
     </script>
