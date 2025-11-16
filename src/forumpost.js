@@ -95,9 +95,9 @@ for (const threadDoc of threadSnap.docs) {
     </div>
     <p> ${threadDoc.data().content} </p>
     <div class="subtitle">
-      <p class="timestamp"> ${new Date(
-        threadDoc.data().date
-      ).toLocaleString()}</p>
+      <p class="timestamp"> ${new Date(threadDoc.data().date)
+        .toLocaleString()
+        .replace(/(.*)\D\d+/, "$1")}</p>
       <p class="commentcount"> ${threadDoc.data().comment_count} comments</p>
     </div>
   `;
@@ -267,7 +267,9 @@ function renderCommentHTML(
       <div class="comment-container">
         <div class="comment-top">
           <p class="user"> <strong>${comment.author}</strong></p>
-          <p class="timestamp">${new Date(comment.date).toLocaleString()}</p>
+          <p class="timestamp">${new Date(comment.date)
+            .toLocaleString()
+            .replace(/(.*)\D\d+/, "$1")}</p>
         </div>
         <div class="comment-content">
         <img class="forum-profile-image" src="${
