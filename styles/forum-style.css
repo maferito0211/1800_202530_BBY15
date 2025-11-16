@@ -21,11 +21,6 @@ li {
   box-shadow: var(--shadow);
 }
 
-li:hover {
-  background: var(--gradient-hover);
-  cursor: pointer;
-}
-
 a {
   color: var(--text);
   text-decoration: none;
@@ -76,46 +71,185 @@ h4 {
   margin-right: 10px;
 }
 
-/* forumpost styles */
-.header {
-  margin: 0 2%;
+.op-forum-top-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
 }
 
-.user {
-  padding-top: 6px;
+.title {
+  text-align: left;
+  margin: 0;
+}
+
+.op-forum-top-container .forum-profile-image {
+  width: 5%;
+  height: 5%;
+  border-radius: 50%;
+}
+
+/* forumpost styles */
+.header {
+  width: 90%;
+  margin: auto;
+  padding: 2%;
+
+  border-radius: 2em;
+  background-color: var(--bg);
+
+  border: var(--border);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
+
+  transition: box-shadow 220ms ease, background 220ms ease;
 }
 
 .comments {
-  margin: 20px 2%;
+  margin: auto;
+  margin-top: 20px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
 }
+
+.comment-container {
+  margin: auto;
+}
+
+/* When a comment is selected */
+.comment-content {
+  cursor: pointer;
+
+  font-size: clamp(0.8em, 1vw, 2em);
+
+  background-color: var(--bg-light);
+
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+
+  padding: 1rem;
+  margin-top: 0;
+
+  transition: box-shadow 180ms ease, background 180ms ease;
+
+  display: flex;
+  align-items: center;
+}
+
+.comment-content .forum-profile-image {
+  width: clamp(30px, 3%, 35px);
+  height: clamp(30px, 3%, 35px);
+  border-radius: 50%;
+  margin-right: 1em;
+}
+
+.comment-content:hover {
+  background-color: rgba(62, 62, 62, 0.329);
+}
+
+/* End of where a comment is selected */
 
 .comment-top {
   display: flex;
+  justify-content: flex-start;
+  align-items: end;
+  margin: 0;
+  padding: 0;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  border-top-left-radius: 1em;
+  border-top-right-radius: 1em;
+  background-color: var(--bg);
+  font-size: clamp(0.8em, 1vw, 2em);
+}
+
+.comment-top .user {
+  margin: 0;
+  padding: 0;
+  margin-left: 1vw;
 }
 
 .comment-top .timestamp {
-  padding: 6px 0 0 5px;
+  align-items: end;
+  margin-left: auto;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
-.commentinput {
-  margin:0 2% 0 3%;
+#commentInputContainer {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 1%;
+  margin: auto;
+
+  background-color: var(--bg);
+  border-top-right-radius: 2em;
+  border-top-left-radius: 2em;
+
+  border: var(--border);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
+
+  display: flex;
+  position: fixed;
+  bottom: 0;
+
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+
+  resize: none; /* controlled by script */
+  overflow: hidden; /* ensures scrollHeight grows correctly */
+
+  /* smooth transition for glow changes */
+  transition: box-shadow 220ms ease, background 220ms ease;
+}
+
+/* add this: glow when any child (textarea) is focused */
+#commentInputContainer:focus-within {
+  box-shadow: var(--selected-glow);
+}
+
+.glow {
+  box-shadow: var(--selected-glow);
 }
 
 textarea {
-  width: 50%;
+  width: calc(100% - 2rem); /* leave room for rounded corners */
+  min-height: 5vh;
+  box-sizing: border-box;
+  background-color: var(--bg-light);
+  border-radius: 2em;
+  padding: 0.7rem 1rem;
+  border: none;
+  line-height: 1.4;
+  text-align: left;
+}
+
+#comment-input::placeholder {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+textarea:focus {
+  outline: none;
 }
 
 #postCommentButton {
-  margin-top: 15px;
+  width: 15%;
+  align-self: stretch;
+
   background-color: var(--primary);
   font-family: "Zalando Sans", system-ui, -apple-system, "Segoe UI", Roboto,
-  "Helvetica Neue", Arial;
+    "Helvetica Neue", Arial;
   color: beige;
   border: none;
   font-size: medium;
-  border-radius: 1em;
-  width: 90px;
-  height: 35px;
+  border-top-right-radius: 2em;
+  border-bottom-right-radius: 2em;
 }
 
 #postCommentButton:hover {
@@ -124,22 +258,67 @@ textarea {
   cursor: pointer;
 }
 
-.commentinput button {
+#commentInputContainer button {
   display: block;
 }
 
 .comment {
-  margin-bottom: 30px;
+  position: relative;
 }
 
 .reply {
-  padding: 0 0 20px 40px;
-  margin: 5px 0 0 15px;
-  border-left: solid;
-  border-color: #b1b1b1;
+  /* space for spine + connector to profile image */
+  padding-left: 3.5rem;
+  margin-bottom: 0;
+  margin-top: 20px;
+
+  position: relative;
 }
 
-/*forumnew styles */
-#content {
-  height: 9em;
+/* Vertical Spline */
+.reply::before {
+  content: "";
+  position: absolute;
+  left: 1.1rem;
+  top: -20px;
+  bottom: auto; /*Calculated in forumpost.js */
+  height: var(--spine-height); /* fallback */
+  width: 2px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  z-index: 0; /* ensure spine is behind connector/profile image */
+}
+
+/* Move horizontal connector to be relative to the comment content so it can be vertically centered.
+   Calculation note:
+   - .reply has padding-left: 3.5rem
+   - spine is at left: 1.1rem
+   - connector start relative to .comment-content is therefore left: -(3.5rem - 1.1rem) = -2.4rem
+   Tweak width as needed to reach the profile image center. */
+.reply > .comment .comment-content {
+  position: relative;
+}
+
+/* Horizontal Connector */
+.reply > .comment .comment-content::before {
+  content: "";
+  position: absolute;
+  left: -2.4rem; /* starts at the spine */
+  top: 50%; /* vertically center with the profile image */
+  transform: translateY(-50%);
+  width: 2.4rem;
+  height: 2px;
+  background: var(--text-muted);
+  z-index: 1; /* above the spine but below the profile image */
+}
+
+/* ensure the reply profile image sits above connectors */
+.comment-top .forum-profile-image {
+  width: 36px;
+  height: 36px;
+  margin-right: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }

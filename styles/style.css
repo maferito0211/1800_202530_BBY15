@@ -19,6 +19,9 @@
   --gradient: linear-gradient(0deg, var(--bg) 95%, var(--bg-light));
   --gradient-hover: linear-gradient(0deg, var(--bg), var(--bg-light));
   --shadow: 0px 2px 2px hsla(0, 0%, 0%, 0.07), 0px 4px 4px hsla(0, 0%, 0%, 0.15);
+
+  --selected-glow: 0px 0px 30px rgba(0, 172, 199, 0.12),
+    0px 0px 18px rgba(0, 172, 199, 0.08);
 }
 
 /* Global / default styles */
@@ -31,10 +34,16 @@ body {
     "Helvetica Neue", Arial;
   background: var(--bg-dark);
   margin: 0;
-  padding: 0 0 80px; /* leave space for fixed footer */
+
+  padding: 0 0 40px; /* leave space for fixed footer */
+  padding-top: 40px;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar-thumb {
+  height: 50%;
 }
 
 /* Generic heading defaults */
@@ -71,6 +80,12 @@ img {
   padding-right: 1rem;
 }
 
+site-navbar {
+  position: fixed;
+  top: 0;
+  z-index: 999;
+}
+
 nav {
   width: 100vw;
   height: 60px;
@@ -88,7 +103,8 @@ nav {
   flex-wrap: nowrap;
 }
 
-#menuButton {
+#menuButton,
+#return-button {
   margin-left: 20px;
   padding: 10px 15px;
   border: none;

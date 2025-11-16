@@ -12,9 +12,32 @@ import {
   getCountFromServer,
 } from "firebase/firestore";
 
+//Used to grab the user's id for the profile picture, Thor you can probably use this for
+// you way to check if user is signed in to post comments! - Tens (tyson)
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+const auth = getAuth();
+let currentUid = null;
+let currentUserPhotoURL = null;
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUid = user.uid; // <- current user's id
+    // read user document
+    const userDoc = await getDoc(doc(db, "users", currentUid));
+    currentUserPhotoURL = userDoc.exists() ? userDoc.data().photoURL : null;
+  } else {
+    currentUid = null;
+    currentUserPhotoURL = null;
+  }
+});
+//End of grabbing user information
+
+//Display the header
 const pageTitle = "💬FORUMS";
 
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
+//Display header end
 
 const querySnapshot = await getDocs(collection(db, "threads"));
 const coll = collection(db, "threads");
@@ -42,6 +65,7 @@ document.getElementById("post").addEventListener("click", function () {
   setDoc(doc(db, "threads", newID.toString()), {
     id: newID,
     user: localStorage.getItem("fullName") || "Anonymous",
+    userID: currentUid,
     title: title.value,
     date: Date.now(),
     content: content.value,
