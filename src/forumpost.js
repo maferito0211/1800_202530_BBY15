@@ -196,49 +196,60 @@ document
 
 //Takes User details and adds them to comment, then calls addComment(comment)
 async function postComment() {
-  var txt = document.querySelector("textarea");
+  const auth = getAuth();
+  let currentUid = null;
 
-  var author = localStorage.getItem("fullName") || "Anonymous";
+  const user =
+    auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
 
-  const coll = collection(db, "threads", id.toString(), "comments");
+  var author =
+    user?.displayName || localStorage.getItem("fullName") || "Anonymous";
 
-  const getCount = await getCountFromServer(coll);
-
-  var content = document.querySelector("textarea");
-  var newID = getCount.data().count;
-
-  // get signed-in user id safely (use currentUid if already set, otherwise fall back to auth.currentUser)
-  const uid = currentUid || (auth.currentUser && auth.currentUser.uid);
-  if (uid) {
-    const userDoc = await getDoc(doc(db, "users", uid));
-    currentUserPhotoURL = userDoc.exists() ? userDoc.data().photoURL : null;
+  if (author === "Anonymous" || author === "anonymous") {
+    alert("Please sign in before commenting!");
   } else {
-    // not signed in — clear photoURL and optionally handle anonymous posting
-    currentUserPhotoURL =
-      "http://localhost:5173/images/defaultProfilePicture.png";
-  }
+    var txt = document.querySelector("textarea");
 
-  await setDoc(
-    doc(db, "threads", id.toString(), "comments", newID.toString()),
-    {
-      id: newID,
-      user: author,
-      photoURL: currentUserPhotoURL,
-      date: Date.now(),
-      content: content.value,
+    const coll = collection(db, "threads", id.toString(), "comments");
+
+    const getCount = await getCountFromServer(coll);
+
+    var content = document.querySelector("textarea");
+    var newID = getCount.data().count;
+
+    // get signed-in user id safely (use currentUid if already set, otherwise fall back to auth.currentUser)
+    const uid = currentUid || (auth.currentUser && auth.currentUser.uid);
+    if (uid) {
+      const userDoc = await getDoc(doc(db, "users", uid));
+      currentUserPhotoURL = userDoc.exists() ? userDoc.data().photoURL : null;
+    } else {
+      // not signed in — clear photoURL and optionally handle anonymous posting
+      currentUserPhotoURL =
+        "http://localhost:5173/images/defaultProfilePicture.png";
     }
-  );
 
-  var comment = {
-    content: txt.value,
-    date: Date.now(),
-    author: author,
-  };
+    await setDoc(
+      doc(db, "threads", id.toString(), "comments", newID.toString()),
+      {
+        id: newID,
+        user: author,
+        photoURL: currentUserPhotoURL,
+        date: Date.now(),
+        content: content.value,
+      }
+    );
 
-  // compute the new document path and pass it to the renderer so replies will be stored under it
-  const newDocPath = `threads/${id.toString()}/comments/${newID.toString()}`;
-  addComments(comment, newID.toString(), currentUserPhotoURL, newDocPath);
-  txt.value = "";
+    var comment = {
+      content: txt.value,
+      date: Date.now(),
+      author: author,
+    };
+
+    // compute the new document path and pass it to the renderer so replies will be stored under it
+    const newDocPath = `threads/${id.toString()}/comments/${newID.toString()}`;
+    addComments(comment, newID.toString(), currentUserPhotoURL, newDocPath);
+    txt.value = "";
+  }
 }
 
 //Adds the comment to the screen
@@ -332,49 +343,62 @@ async function postReply(selectedComment) {
   const content = txt.value.trim();
   if (!content) return;
 
-  const author = localStorage.getItem("fullName") || "anonymous";
+  const user =
+    auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
 
-  const parentDocPath =
-    selectedComment &&
-    selectedComment.dataset &&
-    selectedComment.dataset.docPath;
-  if (!parentDocPath) {
-    console.warn("No doc path found for reply target");
-    return;
-  }
+  var author =
+    user?.displayName || localStorage.getItem("fullName") || "Anonymous";
 
-  try {
-    // build collection path segments and reserve a numeric id for the reply
-    const parentSegments = parentDocPath.split("/"); // e.g. ["threads","1","comments","5"]
-    const repliesColl = collection(db, ...parentSegments, "replies");
+  if (author === "Anonymous" || author === "anonymous") {
+    alert("SIgn in before replying!");
+  } else {
+    const parentDocPath =
+      selectedComment &&
+      selectedComment.dataset &&
+      selectedComment.dataset.docPath;
+    if (!parentDocPath) {
+      console.warn("No doc path found for reply target");
+      return;
+    }
 
-    // get a numeric id (keeps numbering consistent with comments)
-    const getCount = await getCountFromServer(repliesColl);
-    const newID = getCount.data().count;
+    try {
+      // build collection path segments and reserve a numeric id for the reply
+      const parentSegments = parentDocPath.split("/"); // e.g. ["threads","1","comments","5"]
+      const repliesColl = collection(db, ...parentSegments, "replies");
 
-    // write reply using canonical field name 'photoURL'
-    const replyDocRef = doc(db, ...parentSegments, "replies", newID.toString());
-    await setDoc(replyDocRef, {
-      id: newID,
-      author,
-      photoURL: currentUserPhotoURL, // <-- store author's photoURL
-      content,
-      date: Date.now(),
-    });
+      // get a numeric id (keeps numbering consistent with comments)
+      const getCount = await getCountFromServer(repliesColl);
+      const newID = getCount.data().count;
 
-    // include photoURL when rendering locally
-    const reply = {
-      id: newID,
-      author,
-      content,
-      date: Date.now(),
-      photoURL: currentUserPhotoURL,
-    };
-    addReply(reply, selectedComment, newID.toString(), replyDocRef.path);
-    txt.value = "";
-  } catch (err) {
-    console.error("Failed to post reply:", err);
-    alert("Failed to post reply. Check console for details.");
+      // write reply using canonical field name 'photoURL'
+      const replyDocRef = doc(
+        db,
+        ...parentSegments,
+        "replies",
+        newID.toString()
+      );
+      await setDoc(replyDocRef, {
+        id: newID,
+        author,
+        photoURL: currentUserPhotoURL, // <-- store author's photoURL
+        content,
+        date: Date.now(),
+      });
+
+      // include photoURL when rendering locally
+      const reply = {
+        id: newID,
+        author,
+        content,
+        date: Date.now(),
+        photoURL: currentUserPhotoURL,
+      };
+      addReply(reply, selectedComment, newID.toString(), replyDocRef.path);
+      txt.value = "";
+    } catch (err) {
+      console.error("Failed to post reply:", err);
+      alert("Failed to post reply. Check console for details.");
+    }
   }
 }
 
