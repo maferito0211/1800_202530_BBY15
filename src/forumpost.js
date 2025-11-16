@@ -249,6 +249,7 @@ function addComments(comment, commentId, authorProfilePictureURL, docPath) {
     authorProfilePictureURL || "",
     docPath || ""
   );
+  updateAllSpines();
   if (comments) comments.insertAdjacentHTML("beforeend", commentHtml);
 }
 
@@ -388,6 +389,7 @@ function addReply(reply, selectedComment, replyId, docPath) {
     target.insertAdjacentHTML("beforeend", replyHtml);
     updateSpine(target); // adjust height after adding a reply
   }
+  updateAllSpines();
 }
 
 //Make comments clickable to reply - made by the one and only TENSILLIONNNNN

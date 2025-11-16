@@ -18,20 +18,17 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const auth = getAuth();
 let currentUid = null;
-let currentUserPhotoURL = null;
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUid = user.uid; // <- current user's id
-    // read user document
-    const userDoc = await getDoc(doc(db, "users", currentUid));
-    currentUserPhotoURL = userDoc.exists() ? userDoc.data().photoURL : null;
   } else {
     currentUid = null;
-    currentUserPhotoURL = null;
   }
 });
-//End of grabbing user information
+
+// wait for initial auth state so currentUser is available before interacting
+await new Promise((resolve) => onAuthStateChanged(auth, resolve));
 
 //Display the header
 const pageTitle = "💬FORUMS";
@@ -46,9 +43,15 @@ const counterRef = await doc(db, "idCounter", "IdCounterDoc");
 const getCountForID = await getDoc(doc(db, "idCounter", "IdCounterDoc"));
 
 //You know what they say: all posters post posts
-document.getElementById("post").addEventListener("click", function () {
+document.getElementById("post").addEventListener("click", async function () {
   var title = document.querySelector("#threadtitle");
   var content = document.querySelector("#content");
+
+  // read the live signed-in user
+  const user =
+    auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
+  const uid = user ? user.uid : null;
+
   var newID = getCountForID.data().counter + 1;
   const ThreadRef = collection(db, "threads");
   var tags = -1;
@@ -59,27 +62,19 @@ document.getElementById("post").addEventListener("click", function () {
     }
   }
 
-  // Everytime a nwew thread is created, increment the counter by 1
+  // Everytime a new thread is created, increment the counter by 1
   updateDoc(counterRef, { counter: increment(1) });
 
-  setDoc(doc(db, "threads", newID.toString()), {
+  await setDoc(doc(db, "threads", newID.toString()), {
     id: newID,
-    user: localStorage.getItem("fullName") || "Anonymous",
-    userID: currentUid,
+    user: user?.displayName || localStorage.getItem("fullName") || "Anonymous",
+    userID: uid, // <- stores UID reliably
     title: title.value,
     date: Date.now(),
     content: content.value,
     tags: tags,
   });
 
-  // addDoc(ThreadRef, {
-  //   id: newID,
-  //   user: localStorage.getItem("displayName"),
-  //   title: title.value,
-  //   date: Date.now(),
-  //   content: content.value,
-  //   comments: [],
-  // });
   setTimeout(() => {
     window.location.href = `./forumpost.html?id=${newID}`;
   }, 3000);
