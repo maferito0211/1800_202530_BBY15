@@ -415,3 +415,18 @@ textarea:focus {
   position: relative;
   z-index: 2;
 }
+
+/* Visual / interaction for deepest-level comments (no further replies) */
+.comment .comment-content.no-reply {
+  pointer-events: none; /* prevents selection click */
+  opacity: 0.95;
+  cursor: default;
+}
+
+/* optional visual marker to indicate no more replies (small lock) */
+.comment[data-depth="9"] .comment-top .user::after {
+  content: " 🔒";
+  margin-left: 0.35rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
