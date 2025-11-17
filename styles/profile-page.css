@@ -12,6 +12,11 @@ main {
   align-items: center;
   justify-content: center;
   height: 100vh;
+  width: 100vw;
+}
+
+.container {
+  width: 80vw;
 }
 
 #name-container {
@@ -21,7 +26,7 @@ main {
 
 .profile-container {
   background-color: var(--bg);
-  width: 60%;
+  width: 100%;
   padding: 2%;
   margin: auto;
 
@@ -36,6 +41,18 @@ main {
   flex-direction: column;
   align-items: center;
   text-align: center;
+}
+
+.card-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+hr {
+  width: 90%;
+  margin: 20px 0;
 }
 
 #banner-img {
