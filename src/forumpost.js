@@ -105,6 +105,18 @@ for (const threadDoc of threadSnap.docs) {
   header.insertAdjacentHTML("beforeend", headerHtml);
 }
 
+// --- nesting depth helpers -----------------------------------------
+const MAX_REPLY_DEPTH = 9;
+/** depth = 1 for top-level comments (threads/.../comments/X)
+ *  depth increases by 1 for each '/replies/' segment in the doc path
+ */
+function computeDepth(docPath = "") {
+  if (!docPath) return 1;
+  const matches = docPath.match(/\/replies(\/|$)/g);
+  return (matches ? matches.length : 0) + 1;
+}
+// ------------------------------------------------------------------
+
 // Display comments on page load
 const commentDocRef = await getDocs(
   collection(db, "threads", id.toString(), "comments")
@@ -113,6 +125,7 @@ const commentDocRef = await getDocs(
 //For each loop through all comments in the collection
 for (const docSnap of commentDocRef.docs) {
   const data = docSnap.data();
+  const depth = computeDepth(docSnap.ref.path); // top-level => 1
   const html = renderCommentHTML(
     {
       author: data.user,
@@ -121,7 +134,9 @@ for (const docSnap of commentDocRef.docs) {
     },
     docSnap.id,
     data.photoURL || data.currentUserPhotoURL || "",
-    docSnap.ref.path
+    docSnap.ref.path,
+    data.userID || "",
+    depth
   );
 
   // Insert as a fragment and then find the newly appended direct child
@@ -268,12 +283,14 @@ function addComments(
   docPath,
   authorUid
 ) {
+  const depth = computeDepth(docPath);
   const commentHtml = renderCommentHTML(
     comment,
     commentId || "",
     authorProfilePictureURL || "",
     docPath || "",
-    authorUid || ""
+    authorUid || "",
+    depth
   );
   updateAllSpines();
   if (comments) comments.insertAdjacentHTML("beforeend", commentHtml);
@@ -285,12 +302,15 @@ function renderCommentHTML(
   commentId,
   authorProfilePictureURL,
   docPath,
-  authorUserId
+  authorUserId,
+  depth /* new param, integer */
 ) {
+  const d = Number(depth || computeDepth(docPath));
+  const noReplyClass = d >= MAX_REPLY_DEPTH ? " no-reply" : "";
   return `
     <div class="comment" data-comment-id="${commentId || ""}" data-doc-path="${
     docPath || ""
-  }" data-user-id="${authorUserId || ""}">
+  }" data-user-id="${authorUserId || ""}" data-depth="${d}">
       <div class="comment-container">
         <div class="comment-top">
           <p class="user"> <strong>${comment.author}</strong></p>
@@ -301,7 +321,7 @@ function renderCommentHTML(
           <!-- options button for this comment/reply -->
           <button class="options-button" aria-label="Options" title="Options" type="button">⋯</button>
         </div>
-        <div class="comment-content">
+        <div class="comment-content${noReplyClass}">
           <img class="forum-profile-image" src="${
             authorProfilePictureURL || ""
           }"></img>
@@ -325,12 +345,14 @@ async function loadReplies(threadId, parentDocPath, container) {
       const r = rDoc.data();
       const authorPhoto = r.photoURL || r.currentUserPhotoURL || "";
       const authorUid = r.userID || r.userId || r.uid || "";
+      const depth = computeDepth(rDoc.ref.path);
       const html = renderCommentHTML(
         r,
         rDoc.id,
         authorPhoto,
         rDoc.ref.path,
-        authorUid
+        authorUid,
+        depth
       );
 
       // Insert as a fragment and get the newly appended direct child reliably
@@ -365,7 +387,40 @@ window.addEventListener("resize", () => {
   window.resizeTimeout = setTimeout(updateAllSpines, 100);
 });
 
-//takes user details and adds them to reply, then calls addReply(reply)
+// selection toggler — prevent selecting if at max depth
+document.addEventListener("click", (e) => {
+  const headerEl = document.querySelector(".header");
+  const content = e.target.closest(".comment-content");
+  if (!content) return;
+
+  const commentEl = content.closest(".comment");
+  const depth = commentEl
+    ? Number(commentEl.getAttribute("data-depth") || 1)
+    : 1;
+  if (depth >= MAX_REPLY_DEPTH) {
+    // deepest level: do not allow selecting for reply
+    return;
+  }
+
+  // toggle selection: deselect if already selected, otherwise select this and clear others
+  if (content.classList.contains("selected-comment")) {
+    content.classList.remove("selected-comment");
+    content.parentNode.classList.remove("glow");
+    headerEl.classList.add("glow");
+  } else {
+    document
+      .querySelectorAll(".comment-content.selected-comment")
+      .forEach((c) => {
+        c.classList.remove("selected-comment");
+        c.parentNode.classList.remove("glow");
+      });
+    content.classList.add("selected-comment");
+    content.parentNode.classList.add("glow");
+    headerEl.classList.remove("glow");
+  }
+});
+
+// takes user details and adds them to reply, then calls addReply(reply)
 async function postReply(selectedComment) {
   var txt = document.querySelector("textarea");
   const content = txt.value.trim();
@@ -395,6 +450,14 @@ async function postReply(selectedComment) {
   })();
   if (!parentDocPath) {
     console.warn("No doc path found for reply target");
+    return;
+  }
+
+  // disallow creating a reply that would exceed MAX_REPLY_DEPTH
+  const parentDepth = computeDepth(parentDocPath);
+  const childDepth = parentDepth + 1;
+  if (childDepth > MAX_REPLY_DEPTH) {
+    alert("This comment has reached the maximum reply depth.");
     return;
   }
 
@@ -437,7 +500,15 @@ async function postReply(selectedComment) {
       photoURL,
       userID: uid || null,
     };
-    addReply(reply, selectedComment, newID.toString(), replyDocRef.path);
+    // compute depth for newly created reply
+    const replyDepth = computeDepth(replyDocRef.path);
+    addReply(
+      reply,
+      selectedComment,
+      newID.toString(),
+      replyDocRef.path,
+      replyDepth
+    );
     txt.value = "";
   } catch (err) {
     console.error("Failed to post reply:", err);
@@ -446,13 +517,14 @@ async function postReply(selectedComment) {
 }
 
 // addReply inserts a nested .comment and leaves its .reply container ready for more replies
-function addReply(reply, selectedComment, replyId, docPath) {
+function addReply(reply, selectedComment, replyId, docPath, depth) {
   const replyHtml = renderCommentHTML(
     reply,
     replyId || "",
     reply.photoURL || "./images/icons/defaultProfilePicture.png",
     docPath || "",
-    reply.userID || "" // <-- include user id on render
+    reply.userID || "", // <-- include user id on render
+    depth || computeDepth(docPath)
   );
   const target = selectedComment && selectedComment.querySelector(".reply");
   if (target) {
@@ -461,39 +533,6 @@ function addReply(reply, selectedComment, replyId, docPath) {
   }
   updateAllSpines();
 }
-
-//Make comments clickable to reply - made by the one and only TENSILLIONNNNN
-
-/*
- * The goal of this code is to add an event listener to each comment element
- * so that when a comment is clicked, it gets a cool border, How I plan to do that
- * is by adding a CSS class to the clicked comment, and removing that class from any other comments
- * This way, only one comment can have the border at a time
- * The CSS class will be defined in forum-clickable.css
- */
-
-document.addEventListener("click", (e) => {
-  const headerEl = document.querySelector(".header");
-  const content = e.target.closest(".comment-content");
-  if (!content) return;
-
-  // toggle selection: deselect if already selected, otherwise select this and clear others
-  if (content.classList.contains("selected-comment")) {
-    content.classList.remove("selected-comment");
-    content.parentNode.classList.remove("glow");
-    headerEl.classList.add("glow");
-  } else {
-    document
-      .querySelectorAll(".comment-content.selected-comment")
-      .forEach((c) => {
-        c.classList.remove("selected-comment");
-        c.parentNode.classList.remove("glow");
-      });
-    content.classList.add("selected-comment");
-    content.parentNode.classList.add("glow");
-    headerEl.classList.remove("glow");
-  }
-});
 
 // delegated options menu for comments & replies (document-level)
 document.addEventListener("click", async (ev) => {
@@ -510,6 +549,9 @@ document.addEventListener("click", async (ev) => {
 
   const docPath = commentEl.getAttribute("data-doc-path") || "";
   const ownerId = commentEl.getAttribute("data-user-id") || "";
+  const depth = Number(
+    commentEl.getAttribute("data-depth") || computeDepth(docPath)
+  );
   const currentUidLocal = auth.currentUser ? auth.currentUser.uid : currentUid;
 
   // build menu element
@@ -517,30 +559,38 @@ document.addEventListener("click", async (ev) => {
   menu.className = "options-menu";
   menu.setAttribute("role", "menu");
 
-  // reply/view item
-  const replyItem = document.createElement("div");
-  replyItem.className = "options-menu-item";
-  replyItem.textContent = "Reply";
-  replyItem.addEventListener("click", (e) => {
-    e.stopPropagation();
-    // simulate selecting the comment to reply to
-    const content = commentEl.querySelector(".comment-content");
-    if (content) {
-      // clear others
-      document
-        .querySelectorAll(".comment-content.selected-comment")
-        .forEach((c) => {
-          c.classList.remove("selected-comment");
-          c.parentNode.classList.remove("glow");
-        });
-      content.classList.add("selected-comment");
-      content.parentNode.classList.add("glow");
-      document.querySelector(".header")?.classList.remove("glow");
-    }
-    // remove menu
-    menu.remove();
-  });
-  menu.appendChild(replyItem);
+  // reply/view item - only show Reply if depth < MAX_REPLY_DEPTH
+  if (depth < MAX_REPLY_DEPTH) {
+    const replyItem = document.createElement("div");
+    replyItem.className = "options-menu-item";
+    replyItem.textContent = "Reply";
+    replyItem.addEventListener("click", (e) => {
+      e.stopPropagation();
+      // simulate selecting the comment to reply to
+      const content = commentEl.querySelector(".comment-content");
+      if (content) {
+        // clear others
+        document
+          .querySelectorAll(".comment-content.selected-comment")
+          .forEach((c) => {
+            c.classList.remove("selected-comment");
+            c.parentNode.classList.remove("glow");
+          });
+        content.classList.add("selected-comment");
+        content.parentNode.classList.add("glow");
+        document.querySelector(".header")?.classList.remove("glow");
+      }
+      // remove menu
+      menu.remove();
+    });
+    menu.appendChild(replyItem);
+  } else {
+    const info = document.createElement("div");
+    info.className = "options-menu-item";
+    info.textContent = "Max reply depth reached";
+    info.style.opacity = "0.7";
+    menu.appendChild(info);
+  }
 
   // only show delete if current user matches ownerId
   if (currentUidLocal && ownerId && currentUidLocal === ownerId) {
