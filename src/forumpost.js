@@ -112,7 +112,6 @@ const commentDocRef = await getDocs(
 //For each loop through all comments in the collection
 for (const docSnap of commentDocRef.docs) {
   const data = docSnap.data();
-  // pass the document path and the stored photoURL so replies know where to be stored
   const html = renderCommentHTML(
     {
       author: data.user,
@@ -120,17 +119,18 @@ for (const docSnap of commentDocRef.docs) {
       date: data.date,
     },
     docSnap.id,
-    // prefer the canonical field 'photoURL', fall back to any legacy key
     data.photoURL || data.currentUserPhotoURL || "",
     docSnap.ref.path
   );
 
-  if (comments) comments.insertAdjacentHTML("beforeend", html);
+  // Insert as a fragment and then find the newly appended direct child
+  const frag = document.createRange().createContextualFragment(html);
+  if (comments) comments.appendChild(frag);
 
-  // find reply container just inserted for this comment and load nested replies recursively
-  const commentEl = document.querySelector(
-    `.comment[data-comment-id="${docSnap.id}"]`
-  );
+  // reliably get the comment we just inserted (direct child of comments)
+  const commentEl = comments
+    ? comments.querySelector(`:scope > .comment:last-child`)
+    : null;
   const replyContainer = commentEl && commentEl.querySelector(".reply");
 
   // NOTE: call loadReplies with the full document path (docSnap.ref.path)
@@ -297,8 +297,6 @@ function renderCommentHTML(
 // recursive loader: loads replies for a given parent comment document path and appends to container
 async function loadReplies(threadId, parentDocPath, container) {
   try {
-    // Grabs the path and then splits it into segments to access the correct subcollection
-    // e.g. "threads/1/comments/5" => ["threads","1","comments","5"], pretty cool huh
     const parentSegments = parentDocPath.split("/");
     const repliesSnap = await getDocs(
       collection(db, ...parentSegments, "replies")
@@ -307,24 +305,28 @@ async function loadReplies(threadId, parentDocPath, container) {
     for (const rDoc of repliesSnap.docs) {
       const r = rDoc.data();
       const authorPhoto = r.photoURL || r.currentUserPhotoURL || "";
-      // pass the full document path of this reply so its own replies are saved under it
       const html = renderCommentHTML(r, rDoc.id, authorPhoto, rDoc.ref.path);
-      container.insertAdjacentHTML("beforeend", html);
 
+      // Insert as a fragment and get the newly appended direct child reliably
+      const frag = document.createRange().createContextualFragment(html);
+      container.appendChild(frag);
+
+      // the newly appended comment is the last direct .comment child of this container
       const newCommentEl = container.querySelector(
-        `.comment[data-comment-id="${rDoc.id}"]`
+        ":scope > .comment:last-child"
       );
       const replyContainer =
         newCommentEl && newCommentEl.querySelector(".reply");
 
-      // Recall's itself to load nested replies ~_~
+      // load nested replies recursively and update spine for that reply container
       if (replyContainer) {
         await loadReplies(threadId, rDoc.ref.path, replyContainer);
         updateSpine(replyContainer);
       }
     }
-    // update current container after all direct children inserted
-    updateSpine();
+
+    // update the spine for THIS container (pass container explicitly)
+    updateSpine(container);
     updateAllSpines();
   } catch (err) {
     console.error("Failed to load replies for", parentDocPath, err);
@@ -350,55 +352,64 @@ async function postReply(selectedComment) {
     user?.displayName || localStorage.getItem("fullName") || "Anonymous";
 
   if (author === "Anonymous" || author === "anonymous") {
-    alert("SIgn in before replying!");
-  } else {
-    const parentDocPath =
-      selectedComment &&
-      selectedComment.dataset &&
-      selectedComment.dataset.docPath;
-    if (!parentDocPath) {
-      console.warn("No doc path found for reply target");
-      return;
+    alert("Sign in before replying!");
+    return;
+  }
+
+  const parentDocPath = (function () {
+    if (!selectedComment) return null;
+    let path = selectedComment.getAttribute("data-doc-path");
+    if (path) return path;
+    const ancestor = selectedComment.closest("[data-doc-path]");
+    return ancestor ? ancestor.getAttribute("data-doc-path") : null;
+  })();
+  if (!parentDocPath) {
+    console.warn("No doc path found for reply target");
+    return;
+  }
+
+  try {
+    // ensure we have the author's photoURL right before writing
+    const uid = user?.uid || currentUid || null;
+    let photoURL = "./images/defaultProfilePicture.png";
+    if (uid) {
+      const userDoc = await getDoc(doc(db, "users", uid));
+      if (userDoc && userDoc.exists() && userDoc.data().photoURL) {
+        photoURL = userDoc.data().photoURL;
+      }
     }
 
-    try {
-      // build collection path segments and reserve a numeric id for the reply
-      const parentSegments = parentDocPath.split("/"); // e.g. ["threads","1","comments","5"]
-      const repliesColl = collection(db, ...parentSegments, "replies");
+    // build collection path segments and reserve a numeric id for the reply
+    const parentSegments = parentDocPath.split("/"); // e.g. ["threads","1","comments","5"]
+    const repliesColl = collection(db, ...parentSegments, "replies");
 
-      // get a numeric id (keeps numbering consistent with comments)
-      const getCount = await getCountFromServer(repliesColl);
-      const newID = getCount.data().count;
+    // get a numeric id (keeps numbering consistent with comments)
+    const getCount = await getCountFromServer(repliesColl);
+    const newID = getCount.data().count;
 
-      // write reply using canonical field name 'photoURL'
-      const replyDocRef = doc(
-        db,
-        ...parentSegments,
-        "replies",
-        newID.toString()
-      );
-      await setDoc(replyDocRef, {
-        id: newID,
-        author,
-        photoURL: currentUserPhotoURL, // <-- store author's photoURL
-        content,
-        date: Date.now(),
-      });
+    // write reply using canonical field name 'photoURL'
+    const replyDocRef = doc(db, ...parentSegments, "replies", newID.toString());
+    await setDoc(replyDocRef, {
+      id: newID,
+      author,
+      photoURL, // <-- use freshly-resolved photoURL
+      content,
+      date: Date.now(),
+    });
 
-      // include photoURL when rendering locally
-      const reply = {
-        id: newID,
-        author,
-        content,
-        date: Date.now(),
-        photoURL: currentUserPhotoURL,
-      };
-      addReply(reply, selectedComment, newID.toString(), replyDocRef.path);
-      txt.value = "";
-    } catch (err) {
-      console.error("Failed to post reply:", err);
-      alert("Failed to post reply. Check console for details.");
-    }
+    // include photoURL when rendering locally
+    const reply = {
+      id: newID,
+      author,
+      content,
+      date: Date.now(),
+      photoURL,
+    };
+    addReply(reply, selectedComment, newID.toString(), replyDocRef.path);
+    txt.value = "";
+  } catch (err) {
+    console.error("Failed to post reply:", err);
+    alert("Failed to post reply. Check console for details.");
   }
 }
 
