@@ -196,6 +196,8 @@ h4 {
   position: fixed;
   bottom: 0;
 
+  z-index: 999;
+
   flex-direction: row;
   justify-content: space-around;
   align-items: center;

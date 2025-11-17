@@ -351,7 +351,11 @@ async function postReply(selectedComment) {
   var author =
     user?.displayName || localStorage.getItem("fullName") || "Anonymous";
 
-  if (author === "Anonymous" || author === "anonymous") {
+  if (
+    author === "Anonymous" ||
+    author === "anonymous" ||
+    auth.currentUser == null
+  ) {
     alert("Sign in before replying!");
     return;
   }
