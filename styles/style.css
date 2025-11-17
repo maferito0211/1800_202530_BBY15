@@ -130,13 +130,6 @@ nav {
   font-weight: bold;
 }
 
-site-footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  z-index: 999;
-}
-
 footer {
   display: grid;
   grid-template-columns: 33% 34% 33%;
@@ -145,6 +138,9 @@ footer {
   background-color: var(--bg-light);
   color: rgb(179, 179, 179);
   position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 999;
 
   width: 100%;
   box-sizing: border-box;

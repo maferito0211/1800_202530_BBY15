@@ -9,6 +9,7 @@ import {
   query,
   where,
   setDoc,
+  deleteDoc, // <-- added
 } from "firebase/firestore";
 
 //Used to grab the user's id for the profile picture, Thor you can probably use this for
@@ -233,6 +234,7 @@ async function postComment() {
       {
         id: newID,
         user: author,
+        userID: uid || null, // <-- store author UID
         photoURL: currentUserPhotoURL,
         date: Date.now(),
         content: content.value,
@@ -247,18 +249,31 @@ async function postComment() {
 
     // compute the new document path and pass it to the renderer so replies will be stored under it
     const newDocPath = `threads/${id.toString()}/comments/${newID.toString()}`;
-    addComments(comment, newID.toString(), currentUserPhotoURL, newDocPath);
+    addComments(
+      comment,
+      newID.toString(),
+      currentUserPhotoURL,
+      newDocPath,
+      uid
+    ); // <-- pass uid
     txt.value = "";
   }
 }
 
 //Adds the comment to the screen
-function addComments(comment, commentId, authorProfilePictureURL, docPath) {
+function addComments(
+  comment,
+  commentId,
+  authorProfilePictureURL,
+  docPath,
+  authorUid
+) {
   const commentHtml = renderCommentHTML(
     comment,
     commentId || "",
     authorProfilePictureURL || "",
-    docPath || ""
+    docPath || "",
+    authorUid || ""
   );
   updateAllSpines();
   if (comments) comments.insertAdjacentHTML("beforeend", commentHtml);
@@ -269,23 +284,27 @@ function renderCommentHTML(
   comment,
   commentId,
   authorProfilePictureURL,
-  docPath
+  docPath,
+  authorUserId
 ) {
   return `
     <div class="comment" data-comment-id="${commentId || ""}" data-doc-path="${
     docPath || ""
-  }">
+  }" data-user-id="${authorUserId || ""}">
       <div class="comment-container">
         <div class="comment-top">
           <p class="user"> <strong>${comment.author}</strong></p>
           <p class="timestamp">${new Date(comment.date)
             .toLocaleString()
             .replace(/(.*)\D\d+/, "$1")}</p>
+
+          <!-- options button for this comment/reply -->
+          <button class="options-button" aria-label="Options" title="Options" type="button">⋯</button>
         </div>
         <div class="comment-content">
-        <img class="forum-profile-image" src="${
-          authorProfilePictureURL || ""
-        }"></img>
+          <img class="forum-profile-image" src="${
+            authorProfilePictureURL || ""
+          }"></img>
           ${comment.content}
         </div>
       </div>
@@ -305,7 +324,14 @@ async function loadReplies(threadId, parentDocPath, container) {
     for (const rDoc of repliesSnap.docs) {
       const r = rDoc.data();
       const authorPhoto = r.photoURL || r.currentUserPhotoURL || "";
-      const html = renderCommentHTML(r, rDoc.id, authorPhoto, rDoc.ref.path);
+      const authorUid = r.userID || r.userId || r.uid || "";
+      const html = renderCommentHTML(
+        r,
+        rDoc.id,
+        authorPhoto,
+        rDoc.ref.path,
+        authorUid
+      );
 
       // Insert as a fragment and get the newly appended direct child reliably
       const frag = document.createRange().createContextualFragment(html);
@@ -396,6 +422,7 @@ async function postReply(selectedComment) {
     await setDoc(replyDocRef, {
       id: newID,
       author,
+      userID: uid || null, // <-- store author UID for replies
       photoURL, // <-- use freshly-resolved photoURL
       content,
       date: Date.now(),
@@ -408,6 +435,7 @@ async function postReply(selectedComment) {
       content,
       date: Date.now(),
       photoURL,
+      userID: uid || null,
     };
     addReply(reply, selectedComment, newID.toString(), replyDocRef.path);
     txt.value = "";
@@ -423,7 +451,8 @@ function addReply(reply, selectedComment, replyId, docPath) {
     reply,
     replyId || "",
     reply.photoURL || "./images/icons/defaultProfilePicture.png",
-    docPath || ""
+    docPath || "",
+    reply.userID || "" // <-- include user id on render
   );
   const target = selectedComment && selectedComment.querySelector(".reply");
   if (target) {
@@ -464,4 +493,92 @@ document.addEventListener("click", (e) => {
     content.parentNode.classList.add("glow");
     headerEl.classList.remove("glow");
   }
+});
+
+// delegated options menu for comments & replies (document-level)
+document.addEventListener("click", async (ev) => {
+  const btn = ev.target.closest(".options-button");
+  if (!btn) return;
+
+  ev.stopPropagation();
+
+  // close any existing menus
+  document.querySelectorAll(".options-menu").forEach((m) => m.remove());
+
+  const commentEl = btn.closest(".comment");
+  if (!commentEl) return;
+
+  const docPath = commentEl.getAttribute("data-doc-path") || "";
+  const ownerId = commentEl.getAttribute("data-user-id") || "";
+  const currentUidLocal = auth.currentUser ? auth.currentUser.uid : currentUid;
+
+  // build menu element
+  const menu = document.createElement("div");
+  menu.className = "options-menu";
+  menu.setAttribute("role", "menu");
+
+  // reply/view item
+  const replyItem = document.createElement("div");
+  replyItem.className = "options-menu-item";
+  replyItem.textContent = "Reply";
+  replyItem.addEventListener("click", (e) => {
+    e.stopPropagation();
+    // simulate selecting the comment to reply to
+    const content = commentEl.querySelector(".comment-content");
+    if (content) {
+      // clear others
+      document
+        .querySelectorAll(".comment-content.selected-comment")
+        .forEach((c) => {
+          c.classList.remove("selected-comment");
+          c.parentNode.classList.remove("glow");
+        });
+      content.classList.add("selected-comment");
+      content.parentNode.classList.add("glow");
+      document.querySelector(".header")?.classList.remove("glow");
+    }
+    // remove menu
+    menu.remove();
+  });
+  menu.appendChild(replyItem);
+
+  // only show delete if current user matches ownerId
+  if (currentUidLocal && ownerId && currentUidLocal === ownerId) {
+    const delItem = document.createElement("div");
+    delItem.className = "options-menu-item options-menu-delete";
+    delItem.textContent = "Delete";
+    delItem.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      if (!confirm("Delete this item? This cannot be undone.")) return;
+      try {
+        if (!docPath) throw new Error("no document path");
+        const segments = docPath.split("/");
+        await deleteDoc(doc(db, ...segments));
+        commentEl.remove();
+        updateAllSpines();
+      } catch (err) {
+        console.error("Failed to delete comment/reply", err);
+        alert("Failed to delete. See console.");
+      }
+    });
+    menu.appendChild(delItem);
+  }
+
+  // attach menu to the comment (comment must be position:relative)
+  commentEl.appendChild(menu);
+  menu.style.position = "absolute";
+  menu.style.top = `${btn.offsetTop + btn.offsetHeight + 6}px`;
+  menu.style.right = `8px`;
+
+  // close menu when clicking outside
+  const onDocClick = (e) => {
+    if (
+      !e.target.closest(".options-menu") &&
+      !e.target.closest(".options-button")
+    ) {
+      document.querySelectorAll(".options-menu").forEach((m) => m.remove());
+      document.removeEventListener("click", onDocClick);
+    }
+  };
+  setTimeout(() => document.addEventListener("click", onDocClick), 0);
 });
