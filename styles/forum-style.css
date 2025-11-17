@@ -34,8 +34,7 @@ h4 {
   display: flex;
 }
 
-.timestamp,
-.commentcount {
+.subtitle p {
   padding-right: 5px;
   color: #6e6e6e;
 }
@@ -115,6 +114,25 @@ h4 {
 
 .comment-container {
   margin: auto;
+}
+
+#likes,
+#dislikes {
+  margin-left: 5px;
+  display: inline;
+  border-radius: 15px;
+  border: none;
+  color: var(--highlight);
+  height: 50px;
+  width: 70px;
+}
+
+#likes {
+  background-color: var(--success);
+}
+
+#dislikes {
+  background-color: #741a1a;
 }
 
 /* When a comment is selected */
