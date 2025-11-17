@@ -4,11 +4,14 @@ import {
   collection,
   getDocs,
   getDoc,
-  addDoc,
+  updateDoc,
   getCountFromServer,
   query,
   where,
   setDoc,
+  arrayUnion,
+  arrayRemove,
+  onSnapshot,
   deleteDoc, // <-- added
 } from "firebase/firestore";
 
@@ -19,6 +22,12 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 const auth = getAuth();
 let currentUid = null;
 let currentUserPhotoURL = null;
+
+const user =
+  auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
+
+var author =
+  user?.displayName || localStorage.getItem("fullName") || "Anonymous";
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
@@ -99,10 +108,98 @@ for (const threadDoc of threadSnap.docs) {
       <p class="timestamp"> ${new Date(threadDoc.data().date)
         .toLocaleString()
         .replace(/(.*)\D\d+/, "$1")}</p>
-      <p class="commentcount"> ${threadDoc.data().comment_count} comments</p>
+      <p class="commentcount"> ${
+        threadDoc.data().comment_count
+      } comments </p> <br class="buttonsNow"/>
+      <input type="button" id="likes" value="${
+        threadDoc.data().likes.length
+      } likes"></input>
+      <p class="empty"></p>
+      <input type="button" id="dislikes" value="${
+        threadDoc.data().dislikes.length
+      } dislikes"></input>
     </div>
   `;
   header.insertAdjacentHTML("beforeend", headerHtml);
+}
+
+// Adds username to likes array and updates the html to reflect
+document.getElementById("likes").addEventListener("click", likebtn);
+
+async function likebtn() {
+  if (author === "Anonymous" || author === "anonymous") {
+    alert("Please sign in before liking!");
+  } else {
+    const threadDocRef = doc(db, "threads", id.toString());
+    const threadDocSnap = await getDoc(threadDocRef);
+    var likeCount = threadDocSnap.data().likes.length;
+    if (threadDocSnap.data().likes.length == 0) {
+      await updateDoc(threadDocRef, {
+        likes: arrayUnion(author),
+      });
+      likeCount++;
+    } else {
+      threadDocSnap.data().likes.forEach(async (u) => {
+        if (u === author) {
+          likeCount--;
+          await updateDoc(threadDocRef, {
+            likes: arrayRemove(author),
+          });
+        } else {
+          likeCount++;
+          await updateDoc(threadDocRef, {
+            likes: arrayUnion(author),
+          });
+        }
+      });
+    }
+    giveBackLikeBtn(likeCount, ".buttonsNow", "likes");
+  }
+}
+
+function giveBackLikeBtn(likeCount, classSelector, likeType) {
+  document.getElementById(likeType).remove();
+  document
+    .querySelector(classSelector)
+    .insertAdjacentHTML(
+      "afterend",
+      `<input type="button" id="${likeType}" value="${likeCount} ${likeType}"></input>`
+    );
+  document
+    .getElementById(likeType)
+    .addEventListener("click", likeType === "likes" ? likebtn : dislikebtn);
+}
+
+// Adds username to likes array and updates the html to reflect
+document.getElementById("dislikes").addEventListener("click", dislikebtn);
+
+async function dislikebtn() {
+  if (author === "Anonymous" || author === "anonymous") {
+    alert("Please sign in before liking!");
+  } else {
+    const threadDocRef = doc(db, "threads", id.toString());
+    const threadDocSnap = await getDoc(threadDocRef);
+    var dislikeCount = threadDocSnap.data().likes.length;
+    if (threadDocSnap.data().dislikes.length == 0) {
+      await updateDoc(threadDocRef, {
+        dislikes: arrayUnion(author),
+      });
+      dislikeCount++;
+    } else {
+      threadDocSnap.data().dislikes.forEach(async (u) => {
+        if (u === author) {
+          await updateDoc(threadDocRef, {
+            dislikes: arrayRemove(author),
+          });
+        } else {
+          await updateDoc(threadDocRef, {
+            dislikes: arrayUnion(author),
+          });
+        }
+      });
+    }
+    giveBackLikeBtn(dislikeCount, ".empty", "dislikes");
+  }
 }
 
 // --- nesting depth helpers -----------------------------------------
@@ -214,12 +311,6 @@ document
 async function postComment() {
   const auth = getAuth();
   let currentUid = null;
-
-  const user =
-    auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
-
-  var author =
-    user?.displayName || localStorage.getItem("fullName") || "Anonymous";
 
   if (author === "Anonymous" || author === "anonymous") {
     alert("Please sign in before commenting!");

@@ -103,9 +103,8 @@ h4 {
   display: flex;
 }
 
-.timestamp,
-.commentcount {
-  padding-right: 1em;
+.subtitle p {
+  padding-right: 5px;
   color: #6e6e6e;
 }
 
@@ -187,6 +186,25 @@ h4 {
   margin: auto;
   border-radius: 1em;
   background-color: var(--bg);
+}
+
+#likes,
+#dislikes {
+  margin-left: 5px;
+  display: inline;
+  border-radius: 15px;
+  border: none;
+  color: var(--highlight);
+  height: 50px;
+  width: 70px;
+}
+
+#likes {
+  background-color: var(--success);
+}
+
+#dislikes {
+  background-color: #741a1a;
 }
 
 /* When a comment is selected */
