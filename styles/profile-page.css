@@ -53,10 +53,12 @@ main {
 }
 
 #profile-picture {
-  height: 20vh;
-  margin-bottom: 2vh;
-  width: auto;
-  border-radius: 50%;
+  width: 140px; /* puedes ajustar el tamaño */
+  height: 140px;
+  border-radius: 50%; /* ❤️ círculo perfecto */
+  object-fit: cover; /* recorta la imagen sin deformarla */
+  aspect-ratio: 1 / 1; /* 👈 asegura que SIEMPRE sea cuadrado */
+  overflow: hidden;
 }
 
 #name-bar {

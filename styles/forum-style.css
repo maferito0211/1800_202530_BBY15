@@ -84,9 +84,11 @@ h4 {
 }
 
 .op-forum-top-container .forum-profile-image {
-  width: 5%;
-  height: 5%;
+  width: 45px;
+  height: 45px;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 /* forumpost styles */
@@ -138,9 +140,10 @@ h4 {
 }
 
 .comment-content .forum-profile-image {
-  width: clamp(30px, 3%, 35px);
-  height: clamp(30px, 3%, 35px);
+  width: clamp(30px, 3vw, 45px);
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
+  object-fit: cover;
   margin-right: 1em;
 }
 
@@ -317,9 +320,10 @@ textarea:focus {
 /* ensure the reply profile image sits above connectors */
 .comment-top .forum-profile-image {
   width: 36px;
-  height: 36px;
-  margin-right: 12px;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
   flex-shrink: 0;
   position: relative;
   z-index: 2;
