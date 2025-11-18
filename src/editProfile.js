@@ -17,10 +17,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const storage = getStorage();
 
-const pageTitle = "👤PROFILE";
-
-document.getElementById("pageTitleSection").innerHTML = pageTitle;
-
 document.addEventListener("DOMContentLoaded", () => {
   const profileImg = document.getElementById("profile-picture");
   const fileInput = document.getElementById("profileImageInput");
@@ -31,7 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const bioEl = document.getElementById("bio");
 
   let currentUser = null;
-  let currentPhotoURL = null;
+  let currentPhotoURL =
+    "http://localhost:5173/images/defaultProfilePicture.png";
 
   // -------------------------------------------------------------
   // 1️⃣ Load user info and pre-fill form
@@ -54,7 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     profileImg.src =
       data.photoURL || user.photoURL || "./images/defaultProfilePicture.png";
-    currentPhotoURL = profileImg.src;
+
+    currentPhotoURL =
+      data.photoURL || user.photoURL || "./images/defaultProfilePicture.png"; // ⭐ FIXED ⭐
   });
 
   // -------------------------------------------------------------
@@ -69,10 +68,17 @@ document.addEventListener("DOMContentLoaded", () => {
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
 
+      // Update Firebase Auth
       await updateProfile(currentUser, { photoURL: url });
+
+      // Update Firestore
       await updateDoc(doc(db, "users", currentUser.uid), { photoURL: url });
 
+      // Update UI
       profileImg.src = url;
+
+      currentPhotoURL = url;
+
       showToast("📸 Profile picture updated!");
     } catch (err) {
       console.error("Photo upload failed:", err);
@@ -92,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const username = usernameEl.value.trim().toLowerCase();
     const bio = bioEl.value.trim();
 
-    // --- Basic field validation ---
     if (!firstName || !lastName || !username) {
       showToast("⚠️ Please fill in all required fields.", "danger");
       return;
@@ -108,18 +113,17 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // --- Check username uniqueness in Firestore ---
+    // Check username uniqueness
     const usersRef = collection(db, "users");
     const q = query(usersRef, where("username", "==", username));
     const snapshot = await getDocs(q);
 
-    // If someone else already uses this username
     if (!snapshot.empty && snapshot.docs[0].id !== currentUser.uid) {
       showToast("❌ This username is already taken.", "danger");
       return;
     }
 
-    // --- Prepare data to save ---
+    // SAVE DATA
     const updatedData = {
       firstName,
       lastName,
@@ -130,6 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       await updateDoc(doc(db, "users", currentUser.uid), updatedData);
+
       await updateProfile(currentUser, {
         displayName: `${firstName} ${lastName}`,
       });
@@ -145,9 +150,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // -------------------------------------------------------------
-  // 4️⃣ Helper: show toast message
-  // -------------------------------------------------------------
   function showToast(message, type = "success") {
     const toast = document.createElement("div");
     toast.className = `alert alert-${type} text-center position-fixed top-0 start-50 translate-middle-x mt-3 shadow`;
