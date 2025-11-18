@@ -16,6 +16,46 @@ import {
 
 const pageTitle = "💬FORUMS";
 
+const urlParams = new URLSearchParams(window.location.search);
+const locationIdFilter = urlParams.get("locationId");
+
+const locationContextDiv = document.getElementById("locationContext");
+
+// Si venimos con ?locationId, mostramos mensaje y botón para crear post
+if (locationIdFilter && locationContextDiv) {
+  try {
+    const locationDoc = await getDoc(doc(db, "locations", locationIdFilter));
+    if (locationDoc.exists()) {
+      const locationData = locationDoc.data();
+      const locName = locationData.name;
+      const locCategory = locationData.category || "";
+
+      locationContextDiv.innerHTML = `
+        <div class="location-context-box">
+          <p>
+            Showing posts related to 
+            <strong>${locName}</strong>
+            ${locCategory ? `(${locCategory})` : ""}.
+          </p>
+          <button id="createLocationPostBtn" class="btn btn-outline-dark">
+            Create post about ${locName}
+          </button>
+        </div>
+      `;
+
+      document
+        .getElementById("createLocationPostBtn")
+        .addEventListener("click", () => {
+          window.location.href = `./forumnew.html?locationId=${locationIdFilter}`;
+        });
+    } else {
+      locationContextDiv.textContent = "This location could not be found.";
+    }
+  } catch (err) {
+    console.error("Failed to load location", err);
+  }
+}
+
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
 const querySnapshot = await getDocs(collection(db, "threads"));
@@ -37,41 +77,33 @@ var threadsSnap = await getDocs(
 addThreads(threadsSnap);
 
 function addThreads(snapshot) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const locationIdFilter = urlParams.get("locationId");
+
   snapshot.forEach((doc) => {
     const data = doc.data();
-    const html = `<li data-doc-id="${doc.id}" data-thread-id="${
-      data.id
-    }" data-user-id="${data.userID || ""}">
-      <div class="forum-post-top-container">
-        <a href="./forumpost.html?id=${data.id}" class="title-link">
-          <h4 class="title">${data.title} <span> - ${data.user}</span></h4>
-        </a>
-        <div class="options-button" role="button" aria-label="Thread options"
-             data-doc-id="${doc.id}" data-user-id="${
-      data.userID || ""
-    }" data-thread-id="${data.id}">⋯</div>
-      </div>
 
-      <div class="subtitle">
-        <a href="./forumpost.html?id=${data.id}" class="subtitle-link">
-          <p class="timestamp">${new Date(data.date)
-            .toLocaleString()
-            .replace(/(.*)\D\d+/, "$1")}</p>
-          <p class="commentcount">${data.comment_count} comments</p>
-        </a>
-      </div>
-    </li>`;
-    container.insertAdjacentHTML("beforeend", html);
-
-    // attach a click handler on the li so clicking the row opens the thread
-    const li = container.querySelector(":scope > li:last-child");
-    if (li) {
-      li.addEventListener("click", (e) => {
-        // if options-button was clicked, we expect a capture handler to stop propagation
-        const tid = li.dataset.threadId;
-        if (tid) window.location.href = `./forumpost.html?id=${tid}`;
-      });
+    // 🔥 si hay filtro por location, solo mostramos los que coinciden
+    if (locationIdFilter && data.locationId !== locationIdFilter) {
+      return;
     }
+
+    var html = `<li>
+            <a href="./forumpost.html?id=${data.id}">
+              <h4 class="title"> ${data.title} <span> - ${
+      data.user
+    }</span> </h4>
+              <div class="subtitle">
+                <p class="timestamp"> ${new Date(data.date)
+                  .toLocaleString()
+                  .replace(/(.*)\D\d+/, "$1")} </p>
+                <p class="commentcount"> ${
+                  data.comment_count || 0
+                } comments </p>
+              </div>
+            </a>
+          </li>`;
+    container.insertAdjacentHTML("beforeend", html);
   });
 }
 
@@ -86,8 +118,16 @@ document
   .addEventListener("click", async function () {
     container.innerHTML = "";
     const searchText = document.getElementById("searchValue").value;
+    const urlParams = new URLSearchParams(window.location.search);
+    const locationIdFilter = urlParams.get("locationId");
+
     threadsSnap.forEach((doc) => {
       const data = doc.data();
+
+      if (locationIdFilter && data.locationId !== locationIdFilter) {
+        return;
+      }
+
       if (data.title.toLowerCase().includes(searchText.toLowerCase())) {
         var html = `<li>
             <a href="./forumpost.html?id=${data.id}">
@@ -98,7 +138,9 @@ document
                 <p class="timestamp"> ${new Date(data.date)
                   .toLocaleString()
                   .replace(/(.*)\D\d+/, "$1")} </p>
-                <p class="commentcount"> ${data.comment_count} comments </p>
+                <p class="commentcount"> ${
+                  data.comment_count || 0
+                } comments </p>
               </div>
             </a>
           </li>`;

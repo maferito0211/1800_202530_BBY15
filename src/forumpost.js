@@ -93,35 +93,66 @@ if (!firstThreadDoc) {
 //Displays the OP's message and stuff
 for (const threadDoc of threadSnap.docs) {
   const header = document.querySelector(".header");
-  // await the user document snapshot; use a different name so it doesn't shadow the imported doc()
+
   const userSnapshot = await getDoc(doc(db, "users", threadDoc.data().userID));
   const opProfilePictureURL =
     userSnapshot && userSnapshot.exists() ? userSnapshot.data().photoURL : null;
 
+  // 🔥 intentamos leer locationId del thread
+  let locationHtml = "";
+  const locationId = threadDoc.data().locationId;
+
+  if (locationId) {
+    try {
+      const locationDoc = await getDoc(doc(db, "locations", locationId));
+      if (locationDoc.exists()) {
+        const locData = locationDoc.data();
+        const locName = locData.name;
+        const locCategory = locData.category || "";
+
+        locationHtml = `
+          <p class="post-location">
+            📍 <strong>${locName}</strong> ${
+          locCategory ? `(${locCategory})` : ""
+        }
+            <button 
+              type="button" 
+              class="view-location-button" 
+              data-location-id="${locationId}">
+              View on Map
+            </button>
+          </p>
+        `;
+      }
+    } catch (err) {
+      console.error("Failed to load location for thread", err);
+    }
+  }
+
   const headerHtml = ` 
     <div class ="op-forum-top-container"> 
-    <img class="forum-profile-image" src="${opProfilePictureURL || ""}"></img>
-    <h2 class="title"> ${threadDoc.data().title}</h2>
+      <img class="forum-profile-image" src="${opProfilePictureURL || ""}"></img>
+      <h2 class="title"> ${threadDoc.data().title}</h2>
     </div>
+    ${locationHtml}
     <p> ${threadDoc.data().content} </p>
     <div class="subtitle">
       <p class="timestamp"> ${new Date(threadDoc.data().date)
         .toLocaleString()
         .replace(/(.*)\D\d+/, "$1")}</p>
-      <p class="commentcount"> ${
-        threadDoc.data().comment_count
-      } comments </p> <br class="buttonsNow"/>
-      <input type="button" id="likes" value="${
-        threadDoc.data().likes.length
-      } likes"></input>
-      <p class="empty"></p>
-      <input type="button" id="dislikes" value="${
-        threadDoc.data().dislikes.length
-      } dislikes"></input>
+      <p class="commentcount"> ${threadDoc.data().comment_count} comments</p>
     </div>
   `;
   header.insertAdjacentHTML("beforeend", headerHtml);
 }
+
+// 🔥 después del bucle, añadimos listeners al botón "View on Map"
+document.querySelectorAll(".view-location-button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const locId = btn.dataset.locationId;
+    window.location.href = `./map.html?locationId=${locId}`;
+  });
+});
 
 // Adds username to likes array and updates the html to reflect
 document.getElementById("likes").addEventListener("click", likebtn);

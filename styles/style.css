@@ -121,6 +121,14 @@ nav {
   margin-left: 20px;
 }
 
+#logoContainer {
+  cursor: pointer;
+}
+
+#logoContainer img {
+  cursor: pointer;
+}
+
 #pageTitleSection {
   display: flex;
   justify-content: center;
@@ -226,3 +234,296 @@ footer a img:hover {
 }
 
 /* End of global defaults */
+
+/*main page*/
+
+/* ============================================
+   HERO SECTION
+============================================ */
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: fadeIn 0.9s ease;
+}
+
+.hero-title {
+  font-size: 3.2rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  color: #111;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: #555;
+  max-width: 650px;
+  margin: 0 auto 1.9rem;
+}
+
+.hero-button {
+  padding: 0.9rem 2.4rem;
+  background: #202020;
+  border: none;
+  color: white;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.hero-button:hover {
+  background: #000;
+  transform: translateY(-2px);
+}
+
+.hero-image img {
+  width: 100%;
+  max-width: 900px;
+  border-radius: 14px;
+  margin-top: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  animation: fadeInUp 0.8s ease;
+}
+
+/* ============================================
+   TARGET AUDIENCE
+============================================ */
+.targets-section {
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.targets-section h2 {
+  margin-bottom: 2.5rem;
+  font-size: 2rem;
+  color: #222;
+}
+
+.targets-grid {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.target-card {
+  background: #fafafa;
+  padding: 1.8rem;
+  border-radius: 14px;
+  width: 260px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.target-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.img-box {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+/* ============================================
+   FEATURES SECTION
+============================================ */
+.features-section {
+  padding: 4rem 1.5rem 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 2.8rem;
+  margin-bottom: 5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.feature-item.reverse {
+  flex-direction: row-reverse;
+}
+
+.feature-text {
+  flex: 1;
+  min-width: 250px;
+  max-width: 460px;
+}
+
+.feature-text h2 {
+  font-size: 1.8rem;
+  color: #222;
+  margin-bottom: 0.8rem;
+}
+
+.feature-text p {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.feature-image img {
+  max-width: 550px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.7s ease;
+}
+
+/* ============================================
+   HOW IT WORKS
+============================================ */
+.how-section {
+  padding: 4rem 1.5rem;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.how-section h2 {
+  font-size: 2rem;
+  margin-bottom: 2.5rem;
+  color: #222;
+}
+
+.how-grid {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.how-step {
+  max-width: 250px;
+  text-align: center;
+}
+
+.how-step h3 {
+  margin-top: 1rem;
+  font-size: 1.25rem;
+  color: #222;
+}
+
+.how-step p {
+  color: #555;
+  font-size: 1rem;
+}
+
+.how-icon {
+  width: 350px;
+  margin: 5px auto;
+  object-fit: contain;
+}
+
+/* ============================================
+   CTA SECTION
+============================================ */
+.cta-section {
+  text-align: center;
+  padding: 4rem 1.5rem 4rem;
+  background: #f7f7f7;
+  border-top: 1px solid #eaeaea;
+  border-bottom: 1px solid #eaeaea;
+  margin-top: 3rem;
+}
+
+.cta-section h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  color: #111;
+}
+
+.cta-section p {
+  font-size: 1.15rem;
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+.cta-button {
+  padding: 1rem 2.8rem;
+  font-size: 1.15rem;
+  background: #202020;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.25s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.07);
+}
+
+.cta-button:hover {
+  background: #000;
+  transform: translateY(-3px);
+}
+
+/* ============================================
+   ANIMATIONS
+============================================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ============================================
+   SCROLL REVEAL ANIMATIONS
+============================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Variation for sliding from left */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.reveal-left.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Variation for sliding from right */
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.reveal-right.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}

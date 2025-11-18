@@ -14,7 +14,8 @@
     <!-- Mapbox CSS -->
     <link
       href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css"
-      rel="stylesheet"/>
+      rel="stylesheet"
+    />
 
     <link type="text/css" rel="stylesheet" href="./styles/map-styles.css" />
     <link type="text/css" rel="stylesheet" href="./styles/style.css" />
@@ -27,7 +28,6 @@
     <!-- Header -->
     <site-navbar></site-navbar>
 
-    
     <!-- <header class="py-3 mb-4 border-bottom shadow-sm">
       <div class="container text-center">
         <h1 class="fw-bold">🌎 BCIT Community Map</h1>
@@ -38,49 +38,51 @@
     </header> -->
 
     <!-- Main Content -->
-    <main class="container mb-4">
-      <div class="topContainer">
-      <!-- Search Bar -->
-      <div id="searchContainer" class="mb-3 text-center">
-        <input
-          type="text"
-          id="searchBox"
-          class="form-control w-50 mx-auto"
-          placeholder="Search for a place..."
-        />
+    <main class="container mb-4 map-layout">
+      <!-- Search + Filters BOX (separate from the map) -->
+      <div class="map-controls-box">
+        <!-- Search Bar -->
+        <div id="searchContainer" class="mb-3 text-center">
+          <input
+            type="text"
+            id="searchBox"
+            class="form-control w-50 mx-auto"
+            placeholder="Search for a place..."
+          />
+        </div>
+
+        <!-- Filters -->
+        <div id="filters" class="map-filters">
+          <button class="btn btn-outline-dark" data-category="All">All</button>
+          <button class="btn btn-outline-dark" data-category="Education">
+            📚Education
+          </button>
+          <button class="btn btn-outline-dark" data-category="Groceries">
+            🛒Groceries
+          </button>
+          <button class="btn btn-outline-dark" data-category="Banks">
+            🏦Banks
+          </button>
+          <button class="btn btn-outline-dark" data-category="Government">
+            🍁Government
+          </button>
+          <button class="btn btn-outline-dark" data-category="Pharmacies">
+            💊Pharmacies
+          </button>
+          <button class="btn btn-outline-dark" data-category="Shopping">
+            🛍️Shopping
+          </button>
+        </div>
       </div>
 
-      <!-- Filters -->
-      <div id="filters">
-        <button class="btn btn-outline-dark" data-category="All">All</button>
-        <button class="btn btn-outline-dark" data-category="Education">
-          📚Education
-        </button>
-        <button class="btn btn-outline-dark" data-category="Groceries">
-          🛒Groceries
-        </button>
-        <button class="btn btn-outline-dark" data-category="Banks">
-          🏦Banks
-        </button>
-        <button class="btn btn-outline-dark" data-category="Government">
-          🍁Government
-        </button>
-        <button class="btn btn-outline-dark" data-category="Pharmacies">
-          💊Pharmacies
-        </button>
+      <!-- MAP CARD (separate, does NOT get boxed with controls) -->
+      <div class="card border-0 shadow-sm position-relative map-card">
+        <div class="card-body p-2">
+          <div id="map"></div>
+          <button id="locateBtn" class="btn">📍 Locate Me</button>
+        </div>
       </div>
-    </div>
-
-      <div class="card border-0 shadow-sm position-relative">
-  <div class="card-body p-2">
-    <div id="map"></div>
-    <button id="locateBtn" class="btn">📍 Locate Me</button>
-  </div>
-</div>
-
-    <br />
-    <br />
-    <br />
+    </main>
 
     <!-- Footer -->
     <site-footer></site-footer>
