@@ -4,11 +4,15 @@ import {
   collection,
   getDocs,
   getDoc,
-  addDoc,
+  updateDoc,
   getCountFromServer,
   query,
   where,
   setDoc,
+  arrayUnion,
+  arrayRemove,
+  onSnapshot,
+  deleteDoc, // <-- added
 } from "firebase/firestore";
 
 //Used to grab the user's id for the profile picture, Thor you can probably use this for
@@ -18,6 +22,12 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 const auth = getAuth();
 let currentUid = null;
 let currentUserPhotoURL = null;
+
+const user =
+  auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
+
+var author =
+  user?.displayName || localStorage.getItem("fullName") || "Anonymous";
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
@@ -98,11 +108,111 @@ for (const threadDoc of threadSnap.docs) {
       <p class="timestamp"> ${new Date(threadDoc.data().date)
         .toLocaleString()
         .replace(/(.*)\D\d+/, "$1")}</p>
-      <p class="commentcount"> ${threadDoc.data().comment_count} comments</p>
+      <p class="commentcount"> ${
+        threadDoc.data().comment_count
+      } comments </p> <br class="buttonsNow"/>
+      <input type="button" id="likes" value="${
+        threadDoc.data().likes.length
+      } likes"></input>
+      <p class="empty"></p>
+      <input type="button" id="dislikes" value="${
+        threadDoc.data().dislikes.length
+      } dislikes"></input>
     </div>
   `;
   header.insertAdjacentHTML("beforeend", headerHtml);
 }
+
+// Adds username to likes array and updates the html to reflect
+document.getElementById("likes").addEventListener("click", likebtn);
+
+async function likebtn() {
+  if (author === "Anonymous" || author === "anonymous") {
+    alert("Please sign in before liking!");
+  } else {
+    const threadDocRef = doc(db, "threads", id.toString());
+    const threadDocSnap = await getDoc(threadDocRef);
+    var likeCount = threadDocSnap.data().likes.length;
+    if (threadDocSnap.data().likes.length == 0) {
+      await updateDoc(threadDocRef, {
+        likes: arrayUnion(author),
+      });
+      likeCount++;
+    } else {
+      threadDocSnap.data().likes.forEach(async (u) => {
+        if (u === author) {
+          likeCount--;
+          await updateDoc(threadDocRef, {
+            likes: arrayRemove(author),
+          });
+        } else {
+          likeCount++;
+          await updateDoc(threadDocRef, {
+            likes: arrayUnion(author),
+          });
+        }
+      });
+    }
+    giveBackLikeBtn(likeCount, ".buttonsNow", "likes");
+  }
+}
+
+function giveBackLikeBtn(likeCount, classSelector, likeType) {
+  document.getElementById(likeType).remove();
+  document
+    .querySelector(classSelector)
+    .insertAdjacentHTML(
+      "afterend",
+      `<input type="button" id="${likeType}" value="${likeCount} ${likeType}"></input>`
+    );
+  document
+    .getElementById(likeType)
+    .addEventListener("click", likeType === "likes" ? likebtn : dislikebtn);
+}
+
+// Adds username to likes array and updates the html to reflect
+document.getElementById("dislikes").addEventListener("click", dislikebtn);
+
+async function dislikebtn() {
+  if (author === "Anonymous" || author === "anonymous") {
+    alert("Please sign in before liking!");
+  } else {
+    const threadDocRef = doc(db, "threads", id.toString());
+    const threadDocSnap = await getDoc(threadDocRef);
+    var dislikeCount = threadDocSnap.data().likes.length;
+    if (threadDocSnap.data().dislikes.length == 0) {
+      await updateDoc(threadDocRef, {
+        dislikes: arrayUnion(author),
+      });
+      dislikeCount++;
+    } else {
+      threadDocSnap.data().dislikes.forEach(async (u) => {
+        if (u === author) {
+          await updateDoc(threadDocRef, {
+            dislikes: arrayRemove(author),
+          });
+        } else {
+          await updateDoc(threadDocRef, {
+            dislikes: arrayUnion(author),
+          });
+        }
+      });
+    }
+    giveBackLikeBtn(dislikeCount, ".empty", "dislikes");
+  }
+}
+
+// --- nesting depth helpers -----------------------------------------
+const MAX_REPLY_DEPTH = 9;
+/** depth = 1 for top-level comments (threads/.../comments/X)
+ *  depth increases by 1 for each '/replies/' segment in the doc path
+ */
+function computeDepth(docPath = "") {
+  if (!docPath) return 1;
+  const matches = docPath.match(/\/replies(\/|$)/g);
+  return (matches ? matches.length : 0) + 1;
+}
+// ------------------------------------------------------------------
 
 // Display comments on page load
 const commentDocRef = await getDocs(
@@ -112,6 +222,7 @@ const commentDocRef = await getDocs(
 //For each loop through all comments in the collection
 for (const docSnap of commentDocRef.docs) {
   const data = docSnap.data();
+  const depth = computeDepth(docSnap.ref.path); // top-level => 1
   const html = renderCommentHTML(
     {
       author: data.user,
@@ -120,7 +231,9 @@ for (const docSnap of commentDocRef.docs) {
     },
     docSnap.id,
     data.photoURL || data.currentUserPhotoURL || "",
-    docSnap.ref.path
+    docSnap.ref.path,
+    data.userID || "",
+    depth
   );
 
   // Insert as a fragment and then find the newly appended direct child
@@ -199,12 +312,6 @@ async function postComment() {
   const auth = getAuth();
   let currentUid = null;
 
-  const user =
-    auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
-
-  var author =
-    user?.displayName || localStorage.getItem("fullName") || "Anonymous";
-
   if (author === "Anonymous" || author === "anonymous") {
     alert("Please sign in before commenting!");
   } else {
@@ -233,6 +340,7 @@ async function postComment() {
       {
         id: newID,
         user: author,
+        userID: uid || null, // <-- store author UID
         photoURL: currentUserPhotoURL,
         date: Date.now(),
         content: content.value,
@@ -247,18 +355,33 @@ async function postComment() {
 
     // compute the new document path and pass it to the renderer so replies will be stored under it
     const newDocPath = `threads/${id.toString()}/comments/${newID.toString()}`;
-    addComments(comment, newID.toString(), currentUserPhotoURL, newDocPath);
+    addComments(
+      comment,
+      newID.toString(),
+      currentUserPhotoURL,
+      newDocPath,
+      uid
+    ); // <-- pass uid
     txt.value = "";
   }
 }
 
 //Adds the comment to the screen
-function addComments(comment, commentId, authorProfilePictureURL, docPath) {
+function addComments(
+  comment,
+  commentId,
+  authorProfilePictureURL,
+  docPath,
+  authorUid
+) {
+  const depth = computeDepth(docPath);
   const commentHtml = renderCommentHTML(
     comment,
     commentId || "",
     authorProfilePictureURL || "",
-    docPath || ""
+    docPath || "",
+    authorUid || "",
+    depth
   );
   updateAllSpines();
   if (comments) comments.insertAdjacentHTML("beforeend", commentHtml);
@@ -269,23 +392,30 @@ function renderCommentHTML(
   comment,
   commentId,
   authorProfilePictureURL,
-  docPath
+  docPath,
+  authorUserId,
+  depth /* new param, integer */
 ) {
+  const d = Number(depth || computeDepth(docPath));
+  const noReplyClass = d >= MAX_REPLY_DEPTH ? " no-reply" : "";
   return `
     <div class="comment" data-comment-id="${commentId || ""}" data-doc-path="${
     docPath || ""
-  }">
+  }" data-user-id="${authorUserId || ""}" data-depth="${d}">
       <div class="comment-container">
         <div class="comment-top">
           <p class="user"> <strong>${comment.author}</strong></p>
           <p class="timestamp">${new Date(comment.date)
             .toLocaleString()
             .replace(/(.*)\D\d+/, "$1")}</p>
+
+          <!-- options button for this comment/reply -->
+          <button class="options-button" aria-label="Options" title="Options" type="button">⋯</button>
         </div>
-        <div class="comment-content">
-        <img class="forum-profile-image" src="${
-          authorProfilePictureURL || ""
-        }"></img>
+        <div class="comment-content${noReplyClass}">
+          <img class="forum-profile-image" src="${
+            authorProfilePictureURL || ""
+          }"></img>
           ${comment.content}
         </div>
       </div>
@@ -305,7 +435,16 @@ async function loadReplies(threadId, parentDocPath, container) {
     for (const rDoc of repliesSnap.docs) {
       const r = rDoc.data();
       const authorPhoto = r.photoURL || r.currentUserPhotoURL || "";
-      const html = renderCommentHTML(r, rDoc.id, authorPhoto, rDoc.ref.path);
+      const authorUid = r.userID || r.userId || r.uid || "";
+      const depth = computeDepth(rDoc.ref.path);
+      const html = renderCommentHTML(
+        r,
+        rDoc.id,
+        authorPhoto,
+        rDoc.ref.path,
+        authorUid,
+        depth
+      );
 
       // Insert as a fragment and get the newly appended direct child reliably
       const frag = document.createRange().createContextualFragment(html);
@@ -339,7 +478,40 @@ window.addEventListener("resize", () => {
   window.resizeTimeout = setTimeout(updateAllSpines, 100);
 });
 
-//takes user details and adds them to reply, then calls addReply(reply)
+// selection toggler — prevent selecting if at max depth
+document.addEventListener("click", (e) => {
+  const headerEl = document.querySelector(".header");
+  const content = e.target.closest(".comment-content");
+  if (!content) return;
+
+  const commentEl = content.closest(".comment");
+  const depth = commentEl
+    ? Number(commentEl.getAttribute("data-depth") || 1)
+    : 1;
+  if (depth >= MAX_REPLY_DEPTH) {
+    // deepest level: do not allow selecting for reply
+    return;
+  }
+
+  // toggle selection: deselect if already selected, otherwise select this and clear others
+  if (content.classList.contains("selected-comment")) {
+    content.classList.remove("selected-comment");
+    content.parentNode.classList.remove("glow");
+    headerEl.classList.add("glow");
+  } else {
+    document
+      .querySelectorAll(".comment-content.selected-comment")
+      .forEach((c) => {
+        c.classList.remove("selected-comment");
+        c.parentNode.classList.remove("glow");
+      });
+    content.classList.add("selected-comment");
+    content.parentNode.classList.add("glow");
+    headerEl.classList.remove("glow");
+  }
+});
+
+// takes user details and adds them to reply, then calls addReply(reply)
 async function postReply(selectedComment) {
   var txt = document.querySelector("textarea");
   const content = txt.value.trim();
@@ -372,6 +544,14 @@ async function postReply(selectedComment) {
     return;
   }
 
+  // disallow creating a reply that would exceed MAX_REPLY_DEPTH
+  const parentDepth = computeDepth(parentDocPath);
+  const childDepth = parentDepth + 1;
+  if (childDepth > MAX_REPLY_DEPTH) {
+    alert("This comment has reached the maximum reply depth.");
+    return;
+  }
+
   try {
     // ensure we have the author's photoURL right before writing
     const uid = user?.uid || currentUid || null;
@@ -396,6 +576,7 @@ async function postReply(selectedComment) {
     await setDoc(replyDocRef, {
       id: newID,
       author,
+      userID: uid || null, // <-- store author UID for replies
       photoURL, // <-- use freshly-resolved photoURL
       content,
       date: Date.now(),
@@ -408,8 +589,17 @@ async function postReply(selectedComment) {
       content,
       date: Date.now(),
       photoURL,
+      userID: uid || null,
     };
-    addReply(reply, selectedComment, newID.toString(), replyDocRef.path);
+    // compute depth for newly created reply
+    const replyDepth = computeDepth(replyDocRef.path);
+    addReply(
+      reply,
+      selectedComment,
+      newID.toString(),
+      replyDocRef.path,
+      replyDepth
+    );
     txt.value = "";
   } catch (err) {
     console.error("Failed to post reply:", err);
@@ -418,12 +608,14 @@ async function postReply(selectedComment) {
 }
 
 // addReply inserts a nested .comment and leaves its .reply container ready for more replies
-function addReply(reply, selectedComment, replyId, docPath) {
+function addReply(reply, selectedComment, replyId, docPath, depth) {
   const replyHtml = renderCommentHTML(
     reply,
     replyId || "",
     reply.photoURL || "./images/icons/defaultProfilePicture.png",
-    docPath || ""
+    docPath || "",
+    reply.userID || "", // <-- include user id on render
+    depth || computeDepth(docPath)
   );
   const target = selectedComment && selectedComment.querySelector(".reply");
   if (target) {
@@ -433,35 +625,101 @@ function addReply(reply, selectedComment, replyId, docPath) {
   updateAllSpines();
 }
 
-//Make comments clickable to reply - made by the one and only TENSILLIONNNNN
+// delegated options menu for comments & replies (document-level)
+document.addEventListener("click", async (ev) => {
+  const btn = ev.target.closest(".options-button");
+  if (!btn) return;
 
-/*
- * The goal of this code is to add an event listener to each comment element
- * so that when a comment is clicked, it gets a cool border, How I plan to do that
- * is by adding a CSS class to the clicked comment, and removing that class from any other comments
- * This way, only one comment can have the border at a time
- * The CSS class will be defined in forum-clickable.css
- */
+  ev.stopPropagation();
 
-document.addEventListener("click", (e) => {
-  const headerEl = document.querySelector(".header");
-  const content = e.target.closest(".comment-content");
-  if (!content) return;
+  // close any existing menus
+  document.querySelectorAll(".options-menu").forEach((m) => m.remove());
 
-  // toggle selection: deselect if already selected, otherwise select this and clear others
-  if (content.classList.contains("selected-comment")) {
-    content.classList.remove("selected-comment");
-    content.parentNode.classList.remove("glow");
-    headerEl.classList.add("glow");
+  const commentEl = btn.closest(".comment");
+  if (!commentEl) return;
+
+  const docPath = commentEl.getAttribute("data-doc-path") || "";
+  const ownerId = commentEl.getAttribute("data-user-id") || "";
+  const depth = Number(
+    commentEl.getAttribute("data-depth") || computeDepth(docPath)
+  );
+  const currentUidLocal = auth.currentUser ? auth.currentUser.uid : currentUid;
+
+  // build menu element
+  const menu = document.createElement("div");
+  menu.className = "options-menu";
+  menu.setAttribute("role", "menu");
+
+  // reply/view item - only show Reply if depth < MAX_REPLY_DEPTH
+  if (depth < MAX_REPLY_DEPTH) {
+    const replyItem = document.createElement("div");
+    replyItem.className = "options-menu-item";
+    replyItem.textContent = "Reply";
+    replyItem.addEventListener("click", (e) => {
+      e.stopPropagation();
+      // simulate selecting the comment to reply to
+      const content = commentEl.querySelector(".comment-content");
+      if (content) {
+        // clear others
+        document
+          .querySelectorAll(".comment-content.selected-comment")
+          .forEach((c) => {
+            c.classList.remove("selected-comment");
+            c.parentNode.classList.remove("glow");
+          });
+        content.classList.add("selected-comment");
+        content.parentNode.classList.add("glow");
+        document.querySelector(".header")?.classList.remove("glow");
+      }
+      // remove menu
+      menu.remove();
+    });
+    menu.appendChild(replyItem);
   } else {
-    document
-      .querySelectorAll(".comment-content.selected-comment")
-      .forEach((c) => {
-        c.classList.remove("selected-comment");
-        c.parentNode.classList.remove("glow");
-      });
-    content.classList.add("selected-comment");
-    content.parentNode.classList.add("glow");
-    headerEl.classList.remove("glow");
+    const info = document.createElement("div");
+    info.className = "options-menu-item";
+    info.textContent = "Max reply depth reached";
+    info.style.opacity = "0.7";
+    menu.appendChild(info);
   }
+
+  // only show delete if current user matches ownerId
+  if (currentUidLocal && ownerId && currentUidLocal === ownerId) {
+    const delItem = document.createElement("div");
+    delItem.className = "options-menu-item options-menu-delete";
+    delItem.textContent = "Delete";
+    delItem.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      if (!confirm("Delete this item? This cannot be undone.")) return;
+      try {
+        if (!docPath) throw new Error("no document path");
+        const segments = docPath.split("/");
+        await deleteDoc(doc(db, ...segments));
+        commentEl.remove();
+        updateAllSpines();
+      } catch (err) {
+        console.error("Failed to delete comment/reply", err);
+        alert("Failed to delete. See console.");
+      }
+    });
+    menu.appendChild(delItem);
+  }
+
+  // attach menu to the comment (comment must be position:relative)
+  commentEl.appendChild(menu);
+  menu.style.position = "absolute";
+  menu.style.top = `${btn.offsetTop + btn.offsetHeight + 6}px`;
+  menu.style.right = `8px`;
+
+  // close menu when clicking outside
+  const onDocClick = (e) => {
+    if (
+      !e.target.closest(".options-menu") &&
+      !e.target.closest(".options-button")
+    ) {
+      document.querySelectorAll(".options-menu").forEach((m) => m.remove());
+      document.removeEventListener("click", onDocClick);
+    }
+  };
+  setTimeout(() => document.addEventListener("click", onDocClick), 0);
 });

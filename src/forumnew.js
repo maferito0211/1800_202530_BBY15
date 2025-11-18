@@ -77,6 +77,8 @@ document.getElementById("post").addEventListener("click", async function () {
       date: Date.now(),
       content: content.value,
       tags: tags,
+      likes: [],
+      dislikes: [],
     });
 
     setTimeout(() => {
