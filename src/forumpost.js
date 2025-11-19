@@ -104,6 +104,15 @@ for (const threadDoc of threadSnap.docs) {
     <h2 class="title"> ${threadDoc.data().title}</h2>
     </div>
     <p> ${threadDoc.data().content} </p>
+    <div class="forum-image-container">
+      ${
+        threadDoc.data().image || ""
+          ? `<img class="forum-post-image" src="data:image/jpeg;base64,${
+              threadDoc.data().image || ""
+            }"></img>`
+          : ""
+      }
+    </div>
     <div class="subtitle">
       <p class="timestamp"> ${new Date(threadDoc.data().date)
         .toLocaleString()

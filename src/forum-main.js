@@ -51,7 +51,11 @@ function addThreads(snapshot) {
       data.userID || ""
     }" data-thread-id="${data.id}">⋯</div>
       </div>
-
+      <div class="forum-post-image-in-main-container">
+        <img class="forum-post-image-in-main" src="data:image/jpeg;base64,${
+          data.image || ""
+        }" alt="Thread Image" />
+      </div>
       <div class="subtitle">
         <a href="./forumpost.html?id=${data.id}" class="subtitle-link">
           <p class="timestamp">${new Date(data.date)
@@ -94,6 +98,11 @@ document
               <h4 class="title"> ${data.title} <span> - ${
           data.user
         }</span> </h4>
+        <div class="forum-post-image-in-main-container">
+            <img class="forum-post-image-in-main" src="data:image/jpeg;base64,${
+              data.image || ""
+            }" alt="Thread Image" />
+        </div>
               <div class="subtitle">
                 <p class="timestamp"> ${new Date(data.date)
                   .toLocaleString()

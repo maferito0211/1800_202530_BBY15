@@ -1,3 +1,138 @@
+/*--------------------- New Forum Stylesheet ---------------------*/
+.form-text-input-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  background-color: var(--bg);
+
+  width: 90%;
+  margin: auto;
+  padding: 2%;
+
+  border-radius: 1em;
+}
+
+.form-text-input-container #content {
+  height: 10em;
+}
+
+.form-tags-input-container {
+  margin-top: 0;
+  padding-top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.form-tags-input-container .form-tags {
+  padding: 2%;
+  margin: 2%;
+  margin-top: 0;
+  background-color: var(--bg-light);
+  border-radius: 1em;
+
+  width: 20%;
+  aspect-ratio: 1/1;
+  max-width: 100px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form-tags-input-container .form-tags p {
+  justify-self: center;
+  align-self: center;
+  text-align: center;
+  margin: auto;
+}
+
+.form-tags-input-container .form-tags input[type="radio"] {
+  position: relative;
+  justify-self: flex-start;
+  margin: 0;
+}
+
+.form-text-input-container textarea {
+  margin-bottom: 1em;
+}
+
+.form-tags-input-container .form-text-input-container h3 {
+  margin-top: 1em;
+}
+
+form .form-text-input-container textarea {
+  border-radius: 1em;
+  width: calc(100% - 1em);
+
+  min-height: 5vh;
+  box-sizing: border-box;
+  background-color: var(--bg-light);
+  padding: 0.7rem 1rem;
+  border: none;
+  line-height: 1.4;
+  text-align: left;
+}
+
+#threadtitle {
+  margin-bottom: 2.5em;
+}
+
+.photo-upload-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 1em;
+}
+.photo-upload-container .insert-photo-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  padding: 1em;
+  border: none;
+  border-radius: 1em;
+  background-color: var(--primary);
+  color: beige;
+  font-size: medium;
+  transition: background-color 0.3s;
+}
+
+.photo-upload-container .insert-photo-btn h3 {
+  margin: 0;
+}
+
+.form-text-input-container input[type="button"] {
+  margin-top: 2em;
+  padding: 1em;
+  border: none;
+  border-radius: 1em;
+  background-color: var(--primary);
+  color: beige;
+  font-size: medium;
+  transition: background-color 0.3s;
+}
+
+.form-text-input-container input[type="button"]:hover,
+.photo-upload-container .insert-photo-btn:hover {
+  transition: background-color 0.3s;
+  background-color: var(--secondary);
+  cursor: pointer;
+}
+
+#forumImagePreview {
+  display: none;
+  max-width: 100%;
+  max-height: 200px;
+  margin-top: 1em;
+  border-radius: 1em;
+}
+
+/* --------------------- Forum Stylesheet --------------------- */
 ul {
   list-style-type: none;
   display: flex;
@@ -121,7 +256,7 @@ h4 {
 
 #newpost:hover {
   transition: background-color 0.3s;
-  background-color: oklch(60% 0.15 251);
+  background-color: var(--secondary);
   cursor: pointer;
 }
 
@@ -160,6 +295,27 @@ h4 {
   margin-right: 1em;
 }
 
+.forum-post-image-in-main-container {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40%;
+  min-width: 300px;
+  padding: 1em;
+}
+
+.forum-post-image-in-main {
+  max-width: 100%;
+  border-radius: 1em;
+  height: auto;
+}
+
+.forum-post-image-in-main[src="data:image/jpeg;base64,"] {
+  display: none;
+}
+
 /* forumpost styles */
 .header {
   width: 90%;
@@ -188,6 +344,16 @@ h4 {
   margin: auto;
   border-radius: 1em;
   background-color: var(--bg);
+}
+
+.forum-post-image {
+  margin: auto;
+  margin-bottom: 1em;
+  background-color: var(--bg-light);
+  max-width: 50%;
+  min-width: 400px;
+  border-radius: 1em;
+  margin-top: 1em;
 }
 
 #likes,
@@ -245,7 +411,7 @@ h4 {
 
 /* ensure comment container can position the options menu */
 .comment {
-  position: relative; /* already present, keep it */
+  position: relative;
 }
 
 /* align comment-top content and put options button to the far right */
@@ -257,7 +423,7 @@ h4 {
 
 /* make timestamp stay left of the options button and allow title to grow */
 .comment-top .timestamp {
-  margin-left: auto; /* pushes timestamp left so options sits at the far right */
+  margin-left: auto;
   margin-right: 0.5rem;
 }
 
@@ -275,7 +441,7 @@ h4 {
   border: none;
   cursor: pointer;
   flex-shrink: 0;
-  margin-left: 0; /* handled by timestamp margin-left:auto */
+  margin-left: 0;
 }
 
 /* options menu styling (keeps same look as thread list) */
@@ -317,7 +483,6 @@ h4 {
   resize: none; /* controlled by script */
   overflow: hidden; /* ensures scrollHeight grows correctly */
 
-  /* smooth transition for glow changes */
   transition: box-shadow 220ms ease, background 220ms ease;
 }
 
@@ -330,7 +495,7 @@ h4 {
   box-shadow: var(--selected-glow);
 }
 
-textarea {
+#commentInputContainer textarea {
   width: calc(100% - 2rem); /* leave room for rounded corners */
   min-height: 5vh;
   box-sizing: border-box;
@@ -348,7 +513,7 @@ textarea {
   flex-direction: column;
 }
 
-textarea:focus {
+#commentInputContainer textarea:focus {
   outline: none;
 }
 
@@ -404,10 +569,9 @@ textarea:focus {
 }
 
 /* Move horizontal connector to be relative to the comment content so it can be vertically centered.
-   Calculation note:
-   - .reply has padding-left: 3.5rem
-   - spine is at left: 1.1rem
-   - connector start relative to .comment-content is therefore left: -(3.5rem - 1.1rem) = -2.4rem
+    Calculation note:
+    connector start relative to .comment-content 
+    is therefore left: -(.reply padding-left - spline) = result
    Tweak width as needed to reach the profile image center. */
 .reply > .comment .comment-content {
   position: relative;
@@ -418,7 +582,7 @@ textarea:focus {
   content: "";
   position: absolute;
   left: -2.4rem; /* starts at the spine */
-  top: 50%; /* vertically center with the profile image */
+  top: 50%;
   transform: translateY(-50%);
   width: 2.4rem;
   height: 2px;
