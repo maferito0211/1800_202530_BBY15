@@ -150,6 +150,13 @@ for (const threadDoc of threadSnap.docs) {
         .toLocaleString()
         .replace(/(.*)\D\d+/, "$1")}</p>
       <p class="commentcount"> ${threadDoc.data().comment_count} comments</p>
+      <input type="button" id="likes" value="${
+        threadDoc.data().likes.length
+      } likes"></input>
+      <p class="empty"></p>
+      <input type="button" id="dislikes" value="${
+        threadDoc.data().dislikes.length
+      } dislikes"></input>
     </div>
   `;
   header.insertAdjacentHTML("beforeend", headerHtml);
@@ -193,7 +200,7 @@ async function likebtn() {
         }
       });
     }
-    giveBackLikeBtn(likeCount, ".buttonsNow", "likes");
+    giveBackLikeBtn(likeCount, ".commentcount", "likes");
   }
 }
 
