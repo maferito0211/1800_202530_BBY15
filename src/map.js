@@ -144,6 +144,24 @@ function showMap() {
       addUserPin(map);
     }
 
+    // SEARCH FILTER — live filtering by name or category
+    function setupSearch() {
+      const searchBox = document.getElementById("searchBox");
+      if (!searchBox) return;
+
+      searchBox.addEventListener("input", () => {
+        const query = searchBox.value.toLowerCase();
+
+        markers.forEach(({ marker, name, category }) => {
+          const matches =
+            name.toLowerCase().includes(query) ||
+            category.toLowerCase().includes(query);
+
+          marker.getElement().style.display = matches ? "block" : "none";
+        });
+      });
+    }
+
     // NOW userPosition is ready — safe to load markers
     await loadLocations(map);
     setupFilters(map);
