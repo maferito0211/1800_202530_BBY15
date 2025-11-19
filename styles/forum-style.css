@@ -167,6 +167,7 @@ li {
   border-radius: 8px;
   padding: 6px 0;
   z-index: 60;
+  cursor: pointer;
 }
 
 .options-menu-item {
@@ -188,36 +189,45 @@ li {
 .forum-post-top-container {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start; /* top-align so button lines up with title row */
   justify-content: flex-start;
-
-  width: 100%; /* ensure the flex row fills the parent's width */
+  width: 100%;
   gap: 0.5rem;
 }
 
-.forum-post-top-container .title {
-  display: inline-flex;
-  align-items: center;
-  line-height: 1;
+.forum-post-top-container .title-link {
+  display: flex;
+  flex-direction: column; /* stack title row and image */
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
 
-  flex: 1 1 auto; /* take remaining space so the button can be pushed right */
-  min-width: 0; /* allow the title to shrink instead of forcing wrap */
+.title-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .options-button {
   width: 36px;
   height: 36px;
   padding: 0;
-  margin-right: 1vw;
-  justify-self: flex-end;
+  margin-left: auto;
+  margin-right: 1em;
+  flex-shrink: 0;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  margin-left: auto; /* pushes button to the far right */
-  flex-shrink: 0;
+
   background-color: var(--bg-dark);
+  cursor: pointer;
+
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 a {
@@ -295,21 +305,13 @@ h4 {
   margin-right: 1em;
 }
 
-.forum-post-image-in-main-container {
-  margin-top: 1em;
-  margin-bottom: 1em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40%;
-  min-width: 300px;
-  padding: 1em;
-}
-
 .forum-post-image-in-main {
   max-width: 100%;
+  max-height: 200px; /* constrain height so it doesn't dominate */
+  width: auto;
   border-radius: 1em;
-  height: auto;
+  margin-top: 0.5rem;
+  object-fit: cover;
 }
 
 .forum-post-image-in-main[src="data:image/jpeg;base64,"] {
