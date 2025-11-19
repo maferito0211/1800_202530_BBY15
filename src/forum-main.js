@@ -82,8 +82,34 @@ function addThreads(snapshot) {
 
   snapshot.forEach((doc) => {
     const data = doc.data();
+    const html = `<li data-doc-id="${doc.id}" data-thread-id="${
+      data.id
+    }" data-user-id="${data.userID || ""}">
+      <div class="forum-post-top-container">
+        <a href="./forumpost.html?id=${data.id}" class="title-link">
+          <h4 class="title">${data.title} <span> - ${data.user}</span></h4>
+        </a>
+        <div class="options-button" role="button" aria-label="Thread options"
+             data-doc-id="${doc.id}" data-user-id="${
+      data.userID || ""
+    }" data-thread-id="${data.id}">⋯</div>
+      </div>
+      <div class="forum-post-image-in-main-container">
+        <img class="forum-post-image-in-main" src="data:image/jpeg;base64,${
+          data.image || ""
+        }" alt="Thread Image" />
+      </div>
+      <div class="subtitle">
+        <a href="./forumpost.html?id=${data.id}" class="subtitle-link">
+          <p class="timestamp">${new Date(data.date)
+            .toLocaleString()
+            .replace(/(.*)\D\d+/, "$1")}</p>
+          <p class="commentcount">${data.comment_count} comments</p>
+        </a>
+      </div>
+    </li>`;
+    container.insertAdjacentHTML("beforeend", html);
 
-    // 🔥 si hay filtro por location, solo mostramos los que coinciden
     if (locationIdFilter && data.locationId !== locationIdFilter) {
       return;
     }
@@ -134,6 +160,11 @@ document
               <h4 class="title"> ${data.title} <span> - ${
           data.user
         }</span> </h4>
+        <div class="forum-post-image-in-main-container">
+            <img class="forum-post-image-in-main" src="data:image/jpeg;base64,${
+              data.image || ""
+            }" alt="Thread Image" />
+        </div>
               <div class="subtitle">
                 <p class="timestamp"> ${new Date(data.date)
                   .toLocaleString()

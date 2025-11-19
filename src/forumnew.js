@@ -8,7 +8,6 @@ import {
   updateDoc,
   increment,
   getDoc,
-  serverTimestamp,
   getCountFromServer,
 } from "firebase/firestore";
 
@@ -45,10 +44,124 @@ const getCount = await getCountFromServer(coll);
 const counterRef = await doc(db, "idCounter", "IdCounterDoc");
 const getCountForID = await getDoc(doc(db, "idCounter", "IdCounterDoc"));
 
+function uploadImage() {
+  const input = document.getElementById("forumImageInput");
+  if (!input) {
+    console.error("forumImageInput not found");
+    return;
+  }
+
+  input.addEventListener("change", handleFileSelect);
+
+  async function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // quick guard for non-image files
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file.");
+      return;
+    }
+
+    // create an image bitmap for reliable drawing (better memory characteristics)
+    let bitmap;
+    try {
+      bitmap = await createImageBitmap(file);
+    } catch (e) {
+      // fallback to Image + FileReader if createImageBitmap isn't available
+      await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            bitmap = { width: img.width, height: img.height, img };
+            resolve();
+          };
+          img.onerror = reject;
+          img.src = reader.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // determine source dims
+    const srcWidth = bitmap.width || (bitmap.img && bitmap.img.width);
+    const srcHeight = bitmap.height || (bitmap.img && bitmap.img.height);
+
+    // max dimension (change as needed)
+    const MAX_DIM = 1024;
+
+    let dstWidth = srcWidth;
+    let dstHeight = srcHeight;
+    if (Math.max(srcWidth, srcHeight) > MAX_DIM) {
+      const scale = MAX_DIM / Math.max(srcWidth, srcHeight);
+      dstWidth = Math.round(srcWidth * scale);
+      dstHeight = Math.round(srcHeight * scale);
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = dstWidth;
+    canvas.height = dstHeight;
+    const ctx = canvas.getContext("2d");
+
+    if (bitmap instanceof ImageBitmap) {
+      ctx.drawImage(bitmap, 0, 0, dstWidth, dstHeight);
+      bitmap.close && bitmap.close(); // free if supported
+    } else if (bitmap.img) {
+      ctx.drawImage(bitmap.img, 0, 0, dstWidth, dstHeight);
+    }
+
+    // compress to JPEG and reduce quality until under size target (200KB)
+    const SIZE_TARGET_BYTES = 200 * 1024;
+    let quality = 0.8;
+    let dataUrl = canvas.toDataURL("image/jpeg", quality);
+
+    // dataUrl length is ~ (4/3)*bytes, so loop until below target or min quality
+    while (dataUrl.length / 1.33 > SIZE_TARGET_BYTES && quality > 0.2) {
+      quality -= 0.1;
+      dataUrl = canvas.toDataURL("image/jpeg", quality);
+    }
+
+    // final base64
+    const base64String = dataUrl.split(",")[1];
+
+    // try storing, handle quota errors
+    try {
+      localStorage.setItem("forumImage", base64String);
+      console.log(
+        "Compressed image stored in localStorage, size (KB):",
+        Math.round(base64String.length / 1.33 / 1024)
+      );
+    } catch (err) {
+      console.error("Failed storing image in localStorage:", err);
+      alert(
+        "Image still too large to save locally. Please pick a smaller image or reduce dimensions."
+      );
+      return;
+    }
+
+    // set preview (ensure preview element exists)
+    const previewEl = document.getElementById("forumImagePreview");
+    if (previewEl && previewEl.tagName === "IMG") {
+      previewEl.style.display = "block";
+      previewEl.src = dataUrl;
+    } else if (previewEl) {
+      // if existing element isn't an IMG, set background
+      previewEl.style.backgroundImage = `url(${dataUrl})`;
+      previewEl.style.backgroundSize = "cover";
+    }
+  }
+}
+
+//TLDR: This was vibe coded, and IDK what it does fully, but hopefully it downsizes images - Tens
+uploadImage();
+
 //You know what they say: all posters post posts
 document.getElementById("post").addEventListener("click", async function () {
   var title = document.querySelector("#threadtitle");
   var content = document.querySelector("#content");
+  const inputImage = localStorage.getItem("forumImage") || "";
 
   // read the live signed-in user
   const user =
@@ -82,7 +195,8 @@ document.getElementById("post").addEventListener("click", async function () {
       tags: tags,
       likes: [],
       dislikes: [],
-      locationId: locationIdFromUrl || null, // 🔥 sólo tiene valor si vino del mapa
+      image: inputImage,
+      locationId: locationIdFromUrl || null
     });
 
     setTimeout(() => {

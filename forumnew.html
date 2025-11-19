@@ -15,42 +15,65 @@
 
   <body>
     <site-navbar></site-navbar>
-    <div class="search-container">
-      <input type="text" placeholder="Search..." class="search-input" />
-      <button class="search-button">🔍</button>
-    </div>
 
-    <h1>New Post</h1>
+    <h1>Making a Post</h1>
     <form>
-      <h3>Forum Title</h3>
-      <textarea id="threadtitle" placeholder="Title"></textarea>
-      <h3>Forum Content</h3>
-      <textarea
-        id="content"
-        placeholder="Why is parking at BCIT so expensive?"
-      ></textarea>
-      <br />
+      <div class="form-text-input-container">
+        <h3>Forum Title</h3>
+        <textarea id="threadtitle" placeholder="Title"></textarea>
+        <h3>Forum Content</h3>
+        <textarea
+          id="content"
+          placeholder="Put your content here..."
+        ></textarea>
 
-      <h3>Category:</h3>
-      <input type="radio" id="banking" value="0" name="filters" />
-      <label for="banking">Banking</label>
+        <br />
 
-      <input type="radio" id="government" value="1" name="filters" />
-      <label for="government">Government</label>
+        <h3>Category:</h3>
+        <div class="form-tags-input-container">
+          <label class="form-tags" for="banking">
+            <input type="radio" id="banking" value="0" name="filters" />
+            <p>Banking</p>
+          </label>
 
-      <input type="radio" id="medical" value="2" name="filters" />
-      <label for="medical">Medical</label>
+          <label class="form-tags" for="government">
+            <input type="radio" id="government" value="1" name="filters" />
+            <p>Government</p>
+          </label>
 
-      <input type="radio" id="restaurants" value="3" name="filters" />
-      <label for="restaurants">Restaurants</label>
+          <label class="form-tags" for="medical">
+            <input type="radio" id="medical" value="2" name="filters" />
+            <p>Medical</p>
+          </label>
 
-      <input type="radio" id="shopping" value="4" name="filters" />
-      <label for="shopping">Shopping</label>
+          <label class="form-tags" for="restaurants">
+            <input type="radio" id="restaurants" value="3" name="filters" />
+            <p>Restaurants</p>
+          </label>
 
-      <input type="radio" id="transit" value="5" name="filters" />
-      <label for="transit">Transit</label> <br />
+          <label class="form-tags" for="shopping">
+            <input type="radio" id="shopping" value="4" name="filters" />
+            <p>Shopping</p>
+          </label>
 
-      <input type="button" id="post" value="POST" />
+          <label class="form-tags" for="transit">
+            <input type="radio" id="transit" value="5" name="filters" />
+            <p>Transit</p>
+          </label>
+
+          <br />
+        </div>
+        <div class="photo-upload-container">
+          <label for="forumImageInput" class="insert-photo-btn">
+            <h3>Add a Photo</h3>
+          </label>
+          <input type="file" id="forumImageInput" accept="image/*" hidden />
+          <div class="photo-upload-container">
+            <img id="forumImagePreview" alt="Preview"></img>
+          </div>
+        </div>
+        <input type="button" id="post" value="POST" />
+      </div>
     </form>
 
     <!-- Footer -->
