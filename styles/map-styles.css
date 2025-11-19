@@ -35,7 +35,6 @@ header h1 {
 
 /* Search bar inside the white box */
 #searchBox {
-  width: 80% !important;
   max-width: 500px;
   border-radius: 25px;
   padding: 10px 20px;
@@ -132,6 +131,9 @@ header h1 {
 
   #searchContainer {
     order: 1;
+    display: flex;
+    justify-content: center;
+    width: 300% !important;
   }
 
   .map-controls-box {
