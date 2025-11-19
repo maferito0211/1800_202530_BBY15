@@ -32,6 +32,9 @@ await new Promise((resolve) => onAuthStateChanged(auth, resolve));
 //Display the header
 const pageTitle = "💬FORUMS";
 
+const urlParams = new URLSearchParams(window.location.search);
+const locationIdFromUrl = urlParams.get("locationId");
+
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
 //Display header end
 
@@ -193,6 +196,7 @@ document.getElementById("post").addEventListener("click", async function () {
       likes: [],
       dislikes: [],
       image: inputImage,
+      locationId: locationIdFromUrl || null
     });
 
     setTimeout(() => {
