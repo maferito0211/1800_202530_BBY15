@@ -82,22 +82,27 @@ function addThreads(snapshot) {
 
   snapshot.forEach((doc) => {
     const data = doc.data();
-    const html = `<li data-doc-id="${doc.id}" data-thread-id="${
+
+    if (locationIdFilter && data.locationId !== locationIdFilter) {
+      return;
+    }
+
+    var html = `<li data-doc-id="${doc.id}" data-thread-id="${
       data.id
     }" data-user-id="${data.userID || ""}">
       <div class="forum-post-top-container">
         <a href="./forumpost.html?id=${data.id}" class="title-link">
-          <h4 class="title">${data.title} <span> - ${data.user}</span></h4>
+          <div class="title-row">
+            <h4 class="title">${data.title} <span> - ${data.user}</span></h4>
+          </div>
+          <img class="forum-post-image-in-main" src="data:image/jpeg;base64,${
+            data.image || ""
+          }" alt="Thread Image" />
         </a>
         <div class="options-button" role="button" aria-label="Thread options"
              data-doc-id="${doc.id}" data-user-id="${
       data.userID || ""
     }" data-thread-id="${data.id}">⋯</div>
-      </div>
-      <div class="forum-post-image-in-main-container">
-        <img class="forum-post-image-in-main" src="data:image/jpeg;base64,${
-          data.image || ""
-        }" alt="Thread Image" />
       </div>
       <div class="subtitle">
         <a href="./forumpost.html?id=${data.id}" class="subtitle-link">
@@ -108,27 +113,7 @@ function addThreads(snapshot) {
         </a>
       </div>
     </li>`;
-    container.insertAdjacentHTML("beforeend", html);
 
-    if (locationIdFilter && data.locationId !== locationIdFilter) {
-      return;
-    }
-
-    var html = `<li>
-            <a href="./forumpost.html?id=${data.id}">
-              <h4 class="title"> ${data.title} <span> - ${
-      data.user
-    }</span> </h4>
-              <div class="subtitle">
-                <p class="timestamp"> ${new Date(data.date)
-                  .toLocaleString()
-                  .replace(/(.*)\D\d+/, "$1")} </p>
-                <p class="commentcount"> ${
-                  data.comment_count || 0
-                } comments </p>
-              </div>
-            </a>
-          </li>`;
     container.insertAdjacentHTML("beforeend", html);
   });
 }
@@ -155,26 +140,32 @@ document
       }
 
       if (data.title.toLowerCase().includes(searchText.toLowerCase())) {
-        var html = `<li>
-            <a href="./forumpost.html?id=${data.id}">
-              <h4 class="title"> ${data.title} <span> - ${
-          data.user
-        }</span> </h4>
-        <div class="forum-post-image-in-main-container">
-            <img class="forum-post-image-in-main" src="data:image/jpeg;base64,${
-              data.image || ""
-            }" alt="Thread Image" />
-        </div>
-              <div class="subtitle">
-                <p class="timestamp"> ${new Date(data.date)
-                  .toLocaleString()
-                  .replace(/(.*)\D\d+/, "$1")} </p>
-                <p class="commentcount"> ${
-                  data.comment_count || 0
-                } comments </p>
-              </div>
-            </a>
-          </li>`;
+        var html = `<li data-doc-id="${doc.id}" data-thread-id="${
+          data.id
+        }" data-user-id="${data.userID || ""}">
+      <div class="forum-post-top-container">
+        <a href="./forumpost.html?id=${data.id}" class="title-link">
+          <div class="title-row">
+            <h4 class="title">${data.title} <span> - ${data.user}</span></h4>
+          </div>
+          <img class="forum-post-image-in-main" src="data:image/jpeg;base64,${
+            data.image || ""
+          }" alt="Thread Image" />
+        </a>
+        <div class="options-button" role="button" aria-label="Thread options"
+             data-doc-id="${doc.id}" data-user-id="${
+          data.userID || ""
+        }" data-thread-id="${data.id}">⋯</div>
+      </div>
+      <div class="subtitle">
+        <a href="./forumpost.html?id=${data.id}" class="subtitle-link">
+          <p class="timestamp">${new Date(data.date)
+            .toLocaleString()
+            .replace(/(.*)\D\d+/, "$1")}</p>
+          <p class="commentcount">${data.comment_count} comments</p>
+        </a>
+      </div>
+    </li>`;
         container.insertAdjacentHTML("beforeend", html);
       }
     });
