@@ -113,6 +113,27 @@ function getUserLocation() {
   });
 }
 
+function setupSearch() {
+  // Select the search input element
+  const searchBox = document.getElementById("searchBox");
+
+  // Listen for every keystroke
+  searchBox.addEventListener("input", () => {
+    // Convert typed text to lowercase for case-insensitive matching
+    const query = searchBox.value.toLowerCase();
+
+    // Go through every marker and check if it matches the search
+    markers.forEach(({ marker, name, category }) => {
+      const matches =
+        name.toLowerCase().includes(query) ||
+        category.toLowerCase().includes(query);
+
+      // Show or hide marker based on match
+      marker.getElement().style.display = matches ? "block" : "none";
+    });
+  });
+}
+
 function showMap() {
   mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
