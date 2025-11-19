@@ -13,25 +13,45 @@ header h1 {
   color: #343a40 !important;
 }
 
-.topContainer {
-  padding: 20px;
-  margin: 20px;
-  border-radius: 2em;
+/* ==========================================
+   Search + Filters White Box (NOT the map)
+========================================== */
+.map-controls-box {
   background-color: var(--bg);
   border: var(--border);
   border-top: solid 1px var(--highlight);
   box-shadow: var(--shadow);
+
+  padding: 20px;
+  margin: 20px auto;
+  border-radius: 20px;
+
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
-#filters {
+/* Search bar inside the white box */
+#searchBox {
+  width: 80% !important;
+  max-width: 500px;
+  border-radius: 25px;
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Filters inside the white box */
+.map-filters {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 1.5rem;
 }
 
-#filters button {
+.map-filters button {
   border-radius: 2em;
   border: var(--border);
   border-top: solid 1px var(--highlight);
@@ -43,13 +63,16 @@ header h1 {
   transition: all 0.2s ease;
 }
 
-#filters button:hover,
-#filters button.active {
+.map-filters button:hover,
+.map-filters button.active {
   background-color: #444;
   color: #fff;
   border-color: #444;
 }
 
+/* ==========================================
+   MAP CARD
+========================================== */
 #map {
   width: 100%;
   height: 450px;
@@ -58,18 +81,11 @@ header h1 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-#searchBox {
-  border-radius: 25px;
-  padding: 10px 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  border: 1px solid #ccc;
-}
-
 #locateBtn {
   position: absolute;
-  top: 10px; /* distance from top of map */
-  left: 10px; /* distance from right edge */
-  z-index: 10; /* make sure it stays above the map */
+  top: 10px;
+  left: 10px;
+  z-index: 10;
   border-radius: 25px;
   padding: 8px 18px;
   font-weight: 500;
@@ -81,4 +97,48 @@ header h1 {
 
 #locateBtn:hover {
   background-color: #222;
+}
+
+/* ==========================================
+   MOBILE LAYOUT
+   map → controls
+========================================== */
+@media (max-width: 991px) {
+  .map-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Move the whole controls box BELOW the map */
+  .map-card {
+    order: 1;
+  }
+
+  .map-controls-box {
+    order: 2;
+  }
+}
+
+/* ==========================================
+   DESKTOP LAYOUT
+   search + filters → map
+========================================== */
+@media (min-width: 992px) {
+  .map-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  #searchContainer {
+    order: 1;
+  }
+
+  .map-controls-box {
+    order: 1;
+  }
+
+  .map-card {
+    order: 2;
+  }
 }

@@ -33,6 +33,9 @@ await new Promise((resolve) => onAuthStateChanged(auth, resolve));
 //Display the header
 const pageTitle = "💬FORUMS";
 
+const urlParams = new URLSearchParams(window.location.search);
+const locationIdFromUrl = urlParams.get("locationId");
+
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
 //Display header end
 
@@ -79,6 +82,7 @@ document.getElementById("post").addEventListener("click", async function () {
       tags: tags,
       likes: [],
       dislikes: [],
+      locationId: locationIdFromUrl || null, // 🔥 sólo tiene valor si vino del mapa
     });
 
     setTimeout(() => {

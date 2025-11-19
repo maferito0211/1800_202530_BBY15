@@ -2,38 +2,208 @@
 <html lang="en">
   <head>
     <title>Together BCIT</title>
-    <meta name="comp1800 template" content="My 1800 App" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Global Styles -->
     <link rel="stylesheet" href="./styles/style.css" />
-    <script src="./src/main.js"></script>
+
+    <!-- Landing Page Styles -->
+    <link rel="stylesheet" href="./styles/landing.css" />
 
     <!-- Web Components -->
     <script type="module" src="/src/components/default-components.js"></script>
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: #ffffff;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        line-height: 1.55;
+      }
+
+      section {
+        scroll-margin-top: 80px;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+      }
+    </style>
   </head>
 
   <body>
     <site-navbar></site-navbar>
 
-    <div class="search-container">
-      <input type="text" placeholder="Search..." class="search-input" />
-      <button class="search-button">🔍</button>
-    </div>
-
-    <div id="popupcontainer">
-      <div id="popup">
-        <h1>Welcome to Together BCIT!</h1>
-        <p>
-          Here, you can browse the local map and discuss anonymously in our
-          forums!
+    <!-- ===============================
+         HERO SECTION
+    ================================ -->
+    <header class="hero-section reveal">
+      <div class="hero-content">
+        <h1 class="hero-title reveal">Together BCIT</h1>
+        <p class="hero-subtitle reveal">
+          Helping new BCIT students navigate Vancouver and connect with the
+          community.
         </p>
-        <button onclick="disappear()">Continue to Map</button>
-      </div>
-    </div>
 
-    <!-- Footer -->
+        <button id="ctaButton" class="hero-button reveal">
+          Start Exploring
+        </button>
+      </div>
+
+      <!-- Hero Image -->
+      <div class="hero-image reveal">
+        <img
+          src="./images/istockphoto-1453719077-612x612.jpg"
+          alt="Vancouver skyline"
+        />
+      </div>
+    </header>
+
+    <!-- ===============================
+         TARGET AUDIENCE 
+    ================================ -->
+    <section class="targets-section reveal">
+      <h2 class="reveal">Who Is This For?</h2>
+      <div class="targets-grid">
+        <div class="target-card reveal">
+          <div class="img-box">🧳</div>
+          <h3>International Students</h3>
+          <p>Discover essential places and connect with fellow students.</p>
+        </div>
+
+        <div class="target-card reveal">
+          <div class="img-box">🚌</div>
+          <h3>Out-of-Province Students</h3>
+          <p>Learn your way around Vancouver faster and easier.</p>
+        </div>
+
+        <div class="target-card reveal">
+          <div class="img-box">🎓</div>
+          <h3>First-Term BCIT Students</h3>
+          <p>Get oriented and stay informed with student-shared tips.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===============================
+         FEATURES SECTION
+    ================================ -->
+    <section class="features-section">
+      <!-- MAP FEATURE -->
+      <div class="feature-item">
+        <div class="feature-text reveal-left">
+          <h2>Explore the Interactive Map</h2>
+          <p>
+            Use Mapbox to find key locations like banks, groceries, transit,
+            government services, and pharmacies around BCIT.
+          </p>
+        </div>
+
+        <div class="feature-image reveal-right">
+          <img src="./images/map-preview.jpg" alt="Map preview" />
+        </div>
+      </div>
+
+      <!-- FORUM FEATURE -->
+      <div class="feature-item reverse">
+        <div class="feature-text reveal-right">
+          <h2>Join Student Discussions</h2>
+          <p>
+            Ask questions, share experiences, and read advice from students.
+            Topics can even be linked to specific locations on the map.
+          </p>
+        </div>
+
+        <div class="feature-image reveal-left">
+          <img src="./images/forum-preview.png" alt="Forum preview" />
+        </div>
+      </div>
+
+      <!-- PROFILE FEATURE -->
+      <div class="feature-item">
+        <div class="feature-text reveal-left">
+          <h2>Customize Your Profile</h2>
+          <p>
+            Add a profile picture, edit your name, and access your posts to
+            personalize your student experience.
+          </p>
+        </div>
+
+        <div class="feature-image reveal-right">
+          <img src="./images/profile-preview.png" alt="Profile preview" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ===============================
+         HOW IT WORKS 
+    ================================ -->
+    <section class="how-section reveal">
+      <h2 class="reveal">How It Works</h2>
+      <div class="how-grid">
+        <div class="how-step reveal">
+          <img src="./images/how-step-1.png" class="how-icon" alt="Step 1" />
+          <h3>1. Open the Map</h3>
+          <p>Start by exploring locations around BCIT.</p>
+        </div>
+
+        <div class="how-step reveal">
+          <img src="./images/how-step-2.png" class="how-icon" alt="Step 2" />
+          <h3>2. Tap a Location</h3>
+          <p>View details and related forum posts.</p>
+        </div>
+
+        <div class="how-step reveal">
+          <img src="./images/how-step-3.png" class="how-icon" alt="Step 3" />
+          <h3>3. Ask or Answer</h3>
+          <p>Join discussions and share useful tips.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===============================
+         CTA SECTION
+    ================================ -->
+    <section class="cta-section reveal">
+      <h2>Ready to explore?</h2>
+      <p>Click below and start navigating your new BCIT life.</p>
+      <button id="ctaButtonBottom" class="cta-button">Go to Map</button>
+    </section>
+
+    <!-- FOOTER -->
     <site-footer></site-footer>
-    <!-- Script Imports-->
-    <script type="module" src="./src/navBar.js"></script>
+
+    <!-- LOGIN-AWARE BUTTON -->
+    <script type="module">
+      import { auth } from "./src/firebaseConfig.js";
+      import { onAuthStateChanged } from "firebase/auth";
+
+      const topButton = document.getElementById("ctaButton");
+      const bottomButton = document.getElementById("ctaButtonBottom");
+
+      onAuthStateChanged(auth, (user) => {
+        // Logged in → “Open Map”
+        if (user) {
+          topButton.innerText = "Open Map";
+          bottomButton.innerText = "Open Map";
+
+          topButton.onclick = () => (window.location.href = "/map.html");
+          bottomButton.onclick = () => (window.location.href = "/map.html");
+        }
+
+        // Logged out → same button but still leads to map
+        else {
+          topButton.onclick = () => (window.location.href = "/map.html");
+          bottomButton.onclick = () => (window.location.href = "/map.html");
+        }
+      });
+    </script>
+
+    <!-- SCROLL REVEAL -->
+    <script type="module" src="./src/scrollReveal.js"></script>
   </body>
 </html>

@@ -8,49 +8,82 @@ const pageTitle = "🗺️MAP";
 
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
+//global variable for user location
+let userPosition = null;
+
 async function loadLocations(map) {
   const querySnapshot = await getDocs(collection(db, "locations"));
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
+  querySnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
     const { name, lat, lng, category } = data;
+    const locationId = docSnap.id; // Firestore doc ID
 
-    /* ---------------------  MARKERS ------------------------*/
-    // Create a custom HTML element for the marker
+    // ------------------ MARKER HTML ELEMENT ------------------
     const el = document.createElement("div");
     el.className = "custom-marker";
 
-    // Optionally: change marker color or image based on category
-    if (data.category === "Education") {
+    if (category === "Education") {
       el.style.backgroundImage = "url('/images/icons/education.png')";
-    } else if (data.category === "Groceries") {
+    } else if (category === "Groceries") {
       el.style.backgroundImage = "url('/images/icons/groceries.png')";
-    } else if (data.category === "Banks") {
+    } else if (category === "Banks") {
       el.style.backgroundImage = "url('/images/icons/bank.png')";
-    } else if (data.category === "Government") {
+    } else if (category === "Government") {
       el.style.backgroundImage = "url('/images/icons/government.png')";
-    } else if (data.category === "Pharmacies") {
+    } else if (category === "Pharmacies") {
       el.style.backgroundImage = "url('/images/icons/pharmacy.png')";
+    } else if (category === "Shopping") {
+      el.style.backgroundImage = "url('/images/icons/shopping.png')";
     } else {
       el.style.backgroundImage = "url('/images/icons/default.png')";
     }
 
-    // Marker styling (make sure they are visible and clickable)
     el.style.width = "32px";
     el.style.height = "32px";
     el.style.backgroundSize = "cover";
     el.style.cursor = "pointer";
 
-    // Create a new marker using your custom element
+    // ------------------ DISTANCE CALCULATION ------------------
+    let distanceText = "";
+
+    if (userPosition) {
+      const km = getDistanceKm(
+        userPosition[1], // user lat
+        userPosition[0], // user lng
+        lat,
+        lng
+      );
+
+      if (km < 1) {
+        distanceText = `${Math.round(km * 1000)} m away`;
+      } else {
+        distanceText = `${km.toFixed(1)} km away`;
+      }
+    } else {
+      distanceText = "Distance unavailable";
+    }
+
+    // ---------------- POPUP HTML (Distance + Forums Link) ----------------
+    const popupHTML = `
+      <h5>${name}</h5>
+      <p>${category}</p>
+      <p><strong>${distanceText}</strong></p>
+
+      <a 
+        href="./forum-main.html?locationId=${locationId}" 
+        class="map-related-link"
+      >
+        View related posts
+      </a>
+    `;
+
+    // ------------------ CREATE MARKER ------------------
     const marker = new mapboxgl.Marker(el)
-      .setLngLat([data.lng, data.lat])
-      .setPopup(
-        new mapboxgl.Popup().setHTML(
-          `<h5>${data.name}</h5><p>${data.category}</p>`
-        )
-      )
+      .setLngLat([lng, lat])
+      .setPopup(new mapboxgl.Popup().setHTML(popupHTML))
       .addTo(map);
 
-    // 🔹 Add zoom animation when the marker is clicked
+    // Smooth zoom on click
     el.addEventListener("click", () => {
       map.flyTo({
         center: [lng, lat],
@@ -59,54 +92,64 @@ async function loadLocations(map) {
       });
     });
 
-    // Store for filters
-    markers.push({ marker, name, category });
+    // Save in global array
+    markers.push({ marker, name, category, locationId });
   });
 }
 
-// 🔹 This function filters markers based on the search box input
-function setupSearch() {
-  // Select the search input element
-  const searchBox = document.getElementById("searchBox");
-
-  // Listen for every keystroke
-  searchBox.addEventListener("input", () => {
-    // Convert typed text to lowercase for case-insensitive matching
-    const query = searchBox.value.toLowerCase();
-
-    // Go through every marker and check if it matches the search
-    markers.forEach(({ marker, name, category }) => {
-      const matches =
-        name.toLowerCase().includes(query) ||
-        category.toLowerCase().includes(query);
-
-      // Show or hide marker based on match
-      marker.getElement().style.display = matches ? "block" : "none";
-    });
+//Convert getCurrentPosition into a Promise so we can AWAIT it
+//crea una función wrapper
+function getUserLocation() {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        resolve([pos.coords.longitude, pos.coords.latitude]);
+      },
+      (err) => {
+        reject(err);
+      },
+      { enableHighAccuracy: true, timeout: 7000 }
+    );
   });
 }
 
 function showMap() {
-  mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN; // put token in .env
-  // BCIT location 49.25324576104826, -123.00163752324765  Centered at BCIT
+  mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+
+  // Default center (BCIT) before geolocation resolves
   const map = new mapboxgl.Map({
-    container: "map", // <div id="map"></div>
-    style: "mapbox://styles/mapbox/standard", // any Mapbox style
+    container: "map",
+    style: "mapbox://styles/mapbox/standard",
     center: [-123.00163752324765, 49.25324576104826],
-    zoom: 10,
+    zoom: 12,
   });
-  // Adds the zoom and rotation controls to the top-right corner of the map.
-  // This helps users navigate the map manually.
+
   map.addControl(new mapboxgl.NavigationControl());
 
-  // Wait for map to finish loading before running setup
   map.once("load", async () => {
-    addUserPin(map);
-    await loadLocations(map); // Load Firebase markers
-    setupFilters(map);
-    setupSearch(); // Search bar
+    try {
+      // WAIT for geolocation
+      userPosition = await getUserLocation();
 
-    // 🔹 Locate Me button logic
+      // Zoom to user
+      map.flyTo({
+        center: userPosition,
+        zoom: 14,
+        essential: true,
+      });
+
+      addUserPin(map);
+    } catch (err) {
+      console.warn("Geolocation failed:", err);
+      addUserPin(map);
+    }
+
+    // NOW userPosition is ready — safe to load markers
+    await loadLocations(map);
+    setupFilters(map);
+    setupSearch();
+
+    // "Locate Me" button still works
     const locateBtn = document.getElementById("locateBtn");
     if (locateBtn) {
       locateBtn.addEventListener("click", () => {
@@ -121,6 +164,22 @@ function showMap() {
       });
     }
   });
+}
+
+//Function to get the user distance to the locations
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth radius in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // returns km
 }
 
 //-----------------------------------------------------
