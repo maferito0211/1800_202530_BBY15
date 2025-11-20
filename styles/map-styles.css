@@ -74,7 +74,7 @@ header h1 {
 ========================================== */
 #map {
   width: 100%;
-  height: 450px;
+  height: 500px;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -116,6 +116,17 @@ header h1 {
 
   .map-controls-box {
     order: 2;
+  }
+  #searchBox {
+    width: 150% !important; /* más grande que el contenedor */
+    max-width: none;
+    margin: 0; /* quita márgenes raros */
+  }
+  #searchContainer {
+    display: flex;
+    justify-content: center; /* centra horizontalmente */
+    width: 100% !important;
+    overflow: visible; /* por si el input se sale un poco */
   }
 }
 
