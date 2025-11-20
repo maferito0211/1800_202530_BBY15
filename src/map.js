@@ -249,19 +249,30 @@ function addUserPin(map) {
   });
 }
 
-function setupFilters(map) {
-  const buttons = document.querySelectorAll("#filters button");
+function setupFilters() {
+  const filterContainer = document.querySelector(".map-filters");
+  if (!filterContainer) return;
+
+  const buttons = filterContainer.querySelectorAll("button");
+
+  // 🔥 Set "All" as active on first load
+  const allBtn = filterContainer.querySelector('button[data-category="All"]');
+  if (allBtn) allBtn.classList.add("active");
 
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const selected = btn.dataset.category;
 
+      // remove active from all
+      buttons.forEach((b) => b.classList.remove("active"));
+
+      // add active to clicked one
+      btn.classList.add("active");
+
+      // filtering logic
       markers.forEach(({ marker, category }) => {
-        if (selected === "All" || category === selected) {
-          marker.getElement().style.display = "block";
-        } else {
-          marker.getElement().style.display = "none";
-        }
+        marker.getElement().style.display =
+          selected === "All" || category === selected ? "block" : "none";
       });
     });
   });
