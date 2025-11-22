@@ -61,7 +61,8 @@ document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
 // --- NEW: disable "New Post" when not signed in --------------------
 const newCommentBtn = document.getElementById("newpost");
-const user = auth.currentUser;
+const user =
+  auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
 
 if (!user) {
   newCommentBtn.classList.add("disabled");
