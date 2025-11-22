@@ -163,7 +163,6 @@ footer a img:hover {
 #forumIcon img,
 #profileIcon img {
   height: 60px;
-  border-radius: 50%;
   display: inline-block;
   transition: transform 0.2s ease;
 }

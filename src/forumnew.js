@@ -210,6 +210,7 @@ document.getElementById("post").addEventListener("click", async function () {
       title: title.value,
       date: Date.now(),
       content: content.value,
+      comment_count: 0,
       tags: tags,
       likes: [],
       dislikes: [],

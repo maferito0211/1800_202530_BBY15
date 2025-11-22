@@ -11,7 +11,7 @@ import {
   setDoc,
   arrayUnion,
   arrayRemove,
-  onSnapshot,
+  increment,
   deleteDoc, // <-- added
 } from "firebase/firestore";
 
@@ -439,6 +439,9 @@ async function postComment() {
     ); // <-- pass uid
     txt.value = "";
   }
+  await updateDoc(doc(db, "threads", id.toString()), {
+    comment_count: increment(1),
+  });
 }
 
 //Adds the comment to the screen
@@ -679,6 +682,9 @@ async function postReply(selectedComment) {
       replyDepth
     );
     txt.value = "";
+    await updateDoc(doc(db, "threads", id.toString()), {
+      comment_count: increment(1),
+    });
   } catch (err) {
     console.error("Failed to post reply:", err);
     alert("Failed to post reply. Check console for details.");
@@ -775,6 +781,9 @@ document.addEventListener("click", async (ev) => {
         await deleteDoc(doc(db, ...segments));
         commentEl.remove();
         updateAllSpines();
+        await updateDoc(doc(db, "threads", id.toString()), {
+          comment_count: increment(-1),
+        });
       } catch (err) {
         console.error("Failed to delete comment/reply", err);
         alert("Failed to delete. See console.");
