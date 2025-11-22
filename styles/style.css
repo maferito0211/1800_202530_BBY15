@@ -17,11 +17,11 @@
   --success: oklch(0.5 0.05 160);
   --info: oklch(0.5 0.05 260);
   --gradient: linear-gradient(0deg, var(--bg) 95%, var(--bg-light));
-  --gradient-hover: linear-gradient(0deg, var(--bg), var(--bg-light));
+  --gradient-hover: linear-gradient(0deg, var(--bg), var(--highlight));
   --shadow: 0px 2px 2px hsla(0, 0%, 0%, 0.07), 0px 4px 4px hsla(0, 0%, 0%, 0.15);
 
-  --selected-glow: 0px 0px 30px rgba(0, 172, 199, 0.12),
-    0px 0px 18px rgba(0, 172, 199, 0.08);
+  --selected-glow: 0px 0px 30px rgba(0, 63, 199, 0.3),
+    0px 0px 18px rgba(0, 63, 199, 0.3);
 }
 
 /* Global / default styles */
@@ -130,11 +130,11 @@ nav {
 }
 
 #pageTitleSection {
+  font-size: 1.5em;
   display: flex;
   justify-content: center;
   align-items: center;
   color: var(--primary);
-  font-size: larger;
   font-weight: bold;
 }
 
@@ -230,7 +230,7 @@ footer a img:hover {
 }
 
 .search-button:hover {
-  background: #0056b3;
+  background: var(--secondary);
 }
 
 /* End of global defaults */

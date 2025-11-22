@@ -13,6 +13,7 @@ import {
   orderBy,
   deleteDoc, // <-- added
 } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 const pageTitle = "💬FORUMS";
 
@@ -58,6 +59,16 @@ if (locationIdFilter && locationContextDiv) {
 
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
+// --- NEW: disable "New Post" when not signed in --------------------
+const newCommentBtn = document.getElementById("newpost");
+const user = auth.currentUser;
+
+if (!user) {
+  newCommentBtn.classList.add("disabled");
+  newCommentBtn.setAttribute("aria-disabled", "true");
+  newCommentBtn.title = "Please sign in to create a new post.";
+}
+
 const querySnapshot = await getDocs(collection(db, "threads"));
 const getCount = await getCountFromServer(collection(db, "threads"));
 
@@ -90,7 +101,9 @@ function addThreads(snapshot) {
     var html = `<li data-doc-id="${doc.id}" data-thread-id="${
       data.id
     }" data-user-id="${data.userID || ""}">
-      <div class="forum-post-top-container">
+      <div class="forum-post-top-container" href="./forumpost.html?id=${
+        data.id
+      }">
         <a href="./forumpost.html?id=${data.id}" class="title-link">
           <div class="title-row">
             <h4 class="title">${data.title} <span> - ${data.user}</span></h4>
@@ -104,7 +117,7 @@ function addThreads(snapshot) {
       data.userID || ""
     }" data-thread-id="${data.id}">⋯</div>
       </div>
-      <div class="subtitle">
+      <div class="subtitle" href="./forumpost.html?id=${data.id}">
         <a href="./forumpost.html?id=${data.id}" class="subtitle-link">
           <p class="timestamp">${new Date(data.date)
             .toLocaleString()
@@ -143,7 +156,9 @@ document
         var html = `<li data-doc-id="${doc.id}" data-thread-id="${
           data.id
         }" data-user-id="${data.userID || ""}">
-      <div class="forum-post-top-container">
+      <div class="forum-post-top-container" href="./forumpost.html?id=${
+        data.id
+      }">
         <a href="./forumpost.html?id=${data.id}" class="title-link">
           <div class="title-row">
             <h4 class="title">${data.title} <span> - ${data.user}</span></h4>
@@ -157,7 +172,7 @@ document
           data.userID || ""
         }" data-thread-id="${data.id}">⋯</div>
       </div>
-      <div class="subtitle">
+      <div class="subtitle" href="./forumpost.html?id=${data.id}">
         <a href="./forumpost.html?id=${data.id}" class="subtitle-link">
           <p class="timestamp">${new Date(data.date)
             .toLocaleString()
@@ -172,15 +187,24 @@ document
   });
 
 var radValue;
-document.getElementById("filterButton").addEventListener("click", function () {
+
+function filterResultsWithRadioButtons() {
   var ele = document.getElementsByName("filters");
+  radValue = undefined; // reset
   for (var i = 0; i < ele.length; i++) {
     if (ele[i].checked) {
       radValue = i;
+      break;
     }
   }
-  filterThreads();
-});
+  // if no radio is checked, show all threads
+  if (radValue === undefined) {
+    container.innerHTML = "";
+    addThreads(threadsSnap);
+  } else {
+    filterThreads();
+  }
+}
 
 async function filterThreads() {
   container.innerHTML = "";
@@ -283,3 +307,35 @@ container.addEventListener(
   },
   true // useCapture so we can stop propagation before li handler
 );
+
+// ------------------------- Filter Button -----------------------------
+
+document.getElementById("filterToggle").addEventListener("click", () => {
+  const filterContainer = document.getElementById("filter-container");
+  const toggleBtn = document.getElementById("filterToggle");
+  if (filterContainer.style.display === "flex") {
+    filterContainer.style.display = "none";
+    toggleBtn.classList.add("open");
+  } else {
+    filterContainer.style.display = "flex";
+    toggleBtn.classList.remove("open");
+  }
+});
+
+Array.from(
+  document.getElementById("filter-container").getElementsByTagName("input")
+).forEach((input) => {
+  input.addEventListener("change", filterResultsWithRadioButtons);
+});
+
+// Clear filter button, unselects all radio buttons and shows all threads
+document.getElementById("filterButtonClear").addEventListener("click", () => {
+  const inputs = document
+    .getElementById("filter-container")
+    .getElementsByTagName("input");
+  Array.from(inputs).forEach((input) => {
+    input.checked = false;
+  });
+  filterResultsWithRadioButtons();
+});
+// ------------------------- End Filter Button -------------------------

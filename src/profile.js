@@ -27,6 +27,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const snap = await getDoc(docRef);
     const data = snap.exists() ? snap.data() : {};
 
+    //Sets the username in local storage for use in other pages
+    localStorage.setItem(
+      "displayName",
+      data.username || user.email.split("@")[0]
+    );
+
     // Fill in user info
     fullNameEl.textContent =
       localStorage.getItem("fullName") ||

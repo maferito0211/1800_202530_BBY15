@@ -26,8 +26,30 @@ let currentUserPhotoURL = null;
 const user =
   auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
 
-var author =
-  user?.displayName || localStorage.getItem("fullName") || "Anonymous";
+// --- disable "New Comment" when not signed in, and grey out button --------------------
+const newCommentBtn = document.getElementById("postCommentButton");
+
+if (!user) {
+  newCommentBtn.classList.add("disabled");
+  newCommentBtn.setAttribute("aria-disabled", "true");
+}
+
+// ------------------------------------------------------------------
+
+let author = "Anonymous";
+if (user) {
+  try {
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    author = userDoc.exists()
+      ? userDoc.data().username
+      : localStorage.getItem("displayName") || "Anonymous";
+  } catch (e) {
+    console.error("Error fetching username:", e);
+    author = localStorage.getItem("displayName") || "Anonymous";
+  }
+} else {
+  author = localStorage.getItem("displayName") || "Anonymous";
+}
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
@@ -51,7 +73,7 @@ headerLeftSection.innerHTML = `
             <div>
               <button id="return-button">←</button>
             </div>
-            <a  href="./secret.html" id="logoContainer">
+            <a id="logoContainer">
               <img id="logo" src="./images/logoImg.png" alt="Site Logo" />
             </a>
           </div>
@@ -130,9 +152,13 @@ for (const threadDoc of threadSnap.docs) {
   }
 
   const headerHtml = ` 
-    <div class ="op-forum-top-container"> 
+    <div class ="op-forum-top-container glow"> 
       <img class="forum-profile-image" src="${opProfilePictureURL || ""}"></img>
       <h2 class="title"> ${threadDoc.data().title}</h2>
+      <p class="timestamp"> ${new Date(threadDoc.data().date)
+        .toLocaleString()
+        .replace(/(.*)\D\d+/, "$1")}
+      </p>
     </div>
     ${locationHtml}
     <p> ${threadDoc.data().content} </p>
@@ -146,13 +172,10 @@ for (const threadDoc of threadSnap.docs) {
       }
     </div>
     <div class="subtitle">
-      <p class="timestamp"> ${new Date(threadDoc.data().date)
-        .toLocaleString()
-        .replace(/(.*)\D\d+/, "$1")}</p>
-      <p class="commentcount"> ${threadDoc.data().comment_count} comments</p>
-      <input type="button" id="likes" value="${
-        threadDoc.data().likes.length
-      } likes"></input>
+    <p class="commentcount"> ${threadDoc.data().comment_count} comments</p>
+    <input type="button" id="likes" value="${
+      threadDoc.data().likes.length
+    } likes"></input>
       <p class="empty"></p>
       <input type="button" id="dislikes" value="${
         threadDoc.data().dislikes.length
@@ -331,6 +354,11 @@ function updateAllSpines(scope = document) {
 document
   .getElementById("postCommentButton")
   .addEventListener("click", function () {
+    if (!auth.currentUser) {
+      alert("Please sign in before commenting!");
+      return;
+    }
+
     const commentContent = document.getElementById("comment-input").value;
     if (commentContent.length > 1) {
       const selectedContent = document.querySelector(
@@ -527,7 +555,7 @@ window.addEventListener("resize", () => {
 
 // selection toggler — prevent selecting if at max depth
 document.addEventListener("click", (e) => {
-  const headerEl = document.querySelector(".header");
+  const headerEl = document.querySelector(".op-forum-top-container");
   const content = e.target.closest(".comment-content");
   if (!content) return;
 
@@ -567,16 +595,19 @@ async function postReply(selectedComment) {
   const user =
     auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
 
-  var author =
-    user?.displayName || localStorage.getItem("fullName") || "Anonymous";
-
-  if (
-    author === "Anonymous" ||
-    author === "anonymous" ||
-    auth.currentUser == null
-  ) {
-    alert("Sign in before replying!");
-    return;
+  let author = "Anonymous";
+  if (user) {
+    try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      author = userDoc.exists()
+        ? userDoc.data().username
+        : localStorage.getItem("displayName") || "Anonymous";
+    } catch (e) {
+      console.error("Error fetching username:", e);
+      author = localStorage.getItem("displayName") || "Anonymous";
+    }
+  } else {
+    author = localStorage.getItem("displayName") || "Anonymous";
   }
 
   const parentDocPath = (function () {
@@ -770,3 +801,84 @@ document.addEventListener("click", async (ev) => {
   };
   setTimeout(() => document.addEventListener("click", onDocClick), 0);
 });
+
+// Forum onboard overlay
+(function registerForumOnboard() {
+  const STORAGE_KEY = "forumOnboardHidden";
+
+  function createOnboardElement() {
+    const wrap = document.createElement("div");
+    wrap.id = "forum-onboard-overlay";
+    wrap.innerHTML = `
+      <div class="onboard-card" role="dialog" aria-modal="true" aria-labelledby="onboard-title">
+        <h2 id="onboard-title">Welcome to the Forum</h2>
+        <div class="onboard-body">
+          <p><strong>How to reply</strong></p>
+          <ol>
+            <li>Tap any comment to select it for replying (Tapping it again unselects it).</li>
+            <li>Write your reply in the text box at the bottom.</li>
+            <li>Press <em>Post</em> to submit. Sign in is required for posting.</li>
+          </ol>
+          <p><strong>Tips</strong></p>
+          <ul>
+            <li>You can use the options menu (⋯) on a comment to reply or delete (if it's yours).</li>
+            <li>Click 'View on Map' on the OP's post to see the location if the post is connected to one.</li>
+          </ul>
+        </div>
+        <div class="onboard-separator">
+        <label class="onboard-dismiss"><input type="checkbox" id="onboard-dont-show"> Don't show again</label>
+        <div class="onboard-actions">
+          <button id="onboard-close" type="button">Got it</button>
+        </div>
+        </div>
+      </div>
+    `;
+    return wrap;
+  }
+
+  function showOnboard() {
+    if (localStorage.getItem(STORAGE_KEY) === "1") return; // user opted out
+
+    // create modal and append
+    const el = createOnboardElement();
+    document.body.appendChild(el);
+    document.body.classList.add("modal-open");
+
+    // focus management: focus the close button
+    const closeBtn = document.getElementById("onboard-close");
+    const dontShow = document.getElementById("onboard-dont-show");
+    closeBtn?.focus();
+
+    function close() {
+      const dont = dontShow && dontShow.checked;
+      if (dont) localStorage.setItem(STORAGE_KEY, "1");
+      document.body.classList.remove("modal-open");
+      const node = document.getElementById("forum-onboard-overlay");
+      if (node) node.remove();
+    }
+
+    // close handlers
+    closeBtn?.addEventListener("click", close);
+    el.addEventListener("click", (e) => {
+      // clicking overlay outside card closes (but clicking card doesn't)
+      if (e.target === el) close();
+    });
+
+    // close on Escape
+    function onKey(e) {
+      if (e.key === "Escape") close();
+    }
+    document.addEventListener("keydown", onKey);
+    // cleanup listener when closed
+    closeBtn?.addEventListener("click", () =>
+      document.removeEventListener("keydown", onKey)
+    );
+  }
+
+  // run when DOM is ready — forumpost.js is a module, but ensure elements exist
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", showOnboard);
+  } else {
+    showOnboard();
+  }
+})();

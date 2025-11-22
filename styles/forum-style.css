@@ -1,3 +1,7 @@
+textarea {
+  resize: none;
+}
+
 /*--------------------- New Forum Stylesheet ---------------------*/
 .form-text-input-container {
   display: flex;
@@ -27,32 +31,100 @@
 }
 
 .form-tags-input-container .form-tags {
-  padding: 2%;
+  box-sizing: border-box; /* include padding in size so aspect-ratio holds */
+  position: relative; /* allow absolutely positioned radio inside */
+  padding: 0.6rem; /* small uniform padding so inner text won't push height */
   margin: 2%;
   margin-top: 0;
   background-color: var(--bg-light);
   border-radius: 1em;
 
-  width: 20%;
-  aspect-ratio: 1/1;
-  max-width: 100px;
+  font-size: clamp(0.55em, 1vw, 1.2em);
+
+  /* use flexible fixed basis so element remains square across sizes */
+  flex: 0 0 clamp(72px, 15%, 150px);
+  aspect-ratio: 1 / 1;
+  max-width: 200px;
+  min-width: 72px;
 
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center; /* center text horizontally */
+  justify-content: center; /* center text vertically */
+  text-align: center;
+
+  border: var(--border);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
+
+  overflow: hidden; /* prevent text from expanding the box */
+  word-break: break-word; /* allow wrapping inside the square */
 }
 
+.form-tags-input-container .form-tags:hover {
+  cursor: pointer;
+  background: var(--gradient-hover);
+}
+
+/* keep click-through of the label and prevent text nudging radio */
 .form-tags-input-container .form-tags p {
+  margin: 0; /* ensure exact centering */
+  padding: 0 0.25rem; /* small horizontal padding for very long labels */
   justify-self: center;
   align-self: center;
   text-align: center;
-  margin: auto;
+  width: 100%;
+  line-height: 1.05;
+  pointer-events: none; /* clicking the label still works via the label element */
 }
 
 .form-tags-input-container .form-tags input[type="radio"] {
-  position: relative;
-  justify-self: flex-start;
+  position: absolute;
+  top: 0.45rem;
+  left: 0.45rem;
+  width: 1rem;
+  height: 1rem;
   margin: 0;
+  padding: 0;
+  z-index: 2;
+  background: transparent;
+  -webkit-appearance: radio;
+  appearance: auto;
+}
+
+/* small tweak for very small screens */
+@media (max-width: 380px) {
+  .form-tags-input-container .form-tags {
+    flex: 0 0 72px;
+    min-width: 64px;
+    max-width: 80px;
+    font-size: 0.6rem;
+    padding: 0.45rem;
+  }
+}
+
+#clearCategorySelection {
+  margin-top: 1em;
+  margin: auto;
+  padding: 1em;
+  border: none;
+  border-radius: 1em;
+  background-color: var(--primary);
+  color: var(--highlight);
+  font-size: medium;
+  transition: background-color 0.3s;
+
+  width: 50%;
+
+  border: var(--primary);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
+}
+
+#clearCategorySelection:hover {
+  transition: background-color 0.3s;
+  background-color: var(--secondary);
+  cursor: pointer;
 }
 
 .form-text-input-container textarea {
@@ -97,9 +169,13 @@ form .form-text-input-container textarea {
   border: none;
   border-radius: 1em;
   background-color: var(--primary);
-  color: beige;
+  color: var(--highlight);
   font-size: medium;
   transition: background-color 0.3s;
+
+  border: var(--border);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
 }
 
 .photo-upload-container .insert-photo-btn h3 {
@@ -112,9 +188,13 @@ form .form-text-input-container textarea {
   border: none;
   border-radius: 1em;
   background-color: var(--primary);
-  color: beige;
+  color: var(--highlight);
   font-size: medium;
   transition: background-color 0.3s;
+
+  border: var(--border);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
 }
 
 .form-text-input-container input[type="button"]:hover,
@@ -132,7 +212,7 @@ form .form-text-input-container textarea {
   border-radius: 1em;
 }
 
-/* --------------------- Forum Stylesheet --------------------- */
+/* --------------------- Forum  Main Stylesheet --------------------- */
 ul {
   list-style-type: none;
   display: flex;
@@ -142,6 +222,8 @@ ul {
 
 /*Actual Clickable Forums*/
 li {
+  font-size: 1.5em;
+
   background: var(--gradient);
   width: 95%;
 
@@ -156,6 +238,92 @@ li {
   box-shadow: var(--shadow);
 
   position: relative; /* required so options menu can be absolutely positioned inside li */
+}
+
+.main-filter-container {
+  width: 90%;
+  margin: auto;
+}
+
+#filterToggle {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  padding: 0.5em 1em;
+
+  border-radius: 1em;
+  background-color: var(--primary);
+  color: var(--highlight);
+
+  border: var(--secondary);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
+
+  transition: background 0.2s ease;
+}
+
+#filterToggle:hover {
+  background: var(--secondary);
+}
+
+#filterToggle h3 {
+  font-size: 3em;
+  text-align: center;
+  margin: 0;
+}
+
+.filter-arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+#filterToggle.open .filter-arrow {
+  transform: rotateX(180deg);
+}
+
+#filter-container {
+  width: 100%;
+  display: none; /* hidden by default, shown when toggled */
+  align-items: center;
+  gap: 1em;
+}
+
+#filter-container label {
+  border: none;
+  padding: 1em;
+  border-radius: 1em;
+  margin-top: 1em;
+  background-color: var(--bg-light);
+
+  border: var(--bg-light);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
+}
+
+#filter-container label:hover {
+  cursor: pointer;
+  background: var(--gradient-hover);
+}
+
+#filterButtonClear {
+  margin-top: 1em;
+  padding: 1em;
+  border: none;
+  border-radius: 1em;
+  background-color: var(--primary);
+  color: beige;
+  font-size: medium;
+  transition: background-color 0.3s;
+
+  border: var(--primary);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
+}
+
+#filterButtonClear:hover {
+  transition: background-color 0.3s;
+  background-color: var(--secondary);
+  cursor: pointer;
 }
 
 /* Options menu */
@@ -241,11 +409,14 @@ h4 {
 }
 
 .subtitle {
+  font-size: 0.65em;
   display: flex;
+  width: auto;
 }
 
 .subtitle-link {
   display: flex;
+  width: 100%;
 }
 
 .subtitle p {
@@ -262,12 +433,31 @@ h4 {
   right: 5%;
   background-color: var(--primary);
   color: var(--text);
+
+  border: var(--primary);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
 }
 
-#newpost:hover {
-  transition: background-color 0.3s;
-  background-color: var(--secondary);
-  cursor: pointer;
+/* Disabled state: greyed and not interactive */
+#newpost.disabled {
+  background-color: var(--bg-dark);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  pointer-events: auto;
+  opacity: 0.9;
+}
+
+/* Ensure the inner link shows muted text when disabled */
+#newpost.disabled a {
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* keep hover style neutral when disabled (no color change) */
+#newpost.disabled:hover {
+  background-color: var(--bg-dark);
+  cursor: not-allowed;
 }
 
 #newpost a {
@@ -285,10 +475,22 @@ h4 {
 }
 
 .op-forum-top-container {
+  background: var(--bg-dark);
+  padding: 1em;
+  border-top-right-radius: 2em;
+  border-top-left-radius: 2em;
+  margin: 0;
+
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
+}
+
+.op-forum-top-container .timestamp {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 0.9em;
 }
 
 .title {
@@ -307,7 +509,7 @@ h4 {
 
 .forum-post-image-in-main {
   max-width: 100%;
-  max-height: 200px; /* constrain height so it doesn't dominate */
+  max-height: 200px;
   width: auto;
   border-radius: 1em;
   margin-top: 0.5rem;
@@ -318,20 +520,25 @@ h4 {
   display: none;
 }
 
-/* forumpost styles */
+/* ---------------------------- forumpost styles  --------------------*/
 .header {
   width: 90%;
   margin: auto;
-  padding: 2%;
+  padding-bottom: 2%;
 
   border-radius: 2em;
   background-color: var(--bg);
 
   border: var(--border);
-  border-top: solid 1px var(--highlight);
   box-shadow: var(--shadow);
 
-  transition: box-shadow 220ms ease, background 220ms ease;
+  transition: box-shadow 220ms ease, background-color 220ms ease;
+}
+
+/* Forum Content text */
+.header p {
+  font-size: clamp(1.2em, 2vw, 1.5em);
+  margin-left: 1em;
 }
 
 .comments {
@@ -348,6 +555,10 @@ h4 {
   background-color: var(--bg);
 }
 
+.user {
+  margin-left: 1.2em;
+}
+
 .forum-post-image {
   margin: auto;
   margin-bottom: 1em;
@@ -360,7 +571,6 @@ h4 {
 
 #likes,
 #dislikes {
-  margin-left: 5px;
   display: inline;
   border-radius: 15px;
   border: none;
@@ -370,10 +580,12 @@ h4 {
 }
 
 #likes {
+  margin-left: auto;
   background-color: var(--success);
 }
 
 #dislikes {
+  margin-right: 5%;
   background-color: #741a1a;
 }
 
@@ -381,7 +593,7 @@ h4 {
 .comment-content {
   cursor: pointer;
 
-  font-size: clamp(0.8em, 1vw, 2em);
+  font-size: clamp(1em, 1vw, 2em);
 
   background-color: var(--bg-light);
 
@@ -391,7 +603,7 @@ h4 {
   padding: 1rem;
   margin-top: 0;
 
-  transition: box-shadow 180ms ease, background 180ms ease;
+  transition: box-shadow 180ms ease, background-color 180ms ease;
 
   display: flex;
   align-items: center;
@@ -406,10 +618,8 @@ h4 {
 }
 
 .comment-content:hover {
-  background-color: rgba(62, 62, 62, 0.329);
+  background-color: hsl(0, 0%, 71%);
 }
-
-/* End of where a comment is selected */
 
 /* ensure comment container can position the options menu */
 .comment {
@@ -427,6 +637,8 @@ h4 {
 .comment-top .timestamp {
   margin-left: auto;
   margin-right: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.9em;
 }
 
 /* smaller circular options button for comments/replies */
@@ -495,6 +707,7 @@ h4 {
 
 .glow {
   box-shadow: var(--selected-glow);
+  background-color: var(--primary);
 }
 
 #commentInputContainer textarea {
@@ -502,7 +715,8 @@ h4 {
   min-height: 5vh;
   box-sizing: border-box;
   background-color: var(--bg-light);
-  border-radius: 2em;
+  border-top-left-radius: 2em;
+  border-bottom-left-radius: 2em;
   padding: 0.7rem 1rem;
   border: none;
   line-height: 1.4;
@@ -531,6 +745,17 @@ h4 {
   font-size: medium;
   border-top-right-radius: 2em;
   border-bottom-right-radius: 2em;
+}
+
+#postCommentButton.disabled {
+  background-color: var(--bg-dark);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+#postCommentButton.disabled:hover {
+  background-color: var(--bg-dark);
+  cursor: not-allowed;
 }
 
 #postCommentButton:hover {
@@ -617,4 +842,91 @@ h4 {
   margin-left: 0.35rem;
   font-size: 0.9rem;
   opacity: 0.9;
+}
+
+/* Onboarding Overlay Styles */
+
+#forum-onboard-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1200;
+  padding: 1rem;
+}
+
+.onboard-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  border: var(--border);
+}
+
+.onboard-card h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--primary);
+}
+
+.onboard-body {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  max-height: 55vh;
+  overflow: auto;
+  margin-bottom: 0.75rem;
+}
+
+.onboard-body li {
+  padding: 0;
+  background: transparent;
+  margin-bottom: 0.25rem;
+
+  border: none;
+  border-top: none;
+  box-shadow: none;
+}
+
+.onboard-separator {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+
+.onboard-dismiss {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.onboard-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.onboard-actions button {
+  background: var(--primary);
+  color: var(--highlight);
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.onboard-actions button:hover {
+  background: var(--secondary);
+}
+
+body.modal-open {
+  overflow: hidden;
 }

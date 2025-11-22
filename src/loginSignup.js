@@ -9,6 +9,8 @@
 import "../styles/loginPage.css";
 import { loginUser, signupUser, authErrorMessage } from "./authentication.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "./firebaseConfig.js";
 
 // --- Login and Signup Page ---
 
@@ -103,11 +105,16 @@ function initAuthUI() {
       const userCredential = await loginUser(email, password);
       // cache name for instant UI on other pages
       try {
+        const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+        const userData = userDoc.data();
         localStorage.setItem(
           "displayName",
-          userCredential.user.displayName || email.split("@")[0]
+          userData?.username || email.split("@")[0]
         );
-      } catch (e) {}
+        console.log("User data fetched and stored locally.");
+      } catch (e) {
+        console.error("Error fetching user data:", e);
+      }
       location.href = redirectUrl;
     } catch (err) {
       showError(authErrorMessage(err));
