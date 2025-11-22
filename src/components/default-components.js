@@ -3,13 +3,19 @@ class SiteFooter extends HTMLElement {
     this.innerHTML = `
     <footer>
       <a id="forumIcon" href="./forum-main.html">
-        <img src="./images/forum.gif" alt="Forum Icon" />
+        <abbr title="Forums">
+        <img src="./images/forum.png" alt="Forum Icon" />
+        </abbr>
       </a>
       <a id="mapIcon" href="./map.html">
-        <img src="./images/maps.gif" alt="Map Icon" />
+        <abbr title="Maps">
+        <img src="./images/maps.png" alt="Map Icon" />
+        </abbr>
       </a>
       <a id="profileIcon">
-        <img src="./images/profile.gif" alt="Profile Icon" />
+        <abbr title="Profile">
+        <img src="./images/profile.png" alt="Profile Icon" />
+        </abbr>
       </a>
     </footer>
         `;
