@@ -15,6 +15,8 @@ import {
 // you way to check if user is signed in to post comments! - Tens (tyson)
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
+localStorage.removeItem("forumImage");
+
 const auth = getAuth();
 let currentUid = null;
 
@@ -34,6 +36,22 @@ const pageTitle = "💬FORUMS";
 
 const urlParams = new URLSearchParams(window.location.search);
 const locationIdFromUrl = urlParams.get("locationId");
+
+const headerLeftSection = document.getElementById("header-left-section");
+
+headerLeftSection.innerHTML = `
+            <div>
+              <button id="return-button">←</button>
+            </div>
+            <a id="logoContainer">
+              <img id="logo" src="./images/logoImg.png" alt="Site Logo" />
+            </a>
+          </div>
+`;
+
+document.getElementById("return-button").addEventListener("click", function () {
+  window.location.href = "./forum-main.html";
+});
 
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
 //Display header end
@@ -169,7 +187,7 @@ document.getElementById("post").addEventListener("click", async function () {
   const uid = user ? user.uid : null;
 
   const userName =
-    user?.displayName || localStorage.getItem("fullName") || "Anonymous";
+    localStorage.getItem("displayName") || user?.displayName || "Anonymous";
 
   var newID = getCountForID.data().counter + 1;
   const ThreadRef = collection(db, "threads");
@@ -196,7 +214,7 @@ document.getElementById("post").addEventListener("click", async function () {
       likes: [],
       dislikes: [],
       image: inputImage,
-      locationId: locationIdFromUrl || null
+      locationId: locationIdFromUrl || null,
     });
 
     setTimeout(() => {
@@ -206,3 +224,13 @@ document.getElementById("post").addEventListener("click", async function () {
     alert("Please sign in before posting!");
   }
 });
+
+// Clear category selection button
+document
+  .getElementById("clearCategorySelection")
+  .addEventListener("click", function () {
+    var ele = document.getElementsByName("filters");
+    for (var i = 0; i < ele.length; i++) {
+      ele[i].checked = false;
+    }
+  });

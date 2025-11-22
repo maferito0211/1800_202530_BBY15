@@ -26,27 +26,41 @@
       />
       <button class="search-button" id="searchButton">🔍</button>
     </div>
-    <div>
-      <h3>Filter by category:</h3>
-      <form name="filtersForm">
-        <input type="radio" id="banking" value="0" name="filters" />
-        <label for="banking">Banking</label>
+    <div class="main-filter-container">
+      <button id="filterToggle" class="open">
+        <h3>Filters <span class="filter-arrow">∇</span></h3>
+      </button>
 
-        <input type="radio" id="government" value="1" name="filters" />
-        <label for="government">Government</label>
+      <form id="filter-container" name="filtersForm">
+        <label for="banking">
+          <input type="radio" id="banking" value="0" name="filters" />
+          Banking
+        </label>
 
-        <input type="radio" id="medical" value="2" name="filters" />
-        <label for="medical">Medical</label>
+        <label for="government">
+          <input type="radio" id="government" value="1" name="filters" />
+          Government
+        </label>
+        <label for="medical">
+          <input type="radio" id="medical" value="2" name="filters" />
+          Medical
+        </label>
 
-        <input type="radio" id="restaurants" value="3" name="filters" />
-        <label for="restaurants">Restaurants</label>
+        <label for="restaurants">
+          <input type="radio" id="restaurants" value="3" name="filters" />
+          Restaurants
+        </label>
 
-        <input type="radio" id="shopping" value="4" name="filters" />
-        <label for="shopping">Shopping</label>
+        <label for="shopping">
+          <input type="radio" id="shopping" value="4" name="filters" />
+          Shopping
+        </label>
 
-        <input type="radio" id="transit" value="5" name="filters" />
-        <label for="transit">Transit</label>
-        <input type="button" id="filterButton" value="Filter" />
+        <label for="transit">
+          <input type="radio" id="transit" value="5" name="filters" />
+          Transit
+        </label>
+        <input type="button" id="filterButtonClear" value="Clear" />
       </form>
     </div>
 

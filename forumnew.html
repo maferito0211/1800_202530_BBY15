@@ -60,16 +60,22 @@
             <input type="radio" id="transit" value="5" name="filters" />
             <p>Transit</p>
           </label>
-
           <br />
         </div>
+
+        <button type="button" id="clearCategorySelection">
+          Clear Selection
+        </button>
+        <br />
+        <br />
+
         <div class="photo-upload-container">
           <label for="forumImageInput" class="insert-photo-btn">
             <h3>Add a Photo</h3>
           </label>
           <input type="file" id="forumImageInput" accept="image/*" hidden />
           <div class="photo-upload-container">
-            <img id="forumImagePreview" alt="Preview"></img>
+            <img id="forumImagePreview" alt="Preview" />
           </div>
         </div>
         <input type="button" id="post" value="POST" />

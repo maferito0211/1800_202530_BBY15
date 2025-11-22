@@ -8,7 +8,7 @@ class SiteFooter extends HTMLElement {
       <a id="mapIcon" href="./map.html">
         <img src="./images/maps.gif" alt="Map Icon" />
       </a>
-      <a id="profileIcon" href="./loginPage.html">
+      <a id="profileIcon">
         <img src="./images/profile.gif" alt="Profile Icon" />
       </a>
     </footer>
@@ -23,10 +23,7 @@ class SiteHeader extends HTMLElement {
     this.innerHTML = `
         <nav>
           <div id="header-left-section">
-            <div>
-              <button id="menuButton">☰</button>
-            </div>
-
+          
             <!-- Logo container (click handler added below with JS) -->
             <a id="logoContainer">
               <img id="logo" src="./images/logoImg.png" alt="Site Logo" />

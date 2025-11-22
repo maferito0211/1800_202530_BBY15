@@ -18,3 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   });
 });
+
+onAuthStateChanged(auth, (user) => {
+  const profileIcon = document.getElementById("profileIcon");
+  if (user) {
+    profileIcon.setAttribute("href", "./profile.html");
+  } else {
+    profileIcon.setAttribute("href", "./loginPage.html");
+  }
+});
