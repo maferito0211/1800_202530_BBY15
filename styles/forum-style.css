@@ -570,7 +570,9 @@ h4 {
 }
 
 #likes,
-#dislikes {
+#dislikes,
+.comLikes,
+.comDislikes {
   display: inline;
   border-radius: 15px;
   border: none;
@@ -579,12 +581,14 @@ h4 {
   width: 70px;
 }
 
-#likes {
+#likes,
+.comLikes {
   margin-left: auto;
   background-color: var(--success);
 }
 
-#dislikes {
+#dislikes,
+.comDislikes {
   margin-right: 5%;
   background-color: #741a1a;
 }
@@ -636,9 +640,14 @@ h4 {
 /* make timestamp stay left of the options button and allow title to grow */
 .comment-top .timestamp {
   margin-left: auto;
-  margin-right: 0.5rem;
   color: var(--text-muted);
   font-size: 0.9em;
+}
+
+.comLikes,
+.comDislikes {
+  margin-left: 0.5rem;
+  margin-right: 0;
 }
 
 /* smaller circular options button for comments/replies */

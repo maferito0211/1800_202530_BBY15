@@ -392,12 +392,12 @@ async function postComment() {
   } else {
     var txt = document.querySelector("textarea");
 
-    const coll = collection(db, "threads", id.toString(), "comments");
-
-    const getCount = await getCountFromServer(coll);
-
     var content = document.querySelector("textarea");
-    var newID = getCount.data().count;
+    await updateDoc(doc(db, "idCounter", "CommentCounter"), {
+      CRcounter: increment(1),
+    });
+    var newID = (await getDoc(doc(db, "idCounter", "CommentCounter"))).data()
+      .CRcounter;
 
     // get signed-in user id safely (use currentUid if already set, otherwise fall back to auth.currentUser)
     const uid = currentUid || (auth.currentUser && auth.currentUser.uid);
@@ -419,6 +419,8 @@ async function postComment() {
         photoURL: currentUserPhotoURL,
         date: Date.now(),
         content: content.value,
+        likes: [],
+        dislikes: [],
       }
     );
 
@@ -463,6 +465,13 @@ function addComments(
   );
   updateAllSpines();
   if (comments) comments.insertAdjacentHTML("beforeend", commentHtml);
+  //Add event listener for likes and dislikes. this works.
+  document.getElementById(commentId).addEventListener("click", () => {
+    commLikebtn(commentId);
+  });
+  document.getElementById(commentId + ".5").addEventListener("click", () => {
+    commDislikebtn(commentId + ".5");
+  });
 }
 
 // helper function for EVERY HTML block, like replies and comments and stuff, just everything
@@ -486,6 +495,9 @@ function renderCommentHTML(
           <p class="timestamp">${new Date(comment.date)
             .toLocaleString()
             .replace(/(.*)\D\d+/, "$1")}</p>
+            
+            <button class="comLikes" id="${commentId}" name="${commentId}">0 Likes</button>
+            <button class="comDislikes" id="${commentId}.5" name="${commentId}.5">0 Dislikes</button>
 
           <!-- options button for this comment/reply -->
           <button class="options-button" aria-label="Options" title="Options" type="button">⋯</button>
@@ -500,6 +512,93 @@ function renderCommentHTML(
       <div class="reply"></div>
     </div>
   `;
+}
+
+// Makes an event listener for all comment like buttons, and then calls commLikebtn for that comment
+// Note: this only work for base comments; no replies (yet... ever...)
+const likeButtons = document.querySelectorAll(".comLikes");
+likeButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    commLikebtn(btn.name);
+  });
+});
+
+async function commLikebtn(i) {
+  if (author === "Anonymous" || author === "anonymous") {
+    alert("Please sign in before liking!");
+  } else {
+    const q = query(
+      collection(db, "threads", id.toString(), "comments"),
+      where("id", "==", parseInt(i))
+    );
+    const likedComm = await getDocs(q);
+    try {
+      var commLikeCount = likedComm.docs[0].data().likes.length;
+      if (commLikeCount == 0) {
+        commLikeCount++;
+        await updateDoc(likedComm.docs[0].ref, {
+          likes: arrayUnion(author),
+        });
+      } else if (likedComm.docs[0].data().likes.includes(author)) {
+        commLikeCount--;
+        await updateDoc(likedComm.docs[0].ref, {
+          likes: arrayRemove(author),
+        });
+      } else {
+        commLikeCount++;
+        await updateDoc(likedComm.docs[0].ref, {
+          likes: arrayUnion(author),
+        });
+      }
+      document.getElementById(i.toString()).innerHTML =
+        commLikeCount + " Likes";
+    } catch {
+      console.log("I'm... working on reply likes...");
+    }
+  }
+}
+
+// This is the same thing as above; just for dislikes now.
+const dislikeButtons = document.querySelectorAll(".comDislikes");
+dislikeButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    commDislikebtn(btn.name);
+  });
+});
+
+async function commDislikebtn(i) {
+  if (author === "Anonymous" || author === "anonymous") {
+    alert("Please sign in before liking!");
+  } else {
+    const q = query(
+      collection(db, "threads", id.toString(), "comments"),
+      where("id", "==", parseFloat(i) - 0.5)
+    );
+    const dislikedComm = await getDocs(q);
+    try {
+      var commDislikeCount = dislikedComm.docs[0].data().dislikes.length;
+      if (commDislikeCount == 0) {
+        commDislikeCount++;
+        await updateDoc(dislikedComm.docs[0].ref, {
+          dislikes: arrayUnion(author),
+        });
+      } else if (dislikedComm.docs[0].data().dislikes.includes(author)) {
+        commDislikeCount--;
+        await updateDoc(dislikedComm.docs[0].ref, {
+          dislikes: arrayRemove(author),
+        });
+      } else {
+        commDislikeCount++;
+        await updateDoc(dislikedComm.docs[0].ref, {
+          dislikes: arrayUnion(author),
+        });
+      }
+      document.getElementById(i.toString()).innerHTML =
+        commDislikeCount + " Dislikes";
+    } catch {
+      console.log("I'm working on reply dislikes too...");
+    }
+  }
 }
 
 // recursive loader: loads replies for a given parent comment document path and appends to container
@@ -649,8 +748,11 @@ async function postReply(selectedComment) {
     const repliesColl = collection(db, ...parentSegments, "replies");
 
     // get a numeric id (keeps numbering consistent with comments)
-    const getCount = await getCountFromServer(repliesColl);
-    const newID = getCount.data().count;
+    await updateDoc(doc(db, "idCounter", "CommentCounter"), {
+      CRcounter: increment(1),
+    });
+    var newID = (await getDoc(doc(db, "idCounter", "CommentCounter"))).data()
+      .CRcounter;
 
     // write reply using canonical field name 'photoURL'
     const replyDocRef = doc(db, ...parentSegments, "replies", newID.toString());
@@ -661,6 +763,8 @@ async function postReply(selectedComment) {
       photoURL, // <-- use freshly-resolved photoURL
       content,
       date: Date.now(),
+      likes: [],
+      dislikes: [],
     });
 
     // include photoURL when rendering locally
