@@ -30,25 +30,6 @@ if (locationIdFilter && locationContextDiv) {
       const locationData = locationDoc.data();
       const locName = locationData.name;
       const locCategory = locationData.category || "";
-
-      locationContextDiv.innerHTML = `
-        <div class="location-context-box">
-          <p>
-            Showing posts related to 
-            <strong>${locName}</strong>
-            ${locCategory ? `(${locCategory})` : ""}.
-          </p>
-          <button id="createLocationPostBtn" class="btn btn-outline-dark">
-            Create post about ${locName}
-          </button>
-        </div>
-      `;
-
-      document
-        .getElementById("createLocationPostBtn")
-        .addEventListener("click", () => {
-          window.location.href = `./forumnew.html?locationId=${locationIdFilter}`;
-        });
     } else {
       locationContextDiv.textContent = "This location could not be found.";
     }
@@ -60,13 +41,37 @@ if (locationIdFilter && locationContextDiv) {
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
 // --- NEW: disable "New Post" when not signed in --------------------
-const newCommentBtn = document.getElementById("newpost");
-const user = auth.currentUser;
+const newPostBtn = document.getElementById("newpost");
 
-if (!user) {
-  newCommentBtn.classList.add("disabled");
-  newCommentBtn.setAttribute("aria-disabled", "true");
-  newCommentBtn.title = "Please sign in to create a new post.";
+if (newPostBtn) {
+  onAuthStateChanged(auth, (user) => {
+    // If NOT logged in
+    if (!user) {
+      newPostBtn.classList.add("disabled");
+      newPostBtn.setAttribute("aria-disabled", "true");
+      newPostBtn.title = "Please sign in to create a new post.";
+      return;
+    }
+
+    // If logged in
+    newPostBtn.classList.remove("disabled");
+    newPostBtn.removeAttribute("aria-disabled");
+
+    newPostBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const locationId = urlParams.get("locationId");
+
+      if (locationId) {
+        // If accessing from a location
+        window.location.href = `./forumnew.html?locationId=${locationId}`;
+      } else {
+        // Normal new post
+        window.location.href = "./forumnew.html";
+      }
+    });
+  });
 }
 
 const querySnapshot = await getDocs(collection(db, "threads"));

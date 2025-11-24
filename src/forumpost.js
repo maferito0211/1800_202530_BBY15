@@ -185,7 +185,7 @@ for (const threadDoc of threadSnap.docs) {
   header.insertAdjacentHTML("beforeend", headerHtml);
 }
 
-// 🔥 después del bucle, añadimos listeners al botón "View on Map"
+// después del bucle, añadimos listeners al botón "View on Map"
 document.querySelectorAll(".view-location-button").forEach((btn) => {
   btn.addEventListener("click", () => {
     const locId = btn.dataset.locationId;
