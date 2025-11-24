@@ -498,6 +498,19 @@ h4 {
   margin: 0;
 }
 
+.title span {
+  font-weight: normal;
+}
+
+.main-post-profile-image {
+  width: 45px;
+  height: 45px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.5em;
+}
+
 .op-forum-top-container .forum-profile-image {
   width: 45px;
   height: 45px;
