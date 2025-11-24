@@ -5,7 +5,7 @@ import {
   getDocs,
   getDoc,
   updateDoc,
-  getCountFromServer,
+  collectionGroup,
   query,
   where,
   setDoc,
@@ -204,10 +204,10 @@ async function likebtn() {
     const threadDocSnap = await getDoc(threadDocRef);
     var likeCount = threadDocSnap.data().likes.length;
     if (threadDocSnap.data().likes.length == 0) {
+      likeCount++;
       await updateDoc(threadDocRef, {
         likes: arrayUnion(author),
       });
-      likeCount++;
     } else {
       threadDocSnap.data().likes.forEach(async (u) => {
         if (u === author) {
@@ -249,19 +249,21 @@ async function dislikebtn() {
   } else {
     const threadDocRef = doc(db, "threads", id.toString());
     const threadDocSnap = await getDoc(threadDocRef);
-    var dislikeCount = threadDocSnap.data().likes.length;
+    var dislikeCount = threadDocSnap.data().dislikes.length;
     if (threadDocSnap.data().dislikes.length == 0) {
+      dislikeCount++;
       await updateDoc(threadDocRef, {
         dislikes: arrayUnion(author),
       });
-      dislikeCount++;
     } else {
       threadDocSnap.data().dislikes.forEach(async (u) => {
         if (u === author) {
+          dislikeCount--;
           await updateDoc(threadDocRef, {
             dislikes: arrayRemove(author),
           });
         } else {
+          dislikeCount++;
           await updateDoc(threadDocRef, {
             dislikes: arrayUnion(author),
           });
@@ -298,6 +300,8 @@ for (const docSnap of commentDocRef.docs) {
       author: data.user,
       content: data.content,
       date: data.date,
+      likes: data.likes.length || 0,
+      dislikes: data.dislikes.length || 0,
     },
     docSnap.id,
     data.photoURL || data.currentUserPhotoURL || "",
@@ -428,6 +432,8 @@ async function postComment() {
       content: txt.value,
       date: Date.now(),
       author: author,
+      likes: 0,
+      dislikes: 0,
     };
 
     // compute the new document path and pass it to the renderer so replies will be stored under it
@@ -496,8 +502,14 @@ function renderCommentHTML(
             .toLocaleString()
             .replace(/(.*)\D\d+/, "$1")}</p>
             
-            <button class="comLikes" id="${commentId}" name="${commentId}">0 Likes</button>
-            <button class="comDislikes" id="${commentId}.5" name="${commentId}.5">0 Dislikes</button>
+            <button class="comLikes" id="${commentId}" name="${commentId}">${
+    comment.likes.length == 0 ? 0 : comment.likes.length || comment.likes || 0
+  } Likes</button>
+            <button class="comDislikes" id="${commentId}.5" name="${commentId}.5">${
+    comment.dislikes.length == 0
+      ? 0
+      : comment.dislikes.length || comment.dislikes || 0
+  } Dislikes</button>
 
           <!-- options button for this comment/reply -->
           <button class="options-button" aria-label="Options" title="Options" type="button">⋯</button>
@@ -531,30 +543,39 @@ async function commLikebtn(i) {
       collection(db, "threads", id.toString(), "comments"),
       where("id", "==", parseInt(i))
     );
-    const likedComm = await getDocs(q);
-    try {
-      var commLikeCount = likedComm.docs[0].data().likes.length;
-      if (commLikeCount == 0) {
-        commLikeCount++;
-        await updateDoc(likedComm.docs[0].ref, {
-          likes: arrayUnion(author),
-        });
-      } else if (likedComm.docs[0].data().likes.includes(author)) {
-        commLikeCount--;
-        await updateDoc(likedComm.docs[0].ref, {
-          likes: arrayRemove(author),
-        });
-      } else {
-        commLikeCount++;
-        await updateDoc(likedComm.docs[0].ref, {
-          likes: arrayUnion(author),
-        });
+    var likedComm = await getDocs(q);
+    var failed = false;
+    do {
+      try {
+        failed = false;
+        var commLikeCount = likedComm.docs[0].data().likes.length;
+        if (commLikeCount == 0) {
+          commLikeCount++;
+          await updateDoc(likedComm.docs[0].ref, {
+            likes: arrayUnion(author),
+          });
+        } else if (likedComm.docs[0].data().likes.includes(author)) {
+          commLikeCount--;
+          await updateDoc(likedComm.docs[0].ref, {
+            likes: arrayRemove(author),
+          });
+        } else {
+          commLikeCount++;
+          await updateDoc(likedComm.docs[0].ref, {
+            likes: arrayUnion(author),
+          });
+        }
+        document.getElementById(i.toString()).innerHTML =
+          commLikeCount + " Likes";
+      } catch {
+        const q2 = query(
+          collectionGroup(db, "replies"),
+          where("id", "==", parseInt(i))
+        );
+        likedComm = await getDocs(q2);
+        failed = true;
       }
-      document.getElementById(i.toString()).innerHTML =
-        commLikeCount + " Likes";
-    } catch {
-      console.log("I'm... working on reply likes...");
-    }
+    } while (failed);
   }
 }
 
@@ -574,30 +595,39 @@ async function commDislikebtn(i) {
       collection(db, "threads", id.toString(), "comments"),
       where("id", "==", parseFloat(i) - 0.5)
     );
-    const dislikedComm = await getDocs(q);
-    try {
-      var commDislikeCount = dislikedComm.docs[0].data().dislikes.length;
-      if (commDislikeCount == 0) {
-        commDislikeCount++;
-        await updateDoc(dislikedComm.docs[0].ref, {
-          dislikes: arrayUnion(author),
-        });
-      } else if (dislikedComm.docs[0].data().dislikes.includes(author)) {
-        commDislikeCount--;
-        await updateDoc(dislikedComm.docs[0].ref, {
-          dislikes: arrayRemove(author),
-        });
-      } else {
-        commDislikeCount++;
-        await updateDoc(dislikedComm.docs[0].ref, {
-          dislikes: arrayUnion(author),
-        });
+    var dislikedComm = await getDocs(q);
+    var failed = false;
+    do {
+      try {
+        failed = false;
+        var commDislikeCount = dislikedComm.docs[0].data().dislikes.length;
+        if (commDislikeCount == 0) {
+          commDislikeCount++;
+          await updateDoc(dislikedComm.docs[0].ref, {
+            dislikes: arrayUnion(author),
+          });
+        } else if (dislikedComm.docs[0].data().dislikes.includes(author)) {
+          commDislikeCount--;
+          await updateDoc(dislikedComm.docs[0].ref, {
+            dislikes: arrayRemove(author),
+          });
+        } else {
+          commDislikeCount++;
+          await updateDoc(dislikedComm.docs[0].ref, {
+            dislikes: arrayUnion(author),
+          });
+        }
+        document.getElementById(i.toString()).innerHTML =
+          commDislikeCount + " Dislikes";
+      } catch {
+        const q2 = query(
+          collectionGroup(db, "replies"),
+          where("id", "==", parseInt(i))
+        );
+        dislikedComm = await getDocs(q2);
+        failed = true;
       }
-      document.getElementById(i.toString()).innerHTML =
-        commDislikeCount + " Dislikes";
-    } catch {
-      console.log("I'm working on reply dislikes too...");
-    }
+    } while (failed);
   }
 }
 
@@ -775,6 +805,8 @@ async function postReply(selectedComment) {
       date: Date.now(),
       photoURL,
       userID: uid || null,
+      likes: 0,
+      dislikes: 0,
     };
     // compute depth for newly created reply
     const replyDepth = computeDepth(replyDocRef.path);
