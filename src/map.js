@@ -93,7 +93,7 @@ async function loadLocations(map) {
     });
 
     // Save in global array
-    markers.push({ marker, name, category, locationId });
+    markers.push({ marker, name, category, locationId, lat, lng });
   });
 }
 
@@ -145,10 +145,12 @@ function showMap() {
     }
 
     // SEARCH FILTER — live filtering by name or category
-    function setupSearch() {
+    // 🔍 Filter markers + zoom to nearest on Enter
+    function setupSearch(map) {
       const searchBox = document.getElementById("searchBox");
       if (!searchBox) return;
 
+      // Live filter markers while typing
       searchBox.addEventListener("input", () => {
         const query = searchBox.value.toLowerCase();
 
@@ -160,14 +162,103 @@ function showMap() {
           marker.getElement().style.display = matches ? "block" : "none";
         });
       });
+
+      // On Enter: zoom to nearest matching location
+      searchBox.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const query = searchBox.value.trim().toLowerCase();
+          if (!query) return;
+
+          zoomToNearestMatch(query, map);
+        }
+      });
+    }
+
+    function zoomToNearestMatch(query, map) {
+      // Get only markers that match the search text
+      const matched = markers.filter(({ name, category }) => {
+        return (
+          name.toLowerCase().includes(query) ||
+          category.toLowerCase().includes(query)
+        );
+      });
+
+      if (matched.length === 0) {
+        alert("No locations found for that search.");
+        return;
+      }
+
+      // If we don't know user location, just use the first match
+      if (!userPosition) {
+        const { marker } = matched[0];
+        const [lng, lat] = marker.getLngLat().toArray();
+
+        map.flyTo({
+          center: [lng, lat],
+          zoom: 14,
+          essential: true,
+        });
+
+        // Open popup if it exists
+        const popup = marker.getPopup?.();
+        if (popup) popup.addTo(map);
+        return;
+      }
+
+      // If we know user location, find the closest match
+      let closest = null;
+      let minDistance = Infinity;
+
+      matched.forEach(({ marker, lat, lng }) => {
+        if (typeof lat !== "number" || typeof lng !== "number") return;
+
+        const d = getDistanceKm(
+          userPosition[1], // user lat
+          userPosition[0], // user lng
+          lat,
+          lng
+        );
+
+        if (d < minDistance) {
+          minDistance = d;
+          closest = marker;
+        }
+      });
+
+      if (!closest) {
+        // Fallback: first match
+        const { marker } = matched[0];
+        const [lng, lat] = marker.getLngLat().toArray();
+
+        map.flyTo({
+          center: [lng, lat],
+          zoom: 14,
+          essential: true,
+        });
+
+        const popup = marker.getPopup?.();
+        if (popup) popup.addTo(map);
+        return;
+      }
+
+      const [cLng, cLat] = closest.getLngLat().toArray();
+      map.flyTo({
+        center: [cLng, cLat],
+        zoom: 14,
+        essential: true,
+      });
+
+      const popup = closest.getPopup?.();
+      if (popup) popup.addTo(map);
     }
 
     // NOW userPosition is ready — safe to load markers
     await loadLocations(map);
     setupFilters(map);
-    setupSearch();
+    setupSearch(map);
 
-    // "Locate Me" button still works
+    // "Locate Me" button
     const locateBtn = document.getElementById("locateBtn");
     if (locateBtn) {
       locateBtn.addEventListener("click", () => {
