@@ -73,7 +73,7 @@ headerLeftSection.innerHTML = `
             <div>
               <button id="return-button">←</button>
             </div>
-            <a id="logoContainer">
+            <a id="logoContainer" href="./index.html">
               <img id="logo" src="./images/logoImg.png" alt="Site Logo" />
             </a>
           </div>

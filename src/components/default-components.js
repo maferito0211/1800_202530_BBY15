@@ -12,7 +12,7 @@ class SiteFooter extends HTMLElement {
         <img src="./images/maps.png" alt="Map Icon" />
         </abbr>
       </a>
-      <a id="profileIcon">
+      <a id="profileIcon" href="./profilePage.html">
         <abbr title="Profile">
         <img src="./images/profile.png" alt="Profile Icon" />
         </abbr>
@@ -32,7 +32,7 @@ class SiteHeader extends HTMLElement {
           
             <!-- Logo container (click handler added below with JS) -->
             <a id="logoContainer">
-              <img id="logo" src="./images/logoImg.png" alt="Site Logo" />
+              <img id="logo" src="./images/logoImg.png" alt="Site Logo " />
             </a>
 
           </div>
