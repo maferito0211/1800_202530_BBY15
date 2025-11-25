@@ -38,7 +38,7 @@
     </header> -->
 
     <!-- Main Content -->
-    <main class="container mb-4 map-layout">
+    <main class="mb-4 map-layout">
       <!-- Search + Filters BOX (separate from the map) -->
       <div class="map-controls-box">
         <!-- Search Bar -->
@@ -51,8 +51,18 @@
           />
         </div>
 
+        <!-- Controls-->
+        <div class="map-controls">
+          <button id="filterToggle" class="open">
+            <h3>Filters <span class="filter-arrow">∇</span></h3>
+          </button>
+          <button id="locateBtn" class="btn">
+            <h3>📍Locate Me</h3>
+          </button>
+        </div>
+
         <!-- Filters -->
-        <div class="map-filters">
+        <div id="map-filters">
           <button class="btn btn-outline-dark" data-category="All">All</button>
           <button class="btn btn-outline-dark" data-category="Education">
             📚Education
@@ -75,11 +85,10 @@
         </div>
       </div>
 
-      <!-- MAP CARD (separate, does NOT get boxed with controls) -->
+      <!-- MAP CARD -->
       <div class="card border-0 shadow-sm position-relative map-card">
         <div class="card-body p-2">
           <div id="map"></div>
-          <button id="locateBtn" class="btn">📍 Locate Me</button>
         </div>
       </div>
     </main>

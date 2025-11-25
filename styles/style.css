@@ -25,6 +25,23 @@
 }
 
 /* Global / default styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-muted);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  z-index: 200;
+}
+
 html,
 body {
   overflow-x: hidden;
@@ -83,7 +100,7 @@ img {
 site-navbar {
   position: fixed;
   top: 0;
-  z-index: 999;
+  z-index: 100;
 }
 
 nav {
@@ -143,15 +160,18 @@ footer {
   grid-template-columns: 33% 34% 33%;
   text-align: center;
   padding-top: 10px;
-  background-color: var(--bg-light);
+  background-color: var(--bg);
   color: rgb(179, 179, 179);
   position: fixed;
   left: 0;
   bottom: 0;
-  z-index: 999;
+  z-index: 100;
 
   width: 100%;
   box-sizing: border-box;
+
+  border: var(--border);
+  border-top: solid 1px var(--highlight);
 }
 
 footer a img:hover {
@@ -206,6 +226,7 @@ footer a img:hover {
   border-radius: 25px;
   overflow: hidden;
   width: 95vw;
+  height: 60px;
 }
 
 .search-input {
