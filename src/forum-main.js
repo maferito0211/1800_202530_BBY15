@@ -95,14 +95,17 @@ function addThreads(snapshot) {
   const urlParams = new URLSearchParams(window.location.search);
   const locationIdFilter = urlParams.get("locationId");
 
-  snapshot.forEach((doc) => {
-    const data = doc.data();
+  snapshot.forEach(async (document) => {
+    const data = document.data();
+
+    const thisUserRef = doc(db, "users", data.userID);
+    const thisUserSnap = await getDoc(thisUserRef);
 
     if (locationIdFilter && data.locationId !== locationIdFilter) {
       return;
     }
 
-    var html = `<li data-doc-id="${doc.id}" data-thread-id="${
+    var html = `<li data-doc-id="${document.id}" data-thread-id="${
       data.id
     }" data-user-id="${data.userID || ""}">
       <div class="forum-post-top-container" href="./forumpost.html?id=${
@@ -110,14 +113,17 @@ function addThreads(snapshot) {
       }">
         <a href="./forumpost.html?id=${data.id}" class="title-link">
           <div class="title-row">
-            <h4 class="title">${data.title} <span> - ${data.user}</span></h4>
+            <img class="main-post-profile-image" src="${
+              thisUserSnap.data().photoURL
+            }">
+            <h4 class="title"><span>${data.user} - </span>${data.title}</h4>
           </div>
           <img class="forum-post-image-in-main" src="data:image/jpeg;base64,${
             data.image || ""
           }" alt="Thread Image" />
         </a>
         <div class="options-button" role="button" aria-label="Thread options"
-             data-doc-id="${doc.id}" data-user-id="${
+             data-doc-id="${document.id}" data-user-id="${
       data.userID || ""
     }" data-thread-id="${data.id}">⋯</div>
       </div>
