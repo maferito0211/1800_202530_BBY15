@@ -181,6 +181,8 @@ document.getElementById("post").addEventListener("click", async function () {
   var content = document.querySelector("#content");
   const inputImage = localStorage.getItem("forumImage") || "";
 
+  document.getElementById("loading-screen").style.display = "flex";
+
   // read the live signed-in user
   const user =
     auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
@@ -218,9 +220,7 @@ document.getElementById("post").addEventListener("click", async function () {
       locationId: locationIdFromUrl || null,
     });
 
-    setTimeout(() => {
-      window.location.href = `./forumpost.html?id=${newID}`;
-    }, 3000);
+    window.location.href = `./forumpost.html?id=${newID}`;
   } else {
     alert("Please sign in before posting!");
   }

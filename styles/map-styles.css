@@ -1,3 +1,8 @@
+body {
+  padding-top: 20px !important;
+  padding-bottom: 0 !important;
+}
+
 h2 {
   text-align: center;
   font-weight: 600;
@@ -22,51 +27,142 @@ header h1 {
   border-top: solid 1px var(--highlight);
   box-shadow: var(--shadow);
 
-  padding: 20px;
+  padding: clamp(1rem, 2vw, 1.5rem);
   margin: 20px auto;
   border-radius: 20px;
 
-  max-width: 900px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  position: absolute;
+  z-index: 50;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+}
+
+.map-controls {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+#locateBtn {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  padding: 0.5em 1em;
+  align-self: flex-end;
+
+  border-radius: 1em;
+  background-color: var(--primary);
+  color: var(--highlight);
+
+  border: var(--secondary);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
+
+  transition: background 0.2s ease;
+}
+
+#locateBtn h3 {
+  font-size: clamp(0.6em, 1.8vw, 1.2em);
+  font-weight: 400;
+  text-align: center;
+  margin: 0;
+}
+
+#locateBtn:hover {
+  background-color: var(--secondary);
 }
 
 /* Search bar inside the white box */
+
+#searchContainer {
+  display: flex;
+  justify-content: center; /* centra horizontalmente */
+  width: 200% !important;
+  overflow: visible; /* por si el input se sale un poco */
+  margin-bottom: 0;
+  padding: 0;
+}
+
 #searchBox {
-  max-width: 500px;
+  width: 100%;
   border-radius: 25px;
-  padding: 10px 20px;
   border: 1px solid #ccc;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 /* Filters inside the white box */
-.map-filters {
-  display: flex;
+#map-filters {
+  display: none;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 1rem;
   gap: 10px;
 }
 
-.map-filters button {
+#map-filters button {
   border-radius: 2em;
   border: var(--border);
   border-top: solid 1px var(--highlight);
   box-shadow: var(--shadow);
 
-  padding: 8px 18px;
+  padding: 1em 1.5em;
+  font-size: clamp(0.5rem, 0.8vw, 1.2rem);
+
   color: var(--text);
   background-color: var(--bg-light);
   transition: all 0.2s ease;
 }
 
-.map-filters button:hover,
-.map-filters button.active {
+#map-filters button:hover,
+#map-filters button.active {
   background-color: #444;
   color: #fff;
   border-color: #444;
+}
+
+#filterToggle {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  padding: 0.5em 1em;
+  align-self: flex-start;
+
+  border-radius: 1em;
+  background-color: var(--primary);
+  color: var(--highlight);
+
+  border: var(--secondary);
+  border-top: solid 1px var(--highlight);
+  box-shadow: var(--shadow);
+
+  transition: background 0.2s ease;
+}
+
+#filterToggle:hover {
+  background: var(--secondary);
+}
+
+#filterToggle h3 {
+  font-size: clamp(0.7em, 1.8vw, 1.2em);
+  font-weight: 400;
+  text-align: center;
+  margin: 0;
+}
+
+.filter-arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+#filterToggle.open .filter-arrow {
+  transform: rotateX(180deg);
 }
 
 /* ==========================================
@@ -74,98 +170,10 @@ header h1 {
 ========================================== */
 #map {
   width: 100%;
-  height: 510px;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-#locateBtn {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 10;
-  border-radius: 25px;
-  padding: 8px 18px;
-  font-weight: 500;
-  background-color: #444;
-  color: white;
+  height: 81vh;
+  border-radius: 0;
   border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
-
-#locateBtn:hover {
-  background-color: #222;
-}
-
-/* ==========================================
-   MOBILE LAYOUT
-   map → controls
-========================================== */
-@media (max-width: 991px) {
-  .map-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  /* Move the whole controls box BELOW the map */
-  .map-card {
-    order: 1;
-  }
-
-  .map-controls-box {
-    order: 2;
-  }
-  #searchBox {
-    width: 150% !important; /* más grande que el contenedor */
-    max-width: none;
-    margin: 0; /* quita márgenes raros */
-  }
-  #searchContainer {
-    display: flex;
-    justify-content: center; /* centra horizontalmente */
-    width: 100% !important;
-    overflow: visible; /* por si el input se sale un poco */
-  }
-}
-
-/* ==========================================
-   DESKTOP LAYOUT
-   search + filters → map
-========================================== */
-@media (min-width: 992px) {
-  .map-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  #searchContainer {
-    order: 1;
-    display: flex;
-    justify-content: center;
-    width: 300% !important;
-  }
-
-  .map-controls-box {
-    order: 1;
-  }
-
-  .map-card {
-    order: 2;
-  }
-
-  .map-card {
-    width: 90vw !important; /* ocupa TODA la pantalla */
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -45vw; /* saca al mapa fuera del container */
-    margin-right: 0vw;
-    border-radius: 20px; /* opcional */
-  }
-
-  #map {
-    width: 100%;
-  }
+  background-color: var(--bg-dark);
+  border-color: var(--bg-dark);
+  overflow: hidden;
 }

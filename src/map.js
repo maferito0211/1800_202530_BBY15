@@ -340,8 +340,22 @@ function addUserPin(map) {
   });
 }
 
+//----------------------- FILTERS SETUP -----------------------
+
+document.getElementById("filterToggle").addEventListener("click", () => {
+  const filterContainer = document.getElementById("map-filters");
+  const toggleBtn = document.getElementById("filterToggle");
+  if (filterContainer.style.display === "flex") {
+    filterContainer.style.display = "none";
+    toggleBtn.classList.add("open");
+  } else {
+    filterContainer.style.display = "flex";
+    toggleBtn.classList.remove("open");
+  }
+});
+
 function setupFilters() {
-  const filterContainer = document.querySelector(".map-filters");
+  const filterContainer = document.querySelector("#map-filters");
   if (!filterContainer) return;
 
   const buttons = filterContainer.querySelectorAll("button");

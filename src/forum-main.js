@@ -22,7 +22,6 @@ const locationIdFilter = urlParams.get("locationId");
 
 const locationContextDiv = document.getElementById("locationContext");
 
-// Si venimos con ?locationId, mostramos mensaje y botón para crear post
 if (locationIdFilter && locationContextDiv) {
   try {
     const locationDoc = await getDoc(doc(db, "locations", locationIdFilter));
@@ -149,8 +148,9 @@ document.querySelectorAll(".options-button").forEach((button) => {
 
 //Checks all the threads titles for whats in the search bar
 document
-  .getElementById("searchButton")
-  .addEventListener("click", async function () {
+  .getElementById("searchValue")
+  .addEventListener("keydown", async function (event) {
+    if (event.key !== "Enter") return;
     container.innerHTML = "";
     const searchText = document.getElementById("searchValue").value;
     const urlParams = new URLSearchParams(window.location.search);
