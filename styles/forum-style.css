@@ -635,7 +635,7 @@ h4 {
 .comDislikes {
   display: inline;
   border-radius: 15px;
-  border: none;
+  border: solid;
   color: var(--highlight);
   height: 50px;
   width: 70px;
@@ -643,14 +643,18 @@ h4 {
 
 #likes,
 .comLikes {
+  border-color: var(--success);
   margin-left: auto;
-  background-color: var(--success);
+  background-color: var(--highlight);
+  color: var(--success);
 }
 
 #dislikes,
 .comDislikes {
+  border-color: #741a1a;
   margin-right: 5%;
-  background-color: #741a1a;
+  background-color: var(--highlight);
+  color: #741a1a;
 }
 
 /* When a comment is selected */

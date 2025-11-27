@@ -175,11 +175,27 @@ for (const threadDoc of threadSnap.docs) {
     <p class="commentcount"> ${threadDoc.data().comment_count} comments</p>
     <input type="button" id="likes" value="${
       threadDoc.data().likes.length
-    } likes"></input>
+    } likes" ${
+    threadDoc.data().likes.includes(author)
+      ? `
+        style="
+        background-color: var(--success);
+        color: var(--highlight);
+      "`
+      : ""
+  }></input>
       <p class="empty"></p>
       <input type="button" id="dislikes" value="${
         threadDoc.data().dislikes.length
-      } dislikes"></input>
+      } dislikes" ${
+    threadDoc.data().dislikes.includes(author)
+      ? `
+        style="
+        background-color: #741a1a;
+        color: var(--highlight);
+      "`
+      : ""
+  }></input>
     </div>
   `;
   header.insertAdjacentHTML("beforeend", headerHtml);
@@ -203,8 +219,10 @@ async function likebtn() {
     const threadDocRef = doc(db, "threads", id.toString());
     const threadDocSnap = await getDoc(threadDocRef);
     var likeCount = threadDocSnap.data().likes.length;
+    var increased;
     if (threadDocSnap.data().likes.length == 0) {
       likeCount++;
+      increased = true;
       await updateDoc(threadDocRef, {
         likes: arrayUnion(author),
       });
@@ -212,29 +230,35 @@ async function likebtn() {
       threadDocSnap.data().likes.forEach(async (u) => {
         if (u === author) {
           likeCount--;
+          increased = false;
           await updateDoc(threadDocRef, {
             likes: arrayRemove(author),
           });
         } else {
           likeCount++;
+          increased = true;
           await updateDoc(threadDocRef, {
             likes: arrayUnion(author),
           });
         }
       });
     }
-    giveBackLikeBtn(likeCount, ".commentcount", "likes");
+    giveBackLikeBtn(likeCount, ".commentcount", "likes", increased);
   }
 }
 
-function giveBackLikeBtn(likeCount, classSelector, likeType) {
+function giveBackLikeBtn(likeCount, classSelector, likeType, increased) {
   document.getElementById(likeType).remove();
-  document
-    .querySelector(classSelector)
-    .insertAdjacentHTML(
-      "afterend",
-      `<input type="button" id="${likeType}" value="${likeCount} ${likeType}"></input>`
-    );
+  document.querySelector(classSelector).insertAdjacentHTML(
+    "afterend", //Conditional operator in a conditional operator...
+    `<input type="button" id="${likeType}" value="${likeCount} ${likeType}" ${
+      increased
+        ? likeType === "likes"
+          ? `style="background-color: var(--success); color: var(--highlight); "`
+          : `style="background-color: #741a1a; color: var(--highlight); "`
+        : ""
+    } ></input>`
+  );
   document
     .getElementById(likeType)
     .addEventListener("click", likeType === "likes" ? likebtn : dislikebtn);
@@ -250,8 +274,10 @@ async function dislikebtn() {
     const threadDocRef = doc(db, "threads", id.toString());
     const threadDocSnap = await getDoc(threadDocRef);
     var dislikeCount = threadDocSnap.data().dislikes.length;
+    var increased;
     if (threadDocSnap.data().dislikes.length == 0) {
       dislikeCount++;
+      increased = true;
       await updateDoc(threadDocRef, {
         dislikes: arrayUnion(author),
       });
@@ -259,18 +285,20 @@ async function dislikebtn() {
       threadDocSnap.data().dislikes.forEach(async (u) => {
         if (u === author) {
           dislikeCount--;
+          increased = false;
           await updateDoc(threadDocRef, {
             dislikes: arrayRemove(author),
           });
         } else {
           dislikeCount++;
+          increased = true;
           await updateDoc(threadDocRef, {
             dislikes: arrayUnion(author),
           });
         }
       });
     }
-    giveBackLikeBtn(dislikeCount, ".empty", "dislikes");
+    giveBackLikeBtn(dislikeCount, ".empty", "dislikes", increased);
   }
 }
 
@@ -300,8 +328,8 @@ for (const docSnap of commentDocRef.docs) {
       author: data.user,
       content: data.content,
       date: data.date,
-      likes: data.likes.length || 0,
-      dislikes: data.dislikes.length || 0,
+      likes: data.likes || 0,
+      dislikes: data.dislikes || 0,
     },
     docSnap.id,
     data.photoURL || data.currentUserPhotoURL || "",
@@ -502,10 +530,26 @@ function renderCommentHTML(
             .toLocaleString()
             .replace(/(.*)\D\d+/, "$1")}</p>
             
-            <button class="comLikes" id="${commentId}" name="${commentId}">${
+            <button class="comLikes" id="${commentId}" name="${commentId}" ${
+    comment.likes.includes(author)
+      ? `
+        style="
+        background-color: var(--success);
+        color: var(--highlight);
+      "`
+      : ""
+  }>${
     comment.likes.length == 0 ? 0 : comment.likes.length || comment.likes || 0
   } Likes</button>
-            <button class="comDislikes" id="${commentId}.5" name="${commentId}.5">${
+            <button class="comDislikes" id="${commentId}.5" name="${commentId}.5" ${
+    comment.dislikes.includes(author)
+      ? `
+        style="
+        background-color: #741a1a;
+        color: var(--highlight);
+      "`
+      : ""
+  }>${
     comment.dislikes.length == 0
       ? 0
       : comment.dislikes.length || comment.dislikes || 0
@@ -527,13 +571,21 @@ function renderCommentHTML(
 }
 
 // Makes an event listener for all comment like buttons, and then calls commLikebtn for that comment
-// Note: this only work for base comments; no replies (yet... ever...)
-const likeButtons = document.querySelectorAll(".comLikes");
-likeButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    commLikebtn(btn.name);
+function addCommLikeEventListeners() {
+  const likeButtons = document.querySelectorAll(".comLikes");
+  likeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      commLikebtn(btn.name);
+    });
   });
-});
+  const dislikeButtons = document.querySelectorAll(".comDislikes");
+  dislikeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      commDislikebtn(btn.name);
+    });
+  });
+}
+addCommLikeEventListeners();
 
 async function commLikebtn(i) {
   if (author === "Anonymous" || author === "anonymous") {
@@ -548,25 +600,35 @@ async function commLikebtn(i) {
     do {
       try {
         failed = false;
+        var increased;
         var commLikeCount = likedComm.docs[0].data().likes.length;
         if (commLikeCount == 0) {
           commLikeCount++;
+          increased = true;
           await updateDoc(likedComm.docs[0].ref, {
             likes: arrayUnion(author),
           });
         } else if (likedComm.docs[0].data().likes.includes(author)) {
           commLikeCount--;
+          increased = false;
           await updateDoc(likedComm.docs[0].ref, {
             likes: arrayRemove(author),
           });
         } else {
           commLikeCount++;
+          increased = true;
           await updateDoc(likedComm.docs[0].ref, {
             likes: arrayUnion(author),
           });
         }
-        document.getElementById(i.toString()).innerHTML =
-          commLikeCount + " Likes";
+        const thisBtn = document.getElementById(i.toString());
+        thisBtn.innerHTML = commLikeCount + " Likes";
+        thisBtn.style.backgroundColor = increased
+          ? "var(--success)"
+          : "var(--highlight)";
+        thisBtn.style.color = !increased
+          ? "var(--success)"
+          : "var(--highlight)";
       } catch {
         const q2 = query(
           collectionGroup(db, "replies"),
@@ -578,14 +640,6 @@ async function commLikebtn(i) {
     } while (failed);
   }
 }
-
-// This is the same thing as above; just for dislikes now.
-const dislikeButtons = document.querySelectorAll(".comDislikes");
-dislikeButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    commDislikebtn(btn.name);
-  });
-});
 
 async function commDislikebtn(i) {
   if (author === "Anonymous" || author === "anonymous") {
@@ -600,25 +654,33 @@ async function commDislikebtn(i) {
     do {
       try {
         failed = false;
+        var increased;
         var commDislikeCount = dislikedComm.docs[0].data().dislikes.length;
         if (commDislikeCount == 0) {
           commDislikeCount++;
+          increased = true;
           await updateDoc(dislikedComm.docs[0].ref, {
             dislikes: arrayUnion(author),
           });
         } else if (dislikedComm.docs[0].data().dislikes.includes(author)) {
           commDislikeCount--;
+          increased = false;
           await updateDoc(dislikedComm.docs[0].ref, {
             dislikes: arrayRemove(author),
           });
         } else {
           commDislikeCount++;
+          increased = true;
           await updateDoc(dislikedComm.docs[0].ref, {
             dislikes: arrayUnion(author),
           });
         }
-        document.getElementById(i.toString()).innerHTML =
-          commDislikeCount + " Dislikes";
+        const thisBtn = document.getElementById(i.toString());
+        thisBtn.innerHTML = commDislikeCount + " Disikes";
+        thisBtn.style.backgroundColor = increased
+          ? "#741a1a"
+          : "var(--highlight)";
+        thisBtn.style.color = !increased ? "#741a1a" : "var(--highlight)";
       } catch {
         const q2 = query(
           collectionGroup(db, "replies"),
@@ -805,8 +867,8 @@ async function postReply(selectedComment) {
       date: Date.now(),
       photoURL,
       userID: uid || null,
-      likes: 0,
-      dislikes: 0,
+      likes: [],
+      dislikes: [],
     };
     // compute depth for newly created reply
     const replyDepth = computeDepth(replyDocRef.path);
@@ -843,6 +905,7 @@ function addReply(reply, selectedComment, replyId, docPath, depth) {
     updateSpine(target); // adjust height after adding a reply
   }
   updateAllSpines();
+  addCommLikeEventListeners();
 }
 
 // delegated options menu for comments & replies (document-level)
