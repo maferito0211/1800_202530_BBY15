@@ -182,6 +182,7 @@ footer a img:hover {
 #mapIcon img,
 #forumIcon img,
 #profileIcon img {
+  border-radius: 50%;
   height: 60px;
   display: inline-block;
   transition: transform 0.2s ease;
