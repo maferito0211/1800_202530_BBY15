@@ -1,6 +1,7 @@
 body {
-  padding-top: 20px !important;
+  /* reserve space for the fixed nav (60px) */
   padding-bottom: 0 !important;
+  padding-top: 20px !important;
 }
 
 h2 {
@@ -33,8 +34,9 @@ header h1 {
 
   left: 50%;
   transform: translateX(-50%);
-  width: 50%;
+  width: clamp(300px, 50%, 800px);
   position: absolute;
+  top: 72px; /* place controls below fixed nav */
   z-index: 50;
   display: flex;
   flex-direction: column;
@@ -54,7 +56,7 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: start;
-  padding: 0.5em 1em;
+  padding: 0.5em;
   align-self: flex-end;
 
   border-radius: 1em;
@@ -84,14 +86,14 @@ header h1 {
 #searchContainer {
   display: flex;
   justify-content: center; /* centra horizontalmente */
-  width: 200% !important;
+  width: 100%;
   overflow: visible; /* por si el input se sale un poco */
   margin-bottom: 0;
   padding: 0;
 }
 
 #searchBox {
-  width: 100%;
+  width: 100% !important;
   border-radius: 25px;
   border: 1px solid #ccc;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -99,14 +101,31 @@ header h1 {
 
 /* Filters inside the white box */
 #map-filters {
-  display: none;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: none; /* allow horizontal layout and scrolling */
+  flex-wrap: nowrap;
+  justify-content: flex-start; /* align items left so they scroll horizontally */
+  gap: 1rem;
   margin-top: 1rem;
-  gap: 10px;
+  padding: 0.25rem 0;
+  width: 100%;
+
+  /* enable horizontal scrolling */
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  /* optional: make items snap into place while scrolling */
+  scroll-snap-type: x mandatory;
+
+  touch-action: pan-y; /* allow horizontal drag handling while preserving vertical page scroll */
+  cursor: grab;
 }
 
+/* ensure each filter button doesn't shrink and snaps */
 #map-filters button {
+  flex: 0 0 auto;
+  min-width: max-content;
+  scroll-snap-align: start;
+
   border-radius: 2em;
   border: var(--border);
   border-top: solid 1px var(--highlight);
@@ -120,6 +139,18 @@ header h1 {
   transition: all 0.2s ease;
 }
 
+/* optional: slimmer native scrollbar */
+#map-filters {
+  scrollbar-width: thin;
+}
+#map-filters::-webkit-scrollbar {
+  height: 8px;
+}
+#map-filters::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+
 #map-filters button:hover,
 #map-filters button.active {
   background-color: #444;
@@ -131,7 +162,7 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: start;
-  padding: 0.5em 1em;
+  padding: 0.5em;
   align-self: flex-start;
 
   border-radius: 1em;
@@ -168,9 +199,17 @@ header h1 {
 /* ==========================================
    MAP CARD
 ========================================== */
+.map-card {
+  /* ensure the card stretches to the available viewport space */
+  margin-top: 0;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
 #map {
   width: 100%;
-  height: 81vh;
+  height: calc(100vh - 145px);
   border-radius: 0;
   border: none;
   background-color: var(--bg-dark);

@@ -173,29 +173,32 @@ for (const threadDoc of threadSnap.docs) {
     </div>
     <div class="subtitle">
     <p class="commentcount"> ${threadDoc.data().comment_count} comments</p>
-    <input type="button" id="likes" value="${
-      threadDoc.data().likes.length
-    } likes" ${
-    threadDoc.data().likes.includes(author)
-      ? `
+    <button type="button" id="likes" ${
+      threadDoc.data().likes.includes(author)
+        ? `
         style="
         background-color: var(--success);
         color: var(--highlight);
       "`
-      : ""
-  }></input>
+        : ""
+    }>
+    ${threadDoc.data().likes.length}
+  <img src="./images/likeButton.png" class="like-icon-small" alt="Like Icon">
+  </button>
       <p class="empty"></p>
-      <input type="button" id="dislikes" value="${
-        threadDoc.data().dislikes.length
-      } dislikes" ${
-    threadDoc.data().dislikes.includes(author)
-      ? `
+      <button type="button" id="dislikes" ${
+        threadDoc.data().dislikes.includes(author)
+          ? `
         style="
         background-color: #741a1a;
         color: var(--highlight);
       "`
-      : ""
-  }></input>
+          : ""
+      }>
+      ${threadDoc.data().dislikes.length}
+      <img src="./images/dislikeButton.png" class="dislike-icon-small" alt="Dislike Icon">
+
+  </button>
     </div>
   `;
   header.insertAdjacentHTML("beforeend", headerHtml);
@@ -248,16 +251,28 @@ async function likebtn() {
 }
 
 function giveBackLikeBtn(likeCount, classSelector, likeType, increased) {
-  document.getElementById(likeType).remove();
+  const existing = document.getElementById(likeType);
+  if (existing) existing.remove();
+  const isLike = likeType === "likes";
+
   document.querySelector(classSelector).insertAdjacentHTML(
     "afterend", //Conditional operator in a conditional operator...
-    `<input type="button" id="${likeType}" value="${likeCount} ${likeType}" ${
+    `<button type="button" id="${likeType}" ${
       increased
         ? likeType === "likes"
           ? `style="background-color: var(--success); color: var(--highlight); "`
           : `style="background-color: #741a1a; color: var(--highlight); "`
         : ""
-    } ></input>`
+    } >
+    <span class="${isLike ? "like-count" : "dislike-count"}">${likeCount}${
+      isLike ? "" : ""
+    }</span>
+      <img src="./images/${
+        isLike ? "likeButton" : "dislikeButton"
+      }.png" class="like-icon-small" alt="${
+      likeType.charAt(0).toUpperCase() + likeType.slice(1)
+    } Icon">
+    </button>`
   );
   document
     .getElementById(likeType)
@@ -529,7 +544,7 @@ function renderCommentHTML(
           <p class="timestamp">${new Date(comment.date)
             .toLocaleString()
             .replace(/(.*)\D\d+/, "$1")}</p>
-            
+            <div class="like-dislike-buttons">
             <button class="comLikes" id="${commentId}" name="${commentId}" ${
     comment.likes.includes(author)
       ? `
@@ -540,7 +555,7 @@ function renderCommentHTML(
       : ""
   }>${
     comment.likes.length == 0 ? 0 : comment.likes.length || comment.likes || 0
-  } Likes</button>
+  } <img src="./images/likeButton.png" class="like-icon-small" alt="Like Icon"></button>
             <button class="comDislikes" id="${commentId}.5" name="${commentId}.5" ${
     comment.dislikes.includes(author)
       ? `
@@ -553,10 +568,12 @@ function renderCommentHTML(
     comment.dislikes.length == 0
       ? 0
       : comment.dislikes.length || comment.dislikes || 0
-  } Dislikes</button>
-
+  } <img src="./images/dislikeButton.png" class="dislike-icon-small" alt="Dislike Icon">
+  </button>
+  
           <!-- options button for this comment/reply -->
           <button class="options-button" aria-label="Options" title="Options" type="button">⋯</button>
+        </div>
         </div>
         <div class="comment-content${noReplyClass}">
           <img class="forum-profile-image" src="${
@@ -622,7 +639,9 @@ async function commLikebtn(i) {
           });
         }
         const thisBtn = document.getElementById(i.toString());
-        thisBtn.innerHTML = commLikeCount + " Likes";
+        thisBtn.innerHTML =
+          commLikeCount +
+          ' <img src="./images/likeButton.png" class="like-icon-small" alt="Like Icon">';
         thisBtn.style.backgroundColor = increased
           ? "var(--success)"
           : "var(--highlight)";
@@ -676,7 +695,9 @@ async function commDislikebtn(i) {
           });
         }
         const thisBtn = document.getElementById(i.toString());
-        thisBtn.innerHTML = commDislikeCount + " Disikes";
+        thisBtn.innerHTML =
+          commDislikeCount +
+          '<img src="./images/dislikeButton.png" class="dislike-icon-small" alt="Dislike Icon">';
         thisBtn.style.backgroundColor = increased
           ? "#741a1a"
           : "var(--highlight)";
