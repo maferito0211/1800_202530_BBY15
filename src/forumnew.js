@@ -50,7 +50,7 @@ headerLeftSection.innerHTML = `
 `;
 
 document.getElementById("return-button").addEventListener("click", function () {
-  window.location.href = "./forum-main.html";
+  window.location.href = "./forumMain.html";
 });
 
 document.getElementById("pageTitleSection").innerHTML = pageTitle;

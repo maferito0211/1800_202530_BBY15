@@ -70,7 +70,7 @@ async function loadLocations(map) {
       <p><strong>${distanceText}</strong></p>
 
       <a 
-        href="./forum-main.html?locationId=${locationId}" 
+        href="./forumMain.html?locationId=${locationId}" 
         class="map-related-link"
       >
         View related posts
