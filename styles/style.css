@@ -133,7 +133,8 @@ nav {
 }
 
 #logo {
-  height: 6vh;
+  height: auto;
+  max-height: 55px;
   width: auto;
   margin-left: 20px;
 }
@@ -147,12 +148,18 @@ nav {
 }
 
 #pageTitleSection {
-  font-size: 1.5em;
+  font-size: clamp(0.5em, 5vw, 1.5em);
   display: flex;
   justify-content: center;
   align-items: center;
   color: var(--primary);
   font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  #pageTitleSection {
+    grid-column: 3;
+  }
 }
 
 footer {
@@ -182,8 +189,11 @@ footer a img:hover {
 #mapIcon img,
 #forumIcon img,
 #profileIcon img {
+  background-position: center;
+  background-size: contain;
   border-radius: 50%;
-  height: 60px;
+  border-image: top;
+  height: 50px;
   display: inline-block;
   transition: transform 0.2s ease;
 }
