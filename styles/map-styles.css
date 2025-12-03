@@ -116,7 +116,9 @@ header h1 {
   /* optional: make items snap into place while scrolling */
   scroll-snap-type: x mandatory;
 
-  touch-action: pan-y; /* allow horizontal drag handling while preserving vertical page scroll */
+  /* allow horizontal touch gestures; prefer touch-action for cross-browser control */
+  touch-action: pan-x;
+
   cursor: grab;
 }
 
