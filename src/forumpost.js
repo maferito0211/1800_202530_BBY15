@@ -475,8 +475,8 @@ async function postComment() {
       content: txt.value,
       date: Date.now(),
       author: author,
-      likes: 0,
-      dislikes: 0,
+      likes: [],
+      dislikes: [],
     };
 
     // compute the new document path and pass it to the renderer so replies will be stored under it

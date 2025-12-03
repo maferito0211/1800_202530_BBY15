@@ -12,3 +12,4 @@ firebase.json
 firestore.indexes.json
 .firebase/
 dist/
+public/
