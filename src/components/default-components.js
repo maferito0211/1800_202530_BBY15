@@ -2,7 +2,7 @@ class SiteFooter extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
     <footer>
-      <a id="forumIcon" href="./forum-main.html">
+      <a id="forumIcon" href="./forumMain.html">
         <abbr title="Forums">
         <img src="./images/forum.png" alt="Forum Icon" />
         </abbr>
