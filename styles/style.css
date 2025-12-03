@@ -404,7 +404,7 @@ footer a img:hover {
 }
 
 .feature-image img {
-  max-width: 550px;
+  width: clamp(300px, 100%, 550px);
   border-radius: 14px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   animation: fadeIn 0.7s ease;
