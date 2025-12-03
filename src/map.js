@@ -354,9 +354,47 @@ document.getElementById("filterToggle").addEventListener("click", () => {
   }
 });
 
-function setupFilters() {
+function setupFilters(map) {
   const filterContainer = document.querySelector("#map-filters");
   if (!filterContainer) return;
+
+  // Prevent map from stealing touch/pointer events while interacting with the filters
+  const startInteraction = (e) => {
+    // stop propagation so Mapbox won't pan while user drags filters
+    e.stopPropagation();
+    try {
+      // temporarily disable map drag handlers while interacting with the filter strip
+      map?.dragPan?.disable?.();
+      map?.doubleClickZoom?.disable?.();
+    } catch (err) {}
+    filterContainer.classList.add("dragging");
+  };
+  const moveInteraction = (e) => {
+    e.stopPropagation();
+  };
+  const endInteraction = (e) => {
+    e.stopPropagation();
+    try {
+      map?.dragPan?.enable?.();
+      map?.doubleClickZoom?.enable?.();
+    } catch (err) {}
+    filterContainer.classList.remove("dragging");
+  };
+
+  // touch + pointer + mouse events
+  filterContainer.addEventListener("touchstart", startInteraction, {
+    passive: true,
+  });
+  filterContainer.addEventListener("touchmove", moveInteraction, {
+    passive: true,
+  });
+  filterContainer.addEventListener("touchend", endInteraction);
+  filterContainer.addEventListener("pointerdown", startInteraction);
+  filterContainer.addEventListener("pointermove", moveInteraction);
+  filterContainer.addEventListener("pointerup", endInteraction);
+  filterContainer.addEventListener("mousedown", startInteraction);
+  filterContainer.addEventListener("mousemove", moveInteraction);
+  filterContainer.addEventListener("mouseup", endInteraction);
 
   const buttons = filterContainer.querySelectorAll("button");
 

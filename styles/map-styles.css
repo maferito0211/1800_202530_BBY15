@@ -119,6 +119,16 @@ header h1 {
   /* allow horizontal touch gestures; prefer touch-action for cross-browser control */
   touch-action: pan-x;
 
+  /* enable native momentum on iOS */
+  -webkit-overflow-scrolling: touch;
+
+  /* prevent page/map from intercepting the horizontal swipe */
+  overscroll-behavior-x: contain;
+
+  /* ensure the element can receive pointer events */
+  pointer-events: auto;
+
+  /* nicer touch-drag behaviour */
   cursor: grab;
 }
 
