@@ -20,11 +20,12 @@ document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
 //Checks if the user is already logged in, if so redirects to the profile page
 // firebase auth state listener
-
 const auth = getAuth();
+// guard to prevent onAuthStateChanged from redirecting while we are handling signup/login
+let suppressAuthRedirect = false;
 
-document.onLoad = onAuthStateChanged(auth, (user) => {
-  if (user) {
+onAuthStateChanged(auth, (user) => {
+  if (user && !suppressAuthRedirect) {
     // User is signed in, redirect to profile page
     window.location.href = "profilePage.html";
   }
@@ -101,6 +102,7 @@ function initAuthUI() {
       return;
     }
     setSubmitDisabled(loginForm, true);
+    suppressAuthRedirect = true;
     try {
       const userCredential = await loginUser(email, password);
       // cache name for instant UI on other pages
@@ -120,6 +122,7 @@ function initAuthUI() {
       showError(authErrorMessage(err));
       console.error(err);
     } finally {
+      suppressAuthRedirect = false;
       setSubmitDisabled(loginForm, false);
     }
   });
@@ -143,6 +146,7 @@ function initAuthUI() {
     }
 
     setSubmitDisabled(signupForm, true);
+    suppressAuthRedirect = true;
 
     try {
       const user = await signupUser(
@@ -152,6 +156,7 @@ function initAuthUI() {
         email,
         password
       );
+
       localStorage.setItem("fullName", `${firstName} ${lastName}`);
       localStorage.setItem("displayName", username);
       location.href = redirectUrl;
@@ -159,6 +164,7 @@ function initAuthUI() {
       showError(authErrorMessage(err));
       console.error(err);
     } finally {
+      suppressAuthRedirect = false;
       setSubmitDisabled(signupForm, false);
     }
   });

@@ -74,9 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
       user.displayName ||
       "Anonymous User";
 
-    usernameEl.textContent = data.username
-      ? `@${data.username}`
-      : `@${user.email.split("@")[0]}`;
+    usernameEl.textContent =
+      "@" + localStorage.getItem("displayName") || user.email.split("@")[0];
 
     bioEl.textContent = data.bio || "No bio yet.";
     profileImg.src =
