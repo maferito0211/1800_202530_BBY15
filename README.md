@@ -1,60 +1,59 @@
-# BBY15 Team Project
+# Together — BBY15 (BCIT Student Map & Forum)
 
-## Overview
+Live: https://bby15-comp1800.web.app
 
-This web app (name-in-progress) is a coordination and communication app that helps connect new or experienced students at BCIT in order to help the newcomers adjust to their new environment. This app help helps students with forums, where you can get ask and get answers from people directly.
-
----
-
-## Features
-
-- Browse a map featuring significant locations and location forums to assist newcomers to BC.
-- A seperate forum page to ask more detailed / specific information
-- A profile page to customize your profile picture and settings
+A lightweight web app to help BCIT students discover useful campus locations, discuss them in location-specific forums, and connect via a general forum and profiles.
 
 ---
 
-## Technologies Used
+## Key features
 
-Example:
+- Interactive Map with location markers and per-location forum threads
+<p align="center" width="100%">
+  <img src="images/map-preview.jpg" alt="Map Preview Image" text-align="center" width="50%"/>
+</p>
 
-- **Frontend**: HTML, CSS, JavaScript
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Backend**: Firebase for hosting
-- **Database**: Firestore
+- Global forum with threads, comments, likes/dislikes
+<p align="center" width="100%">
+  <img src="images/how-step-3.png" alt="Forum Preview Image" width="50%"/>
+</p>
+
+- User profiles with avatar upload (client-side compressed)
+<p align="center" width="100%">
+  <img src="images/profile-preview.png" alt="Profile Preview" width="50%"/>
+</p>
 
 ---
 
-## Usage
+## Tech stack
 
-1. Open your browser and visit `http://localhost:3000`.
-2. Browse the list of hiking trails displayed on the main page.
-3. Click the heart icon (or similar) to mark a trail as a favorite.
-4. View your favorite hikes in the favorites section.
+- Frontend: HTML, CSS, JavaScript
+- Map: Mapbox GL JS
+- Backend / Auth / DB: Firebase (Firestore, Auth)
+- Vite: Local hosting during development
 
 ---
 
-## Project Structure
+## Project structure
 
 ```
 1800_202530_BBY15/
-├── src/
-│   ├── main.js
-├── styles/
-│   └── style.css
-├── public/
-├── images/
-├── index.html
-├── package.json
-├── README.md
-
+├─ src/                   # application JS
+│  ├─ map.js
+│  ├─ forumpost.js
+│  ├─ forumnew.js
+│  └─ ...
+├─ styles/                # CSS
+├─ images/
+├─ map.html, index.html
+└─ README.md
 ```
 
 ---
 
 ## Contributors
 
-- **Tyson** - BCIT CST Student, very cool and can solve a rubix cube in around 1 minute.
+- **Tyson** - BCIT CST Student, wants to pursue AI engineering and game development. Loves eating food and exploring otaku culture.
 
 - **Maria** - BCIT CST Student. BCIT CST Student with a passion for animals and code. Fun fact: Loves sleeping 8 hours.
 
@@ -66,23 +65,7 @@ Example:
 
 ## Acknowledgments
 
-- Trail data and images are for demonstration purposes only.
 - Code snippets were adapted from resources such as [BCIT COMP1800 Course (https://www.bcit.ca/outlines/comp1800/)]
-
----
-
-## Limitations and Future Work
-
-### Limitations
-
-- Limited post feature
-- Limited profile details
-
-### Future Work
-
-- Implement map view
-- Implement profile settings
-- Implement forum page
 
 ---
 
