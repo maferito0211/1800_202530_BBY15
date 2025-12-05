@@ -11,15 +11,21 @@ import {
   getCountFromServer,
 } from "firebase/firestore";
 
-//Used to grab the user's id for the profile picture, Thor you can probably use this for
-// you way to check if user is signed in to post comments! - Tens (tyson)
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
+//Display the header
+const pageTitle = "💬FORUMS";
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
+
+// Clear any previously stored image
 localStorage.removeItem("forumImage");
 
+// Ensure auth is ready
+await onAuthReady();
 const auth = getAuth();
 let currentUid = null;
 
+// Track current user's UID
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUid = user.uid; // <- current user's id
@@ -31,14 +37,12 @@ onAuthStateChanged(auth, async (user) => {
 // wait for initial auth state so currentUser is available before interacting
 await new Promise((resolve) => onAuthStateChanged(auth, resolve));
 
-//Display the header
-const pageTitle = "💬FORUMS";
-
+// Get locationId from URL if present
 const urlParams = new URLSearchParams(window.location.search);
 const locationIdFromUrl = urlParams.get("locationId");
 
+// Diplay return button
 const headerLeftSection = document.getElementById("header-left-section");
-
 headerLeftSection.innerHTML = `
             <div>
               <button id="return-button">←</button>
@@ -49,19 +53,17 @@ headerLeftSection.innerHTML = `
           </div>
 `;
 
+// Return button event listener, brings user back to forum main page
 document.getElementById("return-button").addEventListener("click", function () {
   window.location.href = "./forumMain.html";
 });
 
-document.getElementById("pageTitleSection").innerHTML = pageTitle;
-//Display header end
-
-const querySnapshot = await getDocs(collection(db, "threads"));
+// Firestore references
 const coll = collection(db, "threads");
-const getCount = await getCountFromServer(coll);
 const counterRef = await doc(db, "idCounter", "IdCounterDoc");
 const getCountForID = await getDoc(doc(db, "idCounter", "IdCounterDoc"));
 
+// Image upload and compression logic
 function uploadImage() {
   const input = document.getElementById("forumImageInput");
   if (!input) {
@@ -172,7 +174,7 @@ function uploadImage() {
   }
 }
 
-//TLDR: This was vibe coded, and IDK what it does fully, but hopefully it downsizes images - Tens
+// Initialize image upload handling
 uploadImage();
 
 //You know what they say: all posters post posts

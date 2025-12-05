@@ -1,11 +1,3 @@
-// -------------------------------------------------------------
-// src/loginSignup.js
-// -------------------------------------------------------------
-// Part of the COMP1800 Projects 1 Course (BCIT).
-// Starter code provided for students to use and adapt.
-// Manages the login/signup form behaviour and redirects.
-// -------------------------------------------------------------
-
 import "../styles/loginPage.css";
 import { loginUser, signupUser, authErrorMessage } from "./authentication.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -19,11 +11,13 @@ const pageTitle = "👤PROFILE";
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
 //Checks if the user is already logged in, if so redirects to the profile page
+
 // firebase auth state listener
 const auth = getAuth();
 // guard to prevent onAuthStateChanged from redirecting while we are handling signup/login
 let suppressAuthRedirect = false;
 
+// Redirect to profile page if already logged in (Just in case the navbar fails to do so)
 onAuthStateChanged(auth, (user) => {
   if (user && !suppressAuthRedirect) {
     // User is signed in, redirect to profile page
@@ -46,7 +40,6 @@ function initAuthUI() {
   const redirectUrl = "index.html";
 
   // --- Helper Functions ---
-  // Toggle element visibility
   function setVisible(el, visible) {
     el.classList.toggle("d-none", !visible);
   }
@@ -74,7 +67,6 @@ function initAuthUI() {
   }
 
   // --- Event Listeners ---
-  // Toggle buttons
   toSignupBtn?.addEventListener("click", (e) => {
     e.preventDefault();
     hideError();

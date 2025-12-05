@@ -12,12 +12,13 @@ import {
   arrayUnion,
   arrayRemove,
   increment,
-  deleteDoc, // <-- added
+  deleteDoc,
 } from "firebase/firestore";
-
-//Used to grab the user's id for the profile picture, Thor you can probably use this for
-// you way to check if user is signed in to post comments! - Tens (tyson)
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+//Display the header
+const pageTitle = "💬FORUMS";
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
 const auth = getAuth();
 let currentUid = null;
@@ -26,7 +27,7 @@ let currentUserPhotoURL = null;
 const user =
   auth.currentUser || (await new Promise((r) => onAuthStateChanged(auth, r)));
 
-// --- disable "New Comment" when not signed in, and grey out button --------------------
+// --- disable "New Comment" when not signed in, and grey out button ---
 const newCommentBtn = document.getElementById("postCommentButton");
 
 if (!user) {
@@ -34,7 +35,7 @@ if (!user) {
   newCommentBtn.setAttribute("aria-disabled", "true");
 }
 
-// ------------------------------------------------------------------
+// --- disable "New Comment" when not signed in, and grey out button ---
 
 let author = "Anonymous";
 if (user) {
@@ -51,10 +52,10 @@ if (user) {
   author = localStorage.getItem("displayName") || "Anonymous";
 }
 
+// Track current user's UID and photoURL
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    currentUid = user.uid; // <- current user's id
-    // read user document
+    currentUid = user.uid;
     const userDoc = await getDoc(doc(db, "users", currentUid));
     currentUserPhotoURL = userDoc.exists() ? userDoc.data().photoURL : null;
   } else {
@@ -63,12 +64,8 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-//End of grabbing user's data
-
-//Replacing The header's hamburger button with a back button
-
+// Replace header with return button and logo
 const headerLeftSection = document.getElementById("header-left-section");
-
 headerLeftSection.innerHTML = `
             <div>
               <button id="return-button">←</button>
@@ -79,21 +76,13 @@ headerLeftSection.innerHTML = `
           </div>
 `;
 
+// Return button event listener, brings user back to forum main page
 document.getElementById("return-button").addEventListener("click", function () {
   window.location.href = "./forumMain.html";
 });
 
-//End of replacing header
-
-const pageTitle = "💬FORUMS";
-
-document.getElementById("pageTitleSection").innerHTML = pageTitle;
-
-// simple increment (recommended for concurrent writers)
-
+//Gets the current thread by ID from URL
 var id = window.location.search.slice(4);
-
-//Gets the current read by ID from URL
 const currentThread = query(
   collection(db, "threads"),
   where("id", "==", Number(id))
@@ -120,7 +109,7 @@ for (const threadDoc of threadSnap.docs) {
   const opProfilePictureURL =
     userSnapshot && userSnapshot.exists() ? userSnapshot.data().photoURL : null;
 
-  // 🔥 intentamos leer locationId del thread
+  // Load location data if applicable
   let locationHtml = "";
   const locationId = threadDoc.data().locationId;
 
@@ -204,7 +193,7 @@ for (const threadDoc of threadSnap.docs) {
   header.insertAdjacentHTML("beforeend", headerHtml);
 }
 
-// después del bucle, añadimos listeners al botón "View on Map"
+// View location button event listeners
 document.querySelectorAll(".view-location-button").forEach((btn) => {
   btn.addEventListener("click", () => {
     const locId = btn.dataset.locationId;
@@ -215,6 +204,7 @@ document.querySelectorAll(".view-location-button").forEach((btn) => {
 // Adds username to likes array and updates the html to reflect
 document.getElementById("likes").addEventListener("click", likebtn);
 
+// Likes button logic
 async function likebtn() {
   if (author === "Anonymous" || author === "anonymous") {
     alert("Please sign in before liking!");
@@ -250,6 +240,7 @@ async function likebtn() {
   }
 }
 
+// Recreates the like button with updated count and style
 function giveBackLikeBtn(likeCount, classSelector, likeType, increased) {
   const existing = document.getElementById(likeType);
   if (existing) existing.remove();
@@ -282,6 +273,7 @@ function giveBackLikeBtn(likeCount, classSelector, likeType, increased) {
 // Adds username to likes array and updates the html to reflect
 document.getElementById("dislikes").addEventListener("click", dislikebtn);
 
+// Dislikes button logic
 async function dislikebtn() {
   if (author === "Anonymous" || author === "anonymous") {
     alert("Please sign in before liking!");
@@ -317,7 +309,8 @@ async function dislikebtn() {
   }
 }
 
-// --- nesting depth helpers -----------------------------------------
+// --- Comments Section Logic ---
+
 const MAX_REPLY_DEPTH = 9;
 /** depth = 1 for top-level comments (threads/.../comments/X)
  *  depth increases by 1 for each '/replies/' segment in the doc path
@@ -327,7 +320,6 @@ function computeDepth(docPath = "") {
   const matches = docPath.match(/\/replies(\/|$)/g);
   return (matches ? matches.length : 0) + 1;
 }
-// ------------------------------------------------------------------
 
 // Display comments on page load
 const commentDocRef = await getDocs(
@@ -337,7 +329,7 @@ const commentDocRef = await getDocs(
 //For each loop through all comments in the collection
 for (const docSnap of commentDocRef.docs) {
   const data = docSnap.data();
-  const depth = computeDepth(docSnap.ref.path); // top-level => 1
+  const depth = computeDepth(docSnap.ref.path);
   const html = renderCommentHTML(
     {
       author: data.user,
@@ -363,11 +355,11 @@ for (const docSnap of commentDocRef.docs) {
     : null;
   const replyContainer = commentEl && commentEl.querySelector(".reply");
 
-  // NOTE: call loadReplies with the full document path (docSnap.ref.path)
+  //call loadReplies with the full document path (docSnap.ref.path)
   if (replyContainer) await loadReplies(id, docSnap.ref.path, replyContainer);
 }
 
-// --- Dynamic vertical spine height ---------------------------------
+// --- Dynamic vertical spine height ---
 function updateSpine(container) {
   if (!container) return;
   // direct child comments only
@@ -392,10 +384,10 @@ function updateSpine(container) {
   container.style.setProperty("--spine-height", `${heightPx + 20}px`);
 }
 
+// update all spines in the document or within a given scope
 function updateAllSpines(scope = document) {
   scope.querySelectorAll(".reply").forEach(updateSpine);
 }
-// ------------------------------------------------------------------
 
 // post button logic — detect visible selection (.comment-content) but use parent .comment for ids
 document
@@ -425,7 +417,6 @@ document
       }
     } else {
       console.log("Empty comment/reply");
-      //TO-DO: Make an popup alert appear here.
     }
   });
 
@@ -457,12 +448,13 @@ async function postComment() {
         "http://localhost:5173/images/defaultProfilePicture.png";
     }
 
+    // add comment document to Firestore
     await setDoc(
       doc(db, "threads", id.toString(), "comments", newID.toString()),
       {
         id: newID,
         user: author,
-        userID: uid || null, // <-- store author UID
+        userID: uid || null,
         photoURL: currentUserPhotoURL,
         date: Date.now(),
         content: content.value,
@@ -471,6 +463,7 @@ async function postComment() {
       }
     );
 
+    // create comment object for rendering
     var comment = {
       content: txt.value,
       date: Date.now(),
@@ -530,7 +523,7 @@ function renderCommentHTML(
   authorProfilePictureURL,
   docPath,
   authorUserId,
-  depth /* new param, integer */
+  depth
 ) {
   const d = Number(depth || computeDepth(docPath));
   const noReplyClass = d >= MAX_REPLY_DEPTH ? " no-reply" : "";
@@ -604,6 +597,7 @@ function addCommLikeEventListeners() {
 }
 addCommLikeEventListeners();
 
+// Comment like button logic
 async function commLikebtn(i) {
   if (author === "Anonymous" || author === "anonymous") {
     alert("Please sign in before liking!");
@@ -660,6 +654,7 @@ async function commLikebtn(i) {
   }
 }
 
+// Comment dislike button logic
 async function commDislikebtn(i) {
   if (author === "Anonymous" || author === "anonymous") {
     alert("Please sign in before liking!");
@@ -825,6 +820,7 @@ async function postReply(selectedComment) {
     author = localStorage.getItem("displayName") || "Anonymous";
   }
 
+  // determine parent document path from selected comment
   const parentDocPath = (function () {
     if (!selectedComment) return null;
     let path = selectedComment.getAttribute("data-doc-path");
@@ -856,9 +852,8 @@ async function postReply(selectedComment) {
       }
     }
 
-    // build collection path segments and reserve a numeric id for the reply
-    const parentSegments = parentDocPath.split("/"); // e.g. ["threads","1","comments","5"]
-    const repliesColl = collection(db, ...parentSegments, "replies");
+    // parse parent document path into segments for doc()
+    const parentSegments = parentDocPath.split("/");
 
     // get a numeric id (keeps numbering consistent with comments)
     await updateDoc(doc(db, "idCounter", "CommentCounter"), {
@@ -872,8 +867,8 @@ async function postReply(selectedComment) {
     await setDoc(replyDocRef, {
       id: newID,
       author,
-      userID: uid || null, // <-- store author UID for replies
-      photoURL, // <-- use freshly-resolved photoURL
+      userID: uid || null,
+      photoURL,
       content,
       date: Date.now(),
       likes: [],
@@ -917,13 +912,13 @@ function addReply(reply, selectedComment, replyId, docPath, depth) {
     replyId || "",
     reply.photoURL || "./images/icons/defaultProfilePicture.png",
     docPath || "",
-    reply.userID || "", // <-- include user id on render
+    reply.userID || "",
     depth || computeDepth(docPath)
   );
   const target = selectedComment && selectedComment.querySelector(".reply");
   if (target) {
     target.insertAdjacentHTML("beforeend", replyHtml);
-    updateSpine(target); // adjust height after adding a reply
+    updateSpine(target);
   }
   updateAllSpines();
   addCommLikeEventListeners();
@@ -975,7 +970,6 @@ document.addEventListener("click", async (ev) => {
         content.parentNode.classList.add("glow");
         document.querySelector(".header")?.classList.remove("glow");
       }
-      // remove menu
       menu.remove();
     });
     menu.appendChild(replyItem);
@@ -1065,6 +1059,7 @@ document.addEventListener("click", async (ev) => {
     return wrap;
   }
 
+  // main function to show the onboard overlay
   function showOnboard() {
     if (localStorage.getItem(STORAGE_KEY) === "1") return; // user opted out
 

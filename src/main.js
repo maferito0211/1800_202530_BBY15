@@ -1,6 +1,3 @@
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import 'bootstrap';
-
 function sayHello() {}
 // document.addEventListener('DOMContentLoaded', sayHello);
 
@@ -12,6 +9,6 @@ function disappear() {
   window.location.href = "map.html";
 }
 
+// display page title
 const pageTitle = "MAIN PAGE";
-
 document.getElementById("pageTitleSection").innerHTML = pageTitle;

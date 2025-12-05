@@ -5,9 +5,11 @@ import { auth, db } from "./firebaseConfig.js";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
+// Display page title
 const pageTitle = "👤PROFILE";
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
+// Load and display user profile info
 document.addEventListener("DOMContentLoaded", () => {
   const fullNameEl = document.getElementById("fullName");
   const usernameEl = document.getElementById("username");
@@ -25,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const docRef = doc(db, "users", user.uid);
     let snap = await getDoc(docRef);
 
-    // 🔥 If user doc does NOT exist yet, create it now
+    //If user doc does NOT exist yet, create it now
     if (!snap.exists()) {
       // Try to get full name from localStorage or Firebase Auth
       const fullNameFromLocal =
@@ -52,10 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try {
         await setDoc(docRef, defaultProfile);
-        console.log("✅ User document auto-created from profile.js");
+        console.log("User document auto-created from profile.js");
         snap = await getDoc(docRef); // reload with fresh data
       } catch (err) {
-        console.error("❌ Failed to create user document from profile:", err);
+        console.error("Failed to create user document from profile:", err);
       }
     }
 
@@ -82,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
       data.photoURL || user.photoURL || "./images/defaultProfilePicture.png";
   });
 
-  // 🔓 Logout functionality (igual que antes)
+  // Logout functionality
   logoutBtn.addEventListener("click", async () => {
     try {
       await signOut(auth);

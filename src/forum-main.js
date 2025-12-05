@@ -15,8 +15,11 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
+// --- Updates the current page title ---
 const pageTitle = "💬FORUMS";
+document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
+// --- show location context if locationId is in URL ---
 const urlParams = new URLSearchParams(window.location.search);
 const locationIdFilter = urlParams.get("locationId");
 
@@ -37,9 +40,7 @@ if (locationIdFilter && locationContextDiv) {
   }
 }
 
-document.getElementById("pageTitleSection").innerHTML = pageTitle;
-
-// --- NEW: disable "New Post" when not signed in --------------------
+// --- disable "New Post" when not signed in ---
 const newPostBtn = document.getElementById("newpost");
 
 if (newPostBtn) {
@@ -72,17 +73,8 @@ if (newPostBtn) {
     });
   });
 }
-
-const querySnapshot = await getDocs(collection(db, "threads"));
-const getCount = await getCountFromServer(collection(db, "threads"));
-
+// --- Load and display threads ---
 var container = document.querySelector("ul");
-const threadID = getCount.data().count;
-
-const currentThread = query(
-  collection(db, "threads"),
-  where("id", "==", threadID)
-);
 
 // Get all threads ordered newest (highest id) first, luckily there is a method for it ╰(*°▽°*)╯
 var threadsSnap = await getDocs(
@@ -91,6 +83,7 @@ var threadsSnap = await getDocs(
 
 addThreads(threadsSnap);
 
+// Function to add threads to the container
 function addThreads(snapshot) {
   const urlParams = new URLSearchParams(window.location.search);
   const locationIdFilter = urlParams.get("locationId");
@@ -197,8 +190,10 @@ document
     });
   });
 
+// Radio button filter logic
 var radValue;
 
+// Function to filter results based on selected radio button
 function filterResultsWithRadioButtons() {
   var ele = document.getElementsByName("filters");
   radValue = undefined; // reset
@@ -217,6 +212,7 @@ function filterResultsWithRadioButtons() {
   }
 }
 
+// Function to filter threads from database based on radio button value
 async function filterThreads() {
   container.innerHTML = "";
   const filteredSnap = await getDocs(
@@ -229,16 +225,9 @@ async function filterThreads() {
   addThreads(filteredSnap);
 }
 
-//       [
-//         document.getElementById("banking").checked.toLocaleString(),
-//         document.getElementById("government").checked.toLocaleString(),
-//         document.getElementById("medical").checked.toLocaleString(),
-//         document.getElementById("restaurants").checked.toLocaleString(),
-//         document.getElementById("shopping").checked.toLocaleString(),
-//         document.getElementById("transit").checked.toLocaleString(),
-//       ]
+// ------------------------- Options Menu -----------------------------
 
-// delegated click handler for options menu (capture phase so it can intercept before li click)
+// Event delegation for options buttons
 container.addEventListener(
   "click",
   async (ev) => {
@@ -321,6 +310,7 @@ container.addEventListener(
 
 // ------------------------- Filter Button -----------------------------
 
+// Toggle filter container visibility
 document.getElementById("filterToggle").addEventListener("click", () => {
   const filterContainer = document.getElementById("filter-container");
   const toggleBtn = document.getElementById("filterToggle");
@@ -333,6 +323,7 @@ document.getElementById("filterToggle").addEventListener("click", () => {
   }
 });
 
+// Radio buttons, filter results when changed
 Array.from(
   document.getElementById("filter-container").getElementsByTagName("input")
 ).forEach((input) => {
@@ -349,4 +340,3 @@ document.getElementById("filterButtonClear").addEventListener("click", () => {
   });
   filterResultsWithRadioButtons();
 });
-// ------------------------- End Filter Button -------------------------

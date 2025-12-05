@@ -4,13 +4,14 @@ import { collection, getDocs } from "firebase/firestore";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
+// Display the header
 const pageTitle = "🗺️MAP";
-
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
 
 //global variable for user location
 let userPosition = null;
 
+//--- LOAD LOCATIONS FROM FIRESTORE ---
 async function loadLocations(map) {
   const querySnapshot = await getDocs(collection(db, "locations"));
   querySnapshot.forEach((docSnap) => {
@@ -18,7 +19,7 @@ async function loadLocations(map) {
     const { name, lat, lng, category } = data;
     const locationId = docSnap.id; // Firestore doc ID
 
-    // ------------------ MARKER HTML ELEMENT ------------------
+    // --- MARKER HTML ELEMENT ---
     const el = document.createElement("div");
     el.className = "custom-marker";
 
@@ -43,7 +44,7 @@ async function loadLocations(map) {
     el.style.backgroundSize = "cover";
     el.style.cursor = "pointer";
 
-    // ------------------ DISTANCE CALCULATION ------------------
+    // --- DISTANCE CALCULATION ---
     let distanceText = "";
 
     if (userPosition) {
@@ -63,7 +64,7 @@ async function loadLocations(map) {
       distanceText = "Distance unavailable";
     }
 
-    // ---------------- POPUP HTML (Distance + Forums Link) ----------------
+    // --- POPUP HTML (Distance + Forums Link) ---
     const popupHTML = `
       <h5>${name}</h5>
       <p>${category}</p>
@@ -77,7 +78,7 @@ async function loadLocations(map) {
       </a>
     `;
 
-    // ------------------ CREATE MARKER ------------------
+    // --- CREATE MARKER ---
     const marker = new mapboxgl.Marker(el)
       .setLngLat([lng, lat])
       .setPopup(new mapboxgl.Popup().setHTML(popupHTML))
@@ -98,7 +99,6 @@ async function loadLocations(map) {
 }
 
 //Convert getCurrentPosition into a Promise so we can AWAIT it
-//crea una función wrapper
 function getUserLocation() {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(
@@ -175,6 +175,7 @@ function showMap() {
       });
     }
 
+    // Zoom to nearest matching location based on search query
     function zoomToNearestMatch(query, map) {
       // Get only markers that match the search text
       const matched = markers.filter(({ name, category }) => {
@@ -340,7 +341,7 @@ function addUserPin(map) {
   });
 }
 
-//----------------------- FILTERS SETUP -----------------------
+//--- FILTERS SETUP ---
 
 document.getElementById("filterToggle").addEventListener("click", () => {
   const filterContainer = document.getElementById("map-filters");
@@ -398,7 +399,7 @@ function setupFilters(map) {
 
   const buttons = filterContainer.querySelectorAll("button");
 
-  // 🔥 Set "All" as active on first load
+  //Set "All" as active on first load
   const allBtn = filterContainer.querySelector('button[data-category="All"]');
   if (allBtn) allBtn.classList.add("active");
 
