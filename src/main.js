@@ -12,3 +12,5 @@ function disappear() {
 // display page title
 const pageTitle = "MAIN PAGE";
 document.getElementById("pageTitleSection").innerHTML = pageTitle;
+
+//comments random
