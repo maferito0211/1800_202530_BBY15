@@ -52,7 +52,7 @@ async function loadLocations(map) {
         userPosition[1], // user lat
         userPosition[0], // user lng
         lat,
-        lng
+        lng,
       );
 
       if (km < 1) {
@@ -108,7 +108,7 @@ function getUserLocation() {
       (err) => {
         reject(err);
       },
-      { enableHighAccuracy: true, timeout: 7000 }
+      { enableHighAccuracy: true, timeout: 7000 },
     );
   });
 }
@@ -145,7 +145,7 @@ function showMap() {
     }
 
     // SEARCH FILTER — live filtering by name or category
-    // 🔍 Filter markers + zoom to nearest on Enter
+    //  Filter markers + zoom to nearest on Enter
     function setupSearch(map) {
       const searchBox = document.getElementById("searchBox");
       if (!searchBox) return;
@@ -218,7 +218,7 @@ function showMap() {
           userPosition[1], // user lat
           userPosition[0], // user lng
           lat,
-          lng
+          lng,
         );
 
         if (d < minDistance) {
